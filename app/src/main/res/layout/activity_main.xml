@@ -43,13 +43,35 @@
         android:padding="14dp"
         android:inputType="phone"
         android:textSize="30sp"
-        android:textColor="@color/neon"
-        android:shadowColor="@color/neon"
+        android:textColor="?attr/cNeon"
+        android:shadowColor="?attr/cNeon"
         android:shadowRadius="14"
         android:shadowDx="0"
         android:shadowDy="0"
         android:gravity="center"
         android:hint="•••" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:scrollbars="none">
+        <LinearLayout
+            android:id="@+id/favRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/suggestRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -100,9 +122,9 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_action"
             android:stateListAnimator="@animator/press"
-            android:textColor="@color/neon"
+            android:textColor="?attr/cNeon"
             android:textSize="22sp"
-            android:shadowColor="@color/neon"
+            android:shadowColor="?attr/cNeon"
             android:shadowRadius="10"
             android:shadowDx="0"
             android:shadowDy="0"

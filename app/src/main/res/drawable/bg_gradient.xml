@@ -9,15 +9,14 @@
                 android:angle="135" />
         </shape>
     </item>
-    <!-- Halo cyan diffus en haut de l'écran -->
     <item android:bottom="400dp">
         <shape>
             <gradient
                 android:type="radial"
                 android:gradientRadius="420dp"
                 android:centerX="0.5" android:centerY="0"
-                android:startColor="#2600E5FF"
-                android:endColor="#0000E5FF" />
+                android:startColor="?attr/cHalo"
+                android:endColor="#00000000" />
         </shape>
     </item>
 </layer-list>

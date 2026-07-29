@@ -18,6 +18,51 @@
             android:textSize="18sp"
             android:paddingBottom="12dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/btnBlockedLog" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1.4"
+                android:text="@string/blocked_log_btn" />
+            <Button android:id="@+id/btnExport" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/export" />
+            <Button android:id="@+id/btnImport" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/import_btn" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/theme_label" android:textColor="@color/text_dim"
+                android:layout_marginEnd="12dp" />
+            <View android:id="@+id/themeCyan" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_cyan" />
+            <View android:id="@+id/themeViolet" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_violet" />
+            <View android:id="@+id/themeGreen" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_green" />
+            <View android:id="@+id/themeOrange" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_orange" />
+        </LinearLayout>
+
+        <Switch android:id="@+id/swSilent"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/silent_mode" />
+
         <Switch android:id="@+id/swHidden"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:padding="8dp" android:text="@string/block_hidden" />
@@ -48,7 +93,7 @@
         <TextView
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="20dp" android:textStyle="bold"
-            android:textColor="@color/neon" android:text="@string/predefined_lists" />
+            android:textColor="?attr/cNeon" android:text="@string/predefined_lists" />
 
         <LinearLayout
             android:id="@+id/listsContainer"
@@ -62,7 +107,7 @@
         <TextView
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="20dp" android:textStyle="bold"
-            android:textColor="@color/neon" android:text="@string/blocked_numbers" />
+            android:textColor="?attr/cNeon" android:text="@string/blocked_numbers" />
 
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -83,12 +128,12 @@
         <ListView android:id="@+id/listNumbers"
             android:layout_width="match_parent" android:layout_height="180dp"
             android:background="@drawable/panel_round" android:layout_marginTop="6dp"
-            android:divider="@color/neon_dim" android:dividerHeight="0.5dp" />
+            android:divider="?attr/cNeonDim" android:dividerHeight="0.5dp" />
 
         <TextView
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="20dp" android:textStyle="bold"
-            android:textColor="@color/neon" android:text="@string/blocked_prefixes" />
+            android:textColor="?attr/cNeon" android:text="@string/blocked_prefixes" />
 
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -109,6 +154,6 @@
         <ListView android:id="@+id/listPrefixes"
             android:layout_width="match_parent" android:layout_height="180dp"
             android:background="@drawable/panel_round" android:layout_marginTop="6dp"
-            android:divider="@color/neon_dim" android:dividerHeight="0.5dp" />
+            android:divider="?attr/cNeonDim" android:dividerHeight="0.5dp" />
     </LinearLayout>
 </ScrollView>

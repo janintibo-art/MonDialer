@@ -40,6 +40,7 @@
         <activity android:name=".FiltersActivity" android:exported="false" />
         <activity android:name=".ContactsActivity" android:exported="false" />
         <activity android:name=".CallLogActivity" android:exported="false" />
+        <activity android:name=".BlockedLogActivity" android:exported="false" />
 
         <activity
             android:name=".InCallActivity"

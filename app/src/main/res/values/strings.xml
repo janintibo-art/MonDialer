@@ -35,4 +35,24 @@
     <string name="perm_needed">Autorisation requise pour afficher ces données</string>
     <string name="block_international">Bloquer les appels internationaux (hors France)</string>
     <string name="predefined_lists">LISTES PRÉDÉFINIES — activez celles que vous voulez</string>
+    <string name="speaker">🔊 HP</string>
+    <string name="mute">🎙 MUET</string>
+    <string name="keypad">⌨ CLAVIER</string>
+    <string name="silent_mode">Mode discret : couper la sonnerie au lieu de rejeter</string>
+    <string name="blocked_log_btn">APPELS BLOQUÉS</string>
+    <string name="blocked_log_title">APPELS BLOQUÉS</string>
+    <string name="no_blocked_calls">Aucun appel bloqué pour l\'instant</string>
+    <string name="clear_log_confirm">Vider le journal des appels bloqués ?</string>
+    <string name="export">EXPORT</string>
+    <string name="import_btn">IMPORT</string>
+    <string name="export_ok">Règles exportées dans Téléchargements (mondialer-regles.json)</string>
+    <string name="export_fail">Échec de l\'export</string>
+    <string name="import_ok">Règles importées</string>
+    <string name="import_fail">Fichier invalide</string>
+    <string name="theme_label">Thème :</string>
+    <string name="action_dial_pad">Mettre au clavier</string>
+    <string name="action_block_number">Bloquer %s</string>
+    <string name="action_block_prefix">Bloquer le préfixe %s…</string>
+    <string name="number_blocked">Numéro bloqué</string>
+    <string name="prefix_blocked">Préfixe bloqué</string>
 </resources>

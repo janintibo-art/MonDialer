@@ -1,46 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        style="@style/NeonTitle"
-        android:id="@+id/txtNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="34sp" />
-
-    <TextView
-        android:id="@+id/txtState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/text_dim"
-        android:textSize="18sp"
-        android:letterSpacing="0.2" />
-
-    <Button
-        android:id="@+id/btnAnswer"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="56dp"
-        android:background="@drawable/btn_call"
-        android:stateListAnimator="@animator/press"
-        android:textColor="@color/bg_deep"
-        android:textStyle="bold"
-        android:text="@string/answer" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnHangup"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/btn_danger"
-        android:stateListAnimator="@animator/press"
-        android:textColor="@color/text_main"
-        android:textStyle="bold"
-        android:text="@string/hangup" />
-</LinearLayout>
+        <ImageView
+            android:id="@+id/imgPhoto"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/panel_round"
+            android:padding="3dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/text_main"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/NeonTitle"
+            android:id="@+id/txtNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/txtState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/text_dim"
+            android:textSize="18sp"
+            android:letterSpacing="0.2" />
+
+        <!-- Contrôles en communication -->
+        <LinearLayout
+            android:id="@+id/controlsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button android:id="@+id/btnSpeaker" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/speaker" />
+            <Button android:id="@+id/btnMute" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/mute" />
+            <Button android:id="@+id/btnKeypad" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/keypad" />
+        </LinearLayout>
+
+        <!-- Clavier DTMF -->
+        <GridLayout
+            android:id="@+id/dtmfGrid"
+            android:layout_width="240dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="12dp"
+            android:columnCount="3"
+            android:rowCount="4"
+            android:visibility="gone">
+
+            <Button android:id="@+id/dt1" style="@style/DialpadMini" android:text="1" />
+            <Button android:id="@+id/dt2" style="@style/DialpadMini" android:text="2" />
+            <Button android:id="@+id/dt3" style="@style/DialpadMini" android:text="3" />
+            <Button android:id="@+id/dt4" style="@style/DialpadMini" android:text="4" />
+            <Button android:id="@+id/dt5" style="@style/DialpadMini" android:text="5" />
+            <Button android:id="@+id/dt6" style="@style/DialpadMini" android:text="6" />
+            <Button android:id="@+id/dt7" style="@style/DialpadMini" android:text="7" />
+            <Button android:id="@+id/dt8" style="@style/DialpadMini" android:text="8" />
+            <Button android:id="@+id/dt9" style="@style/DialpadMini" android:text="9" />
+            <Button android:id="@+id/dtStar" style="@style/DialpadMini" android:text="*" />
+            <Button android:id="@+id/dt0" style="@style/DialpadMini" android:text="0" />
+            <Button android:id="@+id/dtHash" style="@style/DialpadMini" android:text="#" />
+        </GridLayout>
+
+        <Button
+            android:id="@+id/btnAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/btn_call"
+            android:stateListAnimator="@animator/press"
+            android:textColor="@color/bg_deep"
+            android:textStyle="bold"
+            android:text="@string/answer" />
+
+        <Button
+            android:id="@+id/btnHangup"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_danger"
+            android:stateListAnimator="@animator/press"
+            android:textColor="@color/text_main"
+            android:textStyle="bold"
+            android:text="@string/hangup" />
+    </LinearLayout>
+</ScrollView>

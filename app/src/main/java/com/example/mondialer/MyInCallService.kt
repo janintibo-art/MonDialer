@@ -6,6 +6,20 @@ import android.telecom.InCallService
 
 class MyInCallService : InCallService() {
 
+    companion object {
+        var instance: MyInCallService? = null
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        instance = this
+    }
+
+    override fun onDestroy() {
+        instance = null
+        super.onDestroy()
+    }
+
     override fun onCallAdded(call: Call) {
         OngoingCall.call = call
         val i = Intent(this, InCallActivity::class.java)

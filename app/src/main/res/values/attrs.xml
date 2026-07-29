@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="cNeon" format="color" />
+    <attr name="cNeonDim" format="color" />
+    <attr name="cHalo" format="color" />
+    <attr name="cHaloStrong" format="color" />
+</resources>

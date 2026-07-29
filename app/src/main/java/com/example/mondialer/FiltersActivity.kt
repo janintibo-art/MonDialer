@@ -1,7 +1,10 @@
 package com.example.mondialer
 
 import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Switch
 import android.widget.Toast
+import android.view.View
 
 class FiltersActivity : Activity() {
 
@@ -16,24 +20,53 @@ class FiltersActivity : Activity() {
     private lateinit var prefixesAdapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
-        BlockRulesStore.appCtx = applicationContext
         setContentView(R.layout.activity_filters)
+
+        // Boutons hauts : journal bloqués, export, import
+        findViewById<Button>(R.id.btnBlockedLog).setOnClickListener {
+            startActivity(Intent(this, BlockedLogActivity::class.java))
+        }
+        findViewById<Button>(R.id.btnExport).setOnClickListener { exportRules() }
+        findViewById<Button>(R.id.btnImport).setOnClickListener {
+            val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            i.addCategory(Intent.CATEGORY_OPENABLE)
+            i.type = "*/*"
+            startActivityForResult(i, 40)
+        }
+
+        // Thèmes de couleur
+        val themeMap = mapOf(
+            R.id.themeCyan to "cyan",
+            R.id.themeViolet to "violet",
+            R.id.themeGreen to "green",
+            R.id.themeOrange to "orange"
+        )
+        themeMap.forEach { (id, name) ->
+            findViewById<View>(id).setOnClickListener {
+                BlockRulesStore.theme = name
+                recreate()
+            }
+        }
 
         // Options simples
         val swHidden = findViewById<Switch>(R.id.swHidden)
         val swNeighbors = findViewById<Switch>(R.id.swNeighbors)
         val swInternational = findViewById<Switch>(R.id.swInternational)
+        val swSilent = findViewById<Switch>(R.id.swSilent)
 
         swHidden.isChecked = BlockRulesStore.blockHidden
         swNeighbors.isChecked = BlockRulesStore.blockNeighbors
         swInternational.isChecked = BlockRulesStore.blockInternational
+        swSilent.isChecked = BlockRulesStore.silentMode
 
         swHidden.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockHidden = v }
         swNeighbors.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockNeighbors = v }
         swInternational.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockInternational = v }
+        swSilent.setOnCheckedChangeListener { _, v -> BlockRulesStore.silentMode = v }
 
-        // Listes prédéfinies : un interrupteur par liste, généré dynamiquement
+        // Listes prédéfinies
         val container = findViewById<LinearLayout>(R.id.listsContainer)
         for (list in BlockRulesStore.PREDEFINED_LISTS) {
             val sw = Switch(this)
@@ -95,6 +128,42 @@ class FiltersActivity : Activity() {
                 BlockRulesStore.addPrefix(p)
                 editPre.setText("")
                 refreshPrefixes()
+            }
+        }
+    }
+
+    private fun exportRules() {
+        try {
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, "mondialer-regles.json")
+                put(MediaStore.Downloads.MIME_TYPE, "application/json")
+            }
+            val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            if (uri != null) {
+                contentResolver.openOutputStream(uri)?.use {
+                    it.write(BlockRulesStore.exportJson().toByteArray())
+                }
+                Toast.makeText(this, R.string.export_ok, Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, R.string.export_fail, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 40 && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            try {
+                val json = contentResolver.openInputStream(uri)?.bufferedReader()?.readText() ?: return
+                if (BlockRulesStore.importJson(json)) {
+                    Toast.makeText(this, R.string.import_ok, Toast.LENGTH_SHORT).show()
+                    recreate()
+                } else {
+                    Toast.makeText(this, R.string.import_fail, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, R.string.import_fail, Toast.LENGTH_SHORT).show()
             }
         }
     }

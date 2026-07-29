@@ -14,16 +14,13 @@ import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 
-/**
- * Contacts du téléphone : lecture directe du carnet d'adresses système,
- * donc toujours synchronisé avec l'application Contacts actuelle (et Google).
- */
 class ContactsActivity : Activity() {
 
     private var all = listOf<Map<String, String>>()
     private lateinit var list: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
@@ -42,11 +39,22 @@ class ContactsActivity : Activity() {
             override fun afterTextChanged(s: Editable?) = filter(s?.toString() ?: "")
         })
 
+        // Appui simple : appeler directement
         list.setOnItemClickListener { _, _, pos, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = list.adapter.getItem(pos) as Map<String, String>
+            setResult(RESULT_OK, Intent()
+                .putExtra("number", item["sub"] ?: "")
+                .putExtra("call", true))
+            finish()
+        }
+        // Appui long : mettre le numéro au clavier sans appeler
+        list.setOnItemLongClickListener { _, _, pos, _ ->
             @Suppress("UNCHECKED_CAST")
             val item = list.adapter.getItem(pos) as Map<String, String>
             setResult(RESULT_OK, Intent().putExtra("number", item["sub"] ?: ""))
             finish()
+            true
         }
     }
 
@@ -56,14 +64,17 @@ class ContactsActivity : Activity() {
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             arrayOf(
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone.STARRED
             ),
             null, null,
+            ContactsContract.CommonDataKinds.Phone.STARRED + " DESC, " +
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " COLLATE NOCASE ASC"
         )?.use { c ->
             while (c.moveToNext()) {
+                val star = if (c.getInt(2) == 1) "★ " else ""
                 out.add(mapOf(
-                    "title" to (c.getString(0) ?: ""),
+                    "title" to star + (c.getString(0) ?: ""),
                     "sub" to (c.getString(1) ?: "")
                 ))
             }

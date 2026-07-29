@@ -2,12 +2,13 @@ package com.example.mondialer
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.json.JSONArray
+import org.json.JSONObject
 
 object BlockRulesStore {
 
     private const val PREFS = "block_rules"
 
-    /** Une liste prédéfinie de préfixes, activable indépendamment. */
     data class PredefList(val id: String, val label: String, val prefixes: List<String>)
 
     val PREDEFINED_LISTS = listOf(
@@ -43,7 +44,7 @@ object BlockRulesStore {
         return n
     }
 
-    // ---- Options simples ----
+    // ---- Options ----
     var blockHidden: Boolean
         get() = prefs(appCtx).getBoolean("hidden", false)
         set(v) { prefs(appCtx).edit().putBoolean("hidden", v).apply() }
@@ -52,10 +53,18 @@ object BlockRulesStore {
         get() = prefs(appCtx).getBoolean("neighbors", false)
         set(v) { prefs(appCtx).edit().putBoolean("neighbors", v).apply() }
 
-    /** Bloque tout appel dont le numéro n'est pas français (indicatif ≠ +33). */
     var blockInternational: Boolean
         get() = prefs(appCtx).getBoolean("international", false)
         set(v) { prefs(appCtx).edit().putBoolean("international", v).apply() }
+
+    /** Mode discret : sonnerie coupée au lieu de rejeter l'appel. */
+    var silentMode: Boolean
+        get() = prefs(appCtx).getBoolean("silent", false)
+        set(v) { prefs(appCtx).edit().putBoolean("silent", v).apply() }
+
+    var theme: String
+        get() = prefs(appCtx).getString("theme", "cyan") ?: "cyan"
+        set(v) { prefs(appCtx).edit().putString("theme", v).apply() }
 
     var myNumber: String
         get() = prefs(appCtx).getString("my_number", "") ?: ""
@@ -65,12 +74,11 @@ object BlockRulesStore {
         get() = prefs(appCtx).getInt("neighbor_len", 6)
         set(v) { prefs(appCtx).edit().putInt("neighbor_len", v).apply() }
 
-    // ---- Listes prédéfinies activées ----
+    // ---- Listes prédéfinies ----
     fun enabledLists(): MutableSet<String> {
         val p = prefs(appCtx)
         val stored = p.getStringSet("enabled_lists", null)
         if (stored != null) return HashSet(stored)
-        // Migration depuis l'ancienne option unique "predefined"
         return if (p.getBoolean("predefined", true))
             hashSetOf("arcep_metro") else hashSetOf()
     }
@@ -110,29 +118,29 @@ object BlockRulesStore {
         prefs(appCtx).edit().putStringSet("prefixes", s).apply()
     }
 
-    // ---- Décision ----
-    fun shouldBlock(rawNumber: String?): Boolean {
+    // ---- Décision, avec raison ----
+    /** Renvoie la raison du blocage, ou null si l'appel est autorisé. */
+    fun blockReason(rawNumber: String?): String? {
         val n = normalize(rawNumber)
 
-        if (n.isEmpty()) return blockHidden
-        if (n in numbers()) return true
+        if (n.isEmpty()) return if (blockHidden) "Numéro masqué" else null
+        if (n in numbers()) return "Numéro bloqué"
 
         for (pre in prefixes()) {
-            if (pre.isNotEmpty() && n.startsWith(pre)) return true
+            if (pre.isNotEmpty() && n.startsWith(pre)) return "Préfixe $pre"
         }
 
         val enabled = enabledLists()
         for (list in PREDEFINED_LISTS) {
             if (list.id in enabled) {
                 for (pre in list.prefixes) {
-                    if (n.startsWith(pre)) return true
+                    if (n.startsWith(pre)) return list.label
                 }
             }
         }
 
-        // Après normalisation, un numéro français commence par 0.
-        // Un numéro étranger garde son indicatif pays (ex: 49..., 216...).
-        if (blockInternational && !n.startsWith("0") && n.length >= 8) return true
+        if (blockInternational && !n.startsWith("0") && n.length >= 8)
+            return "Appel international"
 
         if (blockNeighbors) {
             val mine = normalize(myNumber)
@@ -140,9 +148,86 @@ object BlockRulesStore {
             if (mine.length >= k && n != mine &&
                 n.length == mine.length &&
                 n.take(k) == mine.take(k)
-            ) return true
+            ) return "Numéro imitant le mien"
         }
 
-        return false
+        return null
+    }
+
+    fun shouldBlock(rawNumber: String?): Boolean = blockReason(rawNumber) != null
+
+    // ---- Journal des appels bloqués ----
+    fun logBlocked(number: String, reason: String) {
+        val p = prefs(appCtx)
+        val arr = try { JSONArray(p.getString("blocked_log", "[]")) } catch (e: Exception) { JSONArray() }
+        val entry = JSONObject()
+            .put("n", number)
+            .put("r", reason)
+            .put("t", System.currentTimeMillis())
+        val out = JSONArray()
+        out.put(entry)
+        var i = 0
+        while (i < arr.length() && i < 199) { out.put(arr.get(i)); i++ }
+        p.edit().putString("blocked_log", out.toString()).apply()
+    }
+
+    data class BlockedEntry(val number: String, val reason: String, val time: Long)
+
+    fun blockedLog(): List<BlockedEntry> {
+        val out = mutableListOf<BlockedEntry>()
+        try {
+            val arr = JSONArray(prefs(appCtx).getString("blocked_log", "[]"))
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                out.add(BlockedEntry(o.optString("n"), o.optString("r"), o.optLong("t")))
+            }
+        } catch (_: Exception) {}
+        return out
+    }
+
+    fun clearBlockedLog() {
+        prefs(appCtx).edit().putString("blocked_log", "[]").apply()
+    }
+
+    // ---- Export / import des règles ----
+    fun exportJson(): String {
+        val o = JSONObject()
+        o.put("numbers", JSONArray(numbers().toList()))
+        o.put("prefixes", JSONArray(prefixes().toList()))
+        o.put("enabled_lists", JSONArray(enabledLists().toList()))
+        o.put("hidden", blockHidden)
+        o.put("international", blockInternational)
+        o.put("neighbors", blockNeighbors)
+        o.put("silent", silentMode)
+        o.put("my_number", myNumber)
+        o.put("theme", theme)
+        return o.toString(2)
+    }
+
+    fun importJson(json: String): Boolean {
+        return try {
+            val o = JSONObject(json)
+            val e = prefs(appCtx).edit()
+            val nums = HashSet<String>()
+            val na = o.optJSONArray("numbers") ?: JSONArray()
+            for (i in 0 until na.length()) nums.add(na.getString(i))
+            e.putStringSet("numbers", nums)
+            val pres = HashSet<String>()
+            val pa = o.optJSONArray("prefixes") ?: JSONArray()
+            for (i in 0 until pa.length()) pres.add(pa.getString(i))
+            e.putStringSet("prefixes", pres)
+            val lists = HashSet<String>()
+            val la = o.optJSONArray("enabled_lists") ?: JSONArray()
+            for (i in 0 until la.length()) lists.add(la.getString(i))
+            e.putStringSet("enabled_lists", lists)
+            e.putBoolean("hidden", o.optBoolean("hidden", false))
+            e.putBoolean("international", o.optBoolean("international", false))
+            e.putBoolean("neighbors", o.optBoolean("neighbors", false))
+            e.putBoolean("silent", o.optBoolean("silent", false))
+            e.putString("my_number", o.optString("my_number", ""))
+            e.putString("theme", o.optString("theme", "cyan"))
+            e.apply()
+            true
+        } catch (ex: Exception) { false }
     }
 }

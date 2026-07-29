@@ -14,14 +14,20 @@ class SpamScreeningService : CallScreeningService() {
         }
 
         val number = details.handle?.schemeSpecificPart
-        val block = BlockRulesStore.shouldBlock(number)
+        val reason = BlockRulesStore.blockReason(number)
 
         val response = CallResponse.Builder()
-        if (block) {
-            response
-                .setDisallowCall(true)
-                .setRejectCall(true)
-                .setSkipNotification(true)
+        if (reason != null) {
+            BlockRulesStore.logBlocked(number ?: "(masqué)", reason)
+            if (BlockRulesStore.silentMode) {
+                // Mode discret : sonnerie coupée, l'appel file en messagerie
+                response.setSilenceCall(true)
+            } else {
+                response
+                    .setDisallowCall(true)
+                    .setRejectCall(true)
+                    .setSkipNotification(true)
+            }
         }
         respondToCall(details, response.build())
     }

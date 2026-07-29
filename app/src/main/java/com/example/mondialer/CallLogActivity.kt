@@ -2,6 +2,7 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -17,16 +18,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Journal d'appels : lecture directe de l'historique système,
- * donc identique à celui de l'application Téléphone actuelle.
- */
 class CallLogActivity : Activity() {
 
     private var all = listOf<Map<String, String>>()
     private lateinit var list: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
@@ -45,11 +43,52 @@ class CallLogActivity : Activity() {
             override fun afterTextChanged(s: Editable?) = filter(s?.toString() ?: "")
         })
 
+        // Appui simple : rappeler directement
         list.setOnItemClickListener { _, _, pos, _ ->
             @Suppress("UNCHECKED_CAST")
             val item = list.adapter.getItem(pos) as Map<String, String>
-            setResult(RESULT_OK, Intent().putExtra("number", item["num"] ?: ""))
+            val num = item["num"] ?: ""
+            if (num.isBlank()) return@setOnItemClickListener
+            setResult(RESULT_OK, Intent()
+                .putExtra("number", num)
+                .putExtra("call", true))
             finish()
+        }
+
+        // Appui long : menu d'actions
+        list.setOnItemLongClickListener { _, _, pos, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = list.adapter.getItem(pos) as Map<String, String>
+            val num = item["num"] ?: ""
+            if (num.isBlank()) return@setOnItemLongClickListener true
+
+            val normalized = BlockRulesStore.normalize(num)
+            val prefix = normalized.take(4)
+            val options = arrayOf(
+                getString(R.string.action_dial_pad),
+                getString(R.string.action_block_number, num),
+                getString(R.string.action_block_prefix, prefix)
+            )
+            AlertDialog.Builder(this)
+                .setTitle(num)
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> {
+                            setResult(RESULT_OK, Intent().putExtra("number", num))
+                            finish()
+                        }
+                        1 -> {
+                            BlockRulesStore.addNumber(num)
+                            Toast.makeText(this, R.string.number_blocked, Toast.LENGTH_SHORT).show()
+                        }
+                        2 -> {
+                            BlockRulesStore.addPrefix(prefix)
+                            Toast.makeText(this, R.string.prefix_blocked, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .show()
+            true
         }
     }
 

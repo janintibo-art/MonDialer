@@ -2,7 +2,7 @@
 <resources>
     <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@drawable/bg_gradient</item>
-        <item name="android:colorAccent">@color/neon</item>
+        <item name="android:colorAccent">?attr/cNeon</item>
         <item name="android:textColor">@color/text_main</item>
         <item name="android:textColorPrimary">@color/text_main</item>
         <item name="android:textColorSecondary">@color/text_dim</item>
@@ -10,5 +10,31 @@
         <item name="android:textColorHint">@color/text_dim</item>
         <item name="android:statusBarColor">@color/bg_deep</item>
         <item name="android:navigationBarColor">@color/bg_deep</item>
+        <!-- Palette cyan (défaut) -->
+        <item name="cNeon">#00E5FF</item>
+        <item name="cNeonDim">#00B8D4</item>
+        <item name="cHalo">#3300E5FF</item>
+        <item name="cHaloStrong">#8000E5FF</item>
+    </style>
+
+    <style name="AppTheme.Violet">
+        <item name="cNeon">#C77DFF</item>
+        <item name="cNeonDim">#9D4EDD</item>
+        <item name="cHalo">#33C77DFF</item>
+        <item name="cHaloStrong">#80C77DFF</item>
+    </style>
+
+    <style name="AppTheme.Green">
+        <item name="cNeon">#00FF66</item>
+        <item name="cNeonDim">#00CC52</item>
+        <item name="cHalo">#3300FF66</item>
+        <item name="cHaloStrong">#8000FF66</item>
+    </style>
+
+    <style name="AppTheme.Orange">
+        <item name="cNeon">#FF9E00</item>
+        <item name="cNeonDim">#E08700</item>
+        <item name="cHalo">#33FF9E00</item>
+        <item name="cHaloStrong">#80FF9E00</item>
     </style>
 </resources>
