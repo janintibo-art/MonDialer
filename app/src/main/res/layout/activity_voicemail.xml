@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        style="@style/NeonTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/voicemail_title"
+        android:textSize="18sp"
+        android:paddingBottom="8dp" />
+
+    <Button
+        android:id="@+id/btnCallVm"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/btn_call"
+        android:stateListAnimator="@animator/press"
+        android:textColor="@color/bg_deep"
+        android:textStyle="bold"
+        android:text="@string/call_voicemail" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textStyle="bold"
+        android:textColor="?attr/cNeon"
+        android:text="@string/visual_vm_label" />
+
+    <ListView
+        android:id="@+id/listVm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="6dp"
+        android:divider="?attr/cNeonDim"
+        android:dividerHeight="0.5dp" />
+</LinearLayout>

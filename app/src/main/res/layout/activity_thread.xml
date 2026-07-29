@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <EditText
+        android:id="@+id/editTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/panel_round"
+        android:padding="12dp"
+        android:inputType="phone"
+        android:hint="@string/to_hint" />
+
+    <ListView
+        android:id="@+id/listMsgs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:stackFromBottom="true"
+        android:transcriptMode="normal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editBody"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/panel_round"
+            android:padding="12dp"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:hint="@string/message_hint" />
+
+        <Button
+            android:id="@+id/btnSend"
+            style="@style/ActionBtn"
+            android:layout_width="wrap_content"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:textSize="16sp"
+            android:text="@string/send" />
+    </LinearLayout>
+</LinearLayout>

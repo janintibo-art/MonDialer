@@ -7,7 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Bundle as OsBundle
 import android.provider.ContactsContract
+import android.telecom.TelecomManager
+import android.telecom.VideoProfile
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
@@ -71,6 +74,13 @@ class MainActivity : Activity() {
             startActivityForResult(Intent(this, CallLogActivity::class.java), 30)
         }
         findViewById<Button>(R.id.btnDefault).setOnClickListener { requestDefaultDialer() }
+        findViewById<Button>(R.id.btnSms).setOnClickListener {
+            startActivity(Intent(this, ConversationsActivity::class.java))
+        }
+        findViewById<Button>(R.id.btnVoicemail).setOnClickListener {
+            startActivity(Intent(this, VoicemailActivity::class.java))
+        }
+        findViewById<Button>(R.id.btnVideo).setOnClickListener { placeVideoCall() }
 
         // T9 : suggestions de contacts pendant la frappe
         display.addTextChangedListener(object : TextWatcher {
@@ -205,6 +215,30 @@ class MainActivity : Activity() {
         val tv = android.util.TypedValue()
         theme.resolveAttribute(R.attr.cNeon, tv, true)
         return tv.data
+    }
+
+    // ---- Appel vidéo (nécessite le support ViLTE de l'opérateur) ----
+    private fun placeVideoCall() {
+        val number = display.text.toString().trim()
+        if (number.isEmpty()) {
+            Toast.makeText(this, R.string.enter_number_first, Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (checkSelfPermission(Manifest.permission.CALL_PHONE)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), 1)
+            return
+        }
+        try {
+            val tm = getSystemService(TelecomManager::class.java)
+            val extras = OsBundle()
+            extras.putInt(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE,
+                VideoProfile.STATE_BIDIRECTIONAL)
+            tm.placeCall(Uri.parse("tel:" + number), extras)
+        } catch (e: Exception) {
+            // Repli : appel audio classique
+            startActivity(Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number)))
+        }
     }
 
     // ---- Appel ----

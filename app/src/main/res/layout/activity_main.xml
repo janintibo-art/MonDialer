@@ -34,6 +34,22 @@
             android:text="@string/set_default" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button android:id="@+id/btnSms" style="@style/ActionBtn"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:text="@string/sms" />
+        <Button android:id="@+id/btnVoicemail" style="@style/ActionBtn"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:text="@string/voicemail" />
+        <Button android:id="@+id/btnVideo" style="@style/ActionBtn"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:text="@string/video_call" />
+    </LinearLayout>
+
     <EditText
         android:id="@+id/editNumber"
         android:layout_width="match_parent"

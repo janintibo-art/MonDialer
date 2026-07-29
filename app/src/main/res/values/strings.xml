@@ -55,4 +55,25 @@
     <string name="action_block_prefix">Bloquer le préfixe %s…</string>
     <string name="number_blocked">Numéro bloqué</string>
     <string name="prefix_blocked">Préfixe bloqué</string>
+    <string name="sms">SMS</string>
+    <string name="sms_title">MESSAGES</string>
+    <string name="voicemail">RÉPONDEUR</string>
+    <string name="voicemail_title">RÉPONDEUR</string>
+    <string name="video_call">VIDÉO ▶</string>
+    <string name="new_message">✎ NOUVEAU</string>
+    <string name="sms_default">SMS PAR DÉFAUT</string>
+    <string name="already_sms_default">Déjà app SMS par défaut</string>
+    <string name="to_hint">Destinataire (numéro)</string>
+    <string name="message_hint">Votre message…</string>
+    <string name="send">➤</string>
+    <string name="sms_fail">Échec de l\u0027envoi du SMS</string>
+    <string name="mms_received">MMS reçu</string>
+    <string name="mms_hint">Ouvrez votre ancienne app Messages pour le consulter</string>
+    <string name="call_voicemail">📞 APPELER LE RÉPONDEUR</string>
+    <string name="choose_carrier">Choisissez votre opérateur</string>
+    <string name="visual_vm_label">MESSAGERIE VOCALE VISUELLE (si opérateur compatible)</string>
+    <string name="no_visual_vm">Messagerie visuelle indisponible : utilisez le bouton d\u0027appel du répondeur</string>
+    <string name="playing_vm">Lecture…</string>
+    <string name="vm_play_fail">Impossible de lire ce message</string>
+    <string name="enter_number_first">Composez d\u0027abord un numéro</string>
 </resources>

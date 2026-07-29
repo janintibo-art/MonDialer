@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
 
     <application
         android:name=".App"
@@ -41,6 +47,24 @@
         <activity android:name=".ContactsActivity" android:exported="false" />
         <activity android:name=".CallLogActivity" android:exported="false" />
         <activity android:name=".BlockedLogActivity" android:exported="false" />
+        <activity android:name=".VoicemailActivity" android:exported="false" />
+        <activity android:name=".ConversationsActivity" android:exported="false" />
+
+        <!-- Fil de discussion SMS ; répond aussi aux intentions sms: (requis pour rôle SMS par défaut) -->
+        <activity
+            android:name=".ThreadActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".InCallActivity"
@@ -49,6 +73,7 @@
             android:turnScreenOn="true"
             android:launchMode="singleTask" />
 
+        <!-- Filtrage anti-spam -->
         <service
             android:name=".SpamScreeningService"
             android:exported="true"
@@ -58,6 +83,7 @@
             </intent-filter>
         </service>
 
+        <!-- Gestion des appels (app téléphone par défaut) -->
         <service
             android:name=".MyInCallService"
             android:exported="true"
@@ -67,6 +93,42 @@
                 android:value="true" />
             <intent-filter>
                 <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+
+        <!-- Réception SMS quand l'app est SMS par défaut -->
+        <receiver
+            android:name=".SmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Réception MMS (requis pour le rôle SMS ; notification simple) -->
+        <receiver
+            android:name=".MmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Réponse rapide depuis l'écran d'appel (requis pour le rôle SMS) -->
+        <service
+            android:name=".HeadlessSmsSendService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
             </intent-filter>
         </service>
 
