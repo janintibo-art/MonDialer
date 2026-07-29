@@ -6,14 +6,12 @@
     android:padding="12dp">
 
     <TextView
+        style="@style/NeonTitle"
         android:id="@+id/txtTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="@color/neon"
         android:textSize="18sp"
-        android:letterSpacing="0.3"
-        android:textStyle="bold"
         android:paddingBottom="8dp" />
 
     <EditText

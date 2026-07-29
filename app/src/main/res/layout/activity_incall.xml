@@ -7,12 +7,11 @@
     android:padding="32dp">
 
     <TextView
+        style="@style/NeonTitle"
         android:id="@+id/txtNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/neon"
-        android:textSize="34sp"
-        android:textStyle="bold" />
+        android:textSize="34sp" />
 
     <TextView
         android:id="@+id/txtState"
@@ -29,7 +28,7 @@
         android:layout_height="60dp"
         android:layout_marginTop="56dp"
         android:background="@drawable/btn_call"
-        android:stateListAnimator="@null"
+        android:stateListAnimator="@animator/press"
         android:textColor="@color/bg_deep"
         android:textStyle="bold"
         android:text="@string/answer" />
@@ -40,7 +39,7 @@
         android:layout_height="60dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/btn_danger"
-        android:stateListAnimator="@null"
+        android:stateListAnimator="@animator/press"
         android:textColor="@color/text_main"
         android:textStyle="bold"
         android:text="@string/hangup" />

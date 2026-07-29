@@ -6,16 +6,14 @@
     android:padding="12dp">
 
     <TextView
+        style="@style/NeonTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/header"
-        android:textColor="@color/neon"
-        android:textSize="20sp"
-        android:letterSpacing="0.4"
+        android:textSize="22sp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textStyle="bold" />
+        android:paddingBottom="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,6 +44,10 @@
         android:inputType="phone"
         android:textSize="30sp"
         android:textColor="@color/neon"
+        android:shadowColor="@color/neon"
+        android:shadowRadius="14"
+        android:shadowDx="0"
+        android:shadowDy="0"
         android:gravity="center"
         android:hint="•••" />
 
@@ -80,25 +82,30 @@
         <Button
             android:id="@+id/btnCall"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="60dp"
             android:layout_weight="2"
             android:layout_margin="4dp"
             android:background="@drawable/btn_call"
-            android:stateListAnimator="@null"
+            android:stateListAnimator="@animator/press"
             android:textColor="@color/bg_deep"
             android:textStyle="bold"
+            android:letterSpacing="0.15"
             android:text="@string/call" />
 
         <Button
             android:id="@+id/btnDelete"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="60dp"
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/btn_action"
-            android:stateListAnimator="@null"
+            android:stateListAnimator="@animator/press"
             android:textColor="@color/neon"
             android:textSize="22sp"
+            android:shadowColor="@color/neon"
+            android:shadowRadius="10"
+            android:shadowDx="0"
+            android:shadowDy="0"
             android:text="@string/delete" />
     </LinearLayout>
 </LinearLayout>

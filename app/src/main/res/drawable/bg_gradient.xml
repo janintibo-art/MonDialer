@@ -1,7 +1,23 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:startColor="@color/bg_deep"
-        android:centerColor="@color/bg_mid"
-        android:endColor="@color/bg_deep"
-        android:angle="135" />
-</shape>
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#03050C"
+                android:centerColor="#0B1B2B"
+                android:endColor="#03050C"
+                android:angle="135" />
+        </shape>
+    </item>
+    <!-- Halo cyan diffus en haut de l'écran -->
+    <item android:bottom="400dp">
+        <shape>
+            <gradient
+                android:type="radial"
+                android:gradientRadius="420dp"
+                android:centerX="0.5" android:centerY="0"
+                android:startColor="#2600E5FF"
+                android:endColor="#0000E5FF" />
+        </shape>
+    </item>
+</layer-list>
