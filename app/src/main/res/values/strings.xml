@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mon Dialer</string>
+    <string name="filters_title">Filtres et blocage</string>
+    <string name="call">Appeler</string>
+    <string name="delete">⌫</string>
+    <string name="filters">Filtres anti-spam</string>
+    <string name="set_default">Définir comme app Téléphone</string>
+    <string name="already_default">Déjà application par défaut</string>
+    <string name="now_default">Mon Dialer est maintenant l\'app Téléphone par défaut</string>
+    <string name="hidden_number">Numéro masqué</string>
+    <string name="state_ringing">Appel entrant…</string>
+    <string name="state_dialing">Appel en cours…</string>
+    <string name="state_active">En communication</string>
+    <string name="state_ended">Appel terminé</string>
+    <string name="answer">Répondre</string>
+    <string name="hangup">Raccrocher</string>
+    <string name="block_hidden">Bloquer les numéros masqués</string>
+    <string name="use_predefined">Bloquer les préfixes démarchage (liste ARCEP intégrée)</string>
+    <string name="block_neighbors">Bloquer les numéros trop proches du mien</string>
+    <string name="my_number_hint">Mon numéro (ex : 0612345678)</string>
+    <string name="save">Enregistrer</string>
+    <string name="saved">Enregistré</string>
+    <string name="removed">Supprimé</string>
+    <string name="blocked_numbers">Numéros bloqués (appui long pour supprimer)</string>
+    <string name="add_number_hint">Ajouter un numéro</string>
+    <string name="blocked_prefixes">Préfixes bloqués — ex : 01 pour Paris/IDF (appui long pour supprimer)</string>
+    <string name="add_prefix_hint">Ajouter un préfixe (ex : 01)</string>
+    <string name="add">Ajouter</string>
+</resources>

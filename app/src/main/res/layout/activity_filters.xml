@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Switch
+            android:id="@+id/swHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/block_hidden" />
+
+        <Switch
+            android:id="@+id/swPredefined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/use_predefined" />
+
+        <Switch
+            android:id="@+id/swNeighbors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/block_neighbors" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editMyNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="phone"
+                android:hint="@string/my_number_hint" />
+
+            <Button
+                android:id="@+id/btnSaveMy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            android:text="@string/blocked_numbers" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editAddNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="phone"
+                android:hint="@string/add_number_hint" />
+
+            <Button
+                android:id="@+id/btnAddNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listNumbers"
+            android:layout_width="match_parent"
+            android:layout_height="180dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            android:text="@string/blocked_prefixes" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editAddPrefix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="phone"
+                android:hint="@string/add_prefix_hint" />
+
+            <Button
+                android:id="@+id/btnAddPrefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listPrefixes"
+            android:layout_width="match_parent"
+            android:layout_height="180dp" />
+    </LinearLayout>
+</ScrollView>
