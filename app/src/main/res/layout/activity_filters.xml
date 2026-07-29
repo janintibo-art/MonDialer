@@ -22,9 +22,9 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:padding="8dp" android:text="@string/block_hidden" />
 
-        <Switch android:id="@+id/swPredefined"
+        <Switch android:id="@+id/swInternational"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:padding="8dp" android:text="@string/use_predefined" />
+            android:padding="8dp" android:text="@string/block_international" />
 
         <Switch android:id="@+id/swNeighbors"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -44,6 +44,20 @@
                 android:layout_width="wrap_content" android:paddingStart="18dp"
                 android:paddingEnd="18dp" android:text="@string/save" />
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:textStyle="bold"
+            android:textColor="@color/neon" android:text="@string/predefined_lists" />
+
+        <LinearLayout
+            android:id="@+id/listsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/panel_round"
+            android:padding="8dp"
+            android:layout_marginTop="6dp" />
 
         <TextView
             android:layout_width="match_parent" android:layout_height="wrap_content"

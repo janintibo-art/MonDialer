@@ -7,10 +7,26 @@ object BlockRulesStore {
 
     private const val PREFS = "block_rules"
 
-    /** Préfixes ARCEP réservés au démarchage commercial (France métropolitaine). */
-    val PREDEFINED_SPAM_PREFIXES = listOf(
-        "0162", "0163", "0270", "0271", "0377", "0378",
-        "0424", "0425", "0568", "0569", "0948", "0949"
+    /** Une liste prédéfinie de préfixes, activable indépendamment. */
+    data class PredefList(val id: String, val label: String, val prefixes: List<String>)
+
+    val PREDEFINED_LISTS = listOf(
+        PredefList(
+            "arcep_metro",
+            "Démarchage ARCEP — métropole",
+            listOf("0162", "0163", "0270", "0271", "0377", "0378",
+                   "0424", "0425", "0568", "0569", "0948", "0949")
+        ),
+        PredefList(
+            "arcep_om",
+            "Démarchage ARCEP — outre-mer",
+            listOf("09475", "09476", "09477", "09478", "09479")
+        ),
+        PredefList(
+            "special_08",
+            "Numéros spéciaux 08 (surtaxés / services)",
+            listOf("08")
+        )
     )
 
     lateinit var appCtx: Context
@@ -27,17 +43,19 @@ object BlockRulesStore {
         return n
     }
 
+    // ---- Options simples ----
     var blockHidden: Boolean
         get() = prefs(appCtx).getBoolean("hidden", false)
         set(v) { prefs(appCtx).edit().putBoolean("hidden", v).apply() }
 
-    var usePredefined: Boolean
-        get() = prefs(appCtx).getBoolean("predefined", true)
-        set(v) { prefs(appCtx).edit().putBoolean("predefined", v).apply() }
-
     var blockNeighbors: Boolean
         get() = prefs(appCtx).getBoolean("neighbors", false)
         set(v) { prefs(appCtx).edit().putBoolean("neighbors", v).apply() }
+
+    /** Bloque tout appel dont le numéro n'est pas français (indicatif ≠ +33). */
+    var blockInternational: Boolean
+        get() = prefs(appCtx).getBoolean("international", false)
+        set(v) { prefs(appCtx).edit().putBoolean("international", v).apply() }
 
     var myNumber: String
         get() = prefs(appCtx).getString("my_number", "") ?: ""
@@ -47,6 +65,25 @@ object BlockRulesStore {
         get() = prefs(appCtx).getInt("neighbor_len", 6)
         set(v) { prefs(appCtx).edit().putInt("neighbor_len", v).apply() }
 
+    // ---- Listes prédéfinies activées ----
+    fun enabledLists(): MutableSet<String> {
+        val p = prefs(appCtx)
+        val stored = p.getStringSet("enabled_lists", null)
+        if (stored != null) return HashSet(stored)
+        // Migration depuis l'ancienne option unique "predefined"
+        return if (p.getBoolean("predefined", true))
+            hashSetOf("arcep_metro") else hashSetOf()
+    }
+
+    fun isListEnabled(id: String): Boolean = id in enabledLists()
+
+    fun setListEnabled(id: String, on: Boolean) {
+        val s = enabledLists()
+        if (on) s.add(id) else s.remove(id)
+        prefs(appCtx).edit().putStringSet("enabled_lists", s).apply()
+    }
+
+    // ---- Listes personnelles ----
     fun numbers(): MutableSet<String> =
         HashSet(prefs(appCtx).getStringSet("numbers", emptySet()) ?: emptySet())
 
@@ -73,6 +110,7 @@ object BlockRulesStore {
         prefs(appCtx).edit().putStringSet("prefixes", s).apply()
     }
 
+    // ---- Décision ----
     fun shouldBlock(rawNumber: String?): Boolean {
         val n = normalize(rawNumber)
 
@@ -83,11 +121,18 @@ object BlockRulesStore {
             if (pre.isNotEmpty() && n.startsWith(pre)) return true
         }
 
-        if (usePredefined) {
-            for (pre in PREDEFINED_SPAM_PREFIXES) {
-                if (n.startsWith(pre)) return true
+        val enabled = enabledLists()
+        for (list in PREDEFINED_LISTS) {
+            if (list.id in enabled) {
+                for (pre in list.prefixes) {
+                    if (n.startsWith(pre)) return true
+                }
             }
         }
+
+        // Après normalisation, un numéro français commence par 0.
+        // Un numéro étranger garde son indicatif pays (ex: 49..., 216...).
+        if (blockInternational && !n.startsWith("0") && n.length >= 8) return true
 
         if (blockNeighbors) {
             val mine = normalize(myNumber)

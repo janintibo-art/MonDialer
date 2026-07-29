@@ -33,4 +33,6 @@
     <string name="search_contact">Rechercher un contact…</string>
     <string name="search_log">Filtrer le journal…</string>
     <string name="perm_needed">Autorisation requise pour afficher ces données</string>
+    <string name="block_international">Bloquer les appels internationaux (hors France)</string>
+    <string name="predefined_lists">LISTES PRÉDÉFINIES — activez celles que vous voulez</string>
 </resources>

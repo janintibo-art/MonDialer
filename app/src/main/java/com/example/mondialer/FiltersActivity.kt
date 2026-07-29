@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Switch
 import android.widget.Toast
@@ -19,18 +20,33 @@ class FiltersActivity : Activity() {
         BlockRulesStore.appCtx = applicationContext
         setContentView(R.layout.activity_filters)
 
+        // Options simples
         val swHidden = findViewById<Switch>(R.id.swHidden)
-        val swPredefined = findViewById<Switch>(R.id.swPredefined)
         val swNeighbors = findViewById<Switch>(R.id.swNeighbors)
+        val swInternational = findViewById<Switch>(R.id.swInternational)
 
         swHidden.isChecked = BlockRulesStore.blockHidden
-        swPredefined.isChecked = BlockRulesStore.usePredefined
         swNeighbors.isChecked = BlockRulesStore.blockNeighbors
+        swInternational.isChecked = BlockRulesStore.blockInternational
 
         swHidden.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockHidden = v }
-        swPredefined.setOnCheckedChangeListener { _, v -> BlockRulesStore.usePredefined = v }
         swNeighbors.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockNeighbors = v }
+        swInternational.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockInternational = v }
 
+        // Listes prédéfinies : un interrupteur par liste, généré dynamiquement
+        val container = findViewById<LinearLayout>(R.id.listsContainer)
+        for (list in BlockRulesStore.PREDEFINED_LISTS) {
+            val sw = Switch(this)
+            sw.text = list.label
+            sw.setPadding(16, 20, 16, 20)
+            sw.isChecked = BlockRulesStore.isListEnabled(list.id)
+            sw.setOnCheckedChangeListener { _, v ->
+                BlockRulesStore.setListEnabled(list.id, v)
+            }
+            container.addView(sw)
+        }
+
+        // Mon numéro
         val editMy = findViewById<EditText>(R.id.editMyNumber)
         editMy.setText(BlockRulesStore.myNumber)
         findViewById<Button>(R.id.btnSaveMy).setOnClickListener {
@@ -38,6 +54,7 @@ class FiltersActivity : Activity() {
             Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
         }
 
+        // Numéros bloqués
         val listNumbers = findViewById<ListView>(R.id.listNumbers)
         numbersAdapter = ArrayAdapter(this, R.layout.item_one_line,
             BlockRulesStore.numbers().sorted().toMutableList())
@@ -59,6 +76,7 @@ class FiltersActivity : Activity() {
             }
         }
 
+        // Préfixes bloqués
         val listPrefixes = findViewById<ListView>(R.id.listPrefixes)
         prefixesAdapter = ArrayAdapter(this, R.layout.item_one_line,
             BlockRulesStore.prefixes().sorted().toMutableList())
