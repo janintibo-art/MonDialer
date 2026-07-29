@@ -3,14 +3,6 @@ package com.example.mondialer
 import android.content.Context
 import android.content.SharedPreferences
 
-/**
- * Stockage et logique des règles de blocage.
- * - Numéros exacts bloqués
- * - Préfixes bloqués (ex: "01" = Paris / Île-de-France, "0033" et "+33" sont normalisés)
- * - Liste prédéfinie ARCEP (préfixes réservés au démarchage téléphonique en France)
- * - Numéros masqués
- * - "Voisins suspects" : numéros qui ressemblent anormalement au vôtre (neighbor spoofing)
- */
 object BlockRulesStore {
 
     private const val PREFS = "block_rules"
@@ -21,10 +13,11 @@ object BlockRulesStore {
         "0424", "0425", "0568", "0569", "0948", "0949"
     )
 
+    lateinit var appCtx: Context
+
     private fun prefs(c: Context): SharedPreferences =
         c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-    /** Normalise un numéro : garde les chiffres, convertit +33 / 0033 en 0. */
     fun normalize(raw: String?): String {
         if (raw == null) return ""
         var n = raw.filter { it.isDigit() || it == '+' }
@@ -34,7 +27,6 @@ object BlockRulesStore {
         return n
     }
 
-    // ---- Options ----
     var blockHidden: Boolean
         get() = prefs(appCtx).getBoolean("hidden", false)
         set(v) { prefs(appCtx).edit().putBoolean("hidden", v).apply() }
@@ -51,12 +43,10 @@ object BlockRulesStore {
         get() = prefs(appCtx).getString("my_number", "") ?: ""
         set(v) { prefs(appCtx).edit().putString("my_number", v).apply() }
 
-    /** Nombre de premiers chiffres identiques pour considérer un numéro "trop proche" du vôtre. */
     var neighborPrefixLen: Int
         get() = prefs(appCtx).getInt("neighbor_len", 6)
         set(v) { prefs(appCtx).edit().putInt("neighbor_len", v).apply() }
 
-    // ---- Listes ----
     fun numbers(): MutableSet<String> =
         HashSet(prefs(appCtx).getStringSet("numbers", emptySet()) ?: emptySet())
 
@@ -83,12 +73,10 @@ object BlockRulesStore {
         prefs(appCtx).edit().putStringSet("prefixes", s).apply()
     }
 
-    // ---- Décision ----
     fun shouldBlock(rawNumber: String?): Boolean {
         val n = normalize(rawNumber)
 
         if (n.isEmpty()) return blockHidden
-
         if (n in numbers()) return true
 
         for (pre in prefixes()) {
@@ -112,7 +100,4 @@ object BlockRulesStore {
 
         return false
     }
-
-    // Contexte applicatif (initialisé par App)
-    lateinit var appCtx: Context
 }

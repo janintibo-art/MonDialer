@@ -8,7 +8,6 @@ class SpamScreeningService : CallScreeningService() {
     override fun onScreenCall(details: Call.Details) {
         BlockRulesStore.appCtx = applicationContext
 
-        // On ne filtre que les appels entrants
         if (details.callDirection != Call.Details.DIRECTION_INCOMING) {
             respondToCall(details, CallResponse.Builder().build())
             return

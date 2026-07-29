@@ -21,7 +21,6 @@ class MainActivity : Activity() {
 
         display = findViewById(R.id.editNumber)
 
-        // Si ouvert via une intention DIAL/VIEW tel:
         intent?.data?.let { uri: Uri ->
             if (uri.scheme == "tel") display.setText(uri.schemeSpecificPart)
         }
@@ -47,7 +46,12 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.btnFilters).setOnClickListener {
             startActivity(Intent(this, FiltersActivity::class.java))
         }
-
+        findViewById<Button>(R.id.btnContacts).setOnClickListener {
+            startActivityForResult(Intent(this, ContactsActivity::class.java), 20)
+        }
+        findViewById<Button>(R.id.btnLog).setOnClickListener {
+            startActivityForResult(Intent(this, CallLogActivity::class.java), 30)
+        }
         findViewById<Button>(R.id.btnDefault).setOnClickListener { requestDefaultDialer() }
     }
 
@@ -80,8 +84,14 @@ class MainActivity : Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 10 && resultCode == RESULT_OK) {
-            Toast.makeText(this, R.string.now_default, Toast.LENGTH_SHORT).show()
+        when (requestCode) {
+            10 -> if (resultCode == RESULT_OK)
+                Toast.makeText(this, R.string.now_default, Toast.LENGTH_SHORT).show()
+            20, 30 -> if (resultCode == RESULT_OK) {
+                val n = data?.getStringExtra("number") ?: return
+                display.setText(n)
+                display.setSelection(display.text.length)
+            }
         }
     }
 }

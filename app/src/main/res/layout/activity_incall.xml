@@ -10,27 +10,38 @@
         android:id="@+id/txtNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="32sp"
+        android:textColor="@color/neon"
+        android:textSize="34sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="18sp" />
+        android:layout_marginTop="10dp"
+        android:textColor="@color/text_dim"
+        android:textSize="18sp"
+        android:letterSpacing="0.2" />
 
     <Button
         android:id="@+id/btnAnswer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/btn_call"
+        android:stateListAnimator="@null"
+        android:textColor="@color/bg_deep"
+        android:textStyle="bold"
         android:text="@string/answer" />
 
     <Button
         android:id="@+id/btnHangup"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/btn_danger"
+        android:stateListAnimator="@null"
+        android:textColor="@color/text_main"
+        android:textStyle="bold"
         android:text="@string/hangup" />
 </LinearLayout>

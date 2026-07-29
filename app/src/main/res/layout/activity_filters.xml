@@ -9,106 +9,94 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <Switch
-            android:id="@+id/swHidden"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/block_hidden" />
+            android:gravity="center"
+            android:text="@string/filters_title"
+            android:textColor="@color/neon"
+            android:textSize="18sp"
+            android:letterSpacing="0.3"
+            android:textStyle="bold"
+            android:paddingBottom="12dp" />
 
-        <Switch
-            android:id="@+id/swPredefined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/use_predefined" />
+        <Switch android:id="@+id/swHidden"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/block_hidden" />
 
-        <Switch
-            android:id="@+id/swNeighbors"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/block_neighbors" />
+        <Switch android:id="@+id/swPredefined"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/use_predefined" />
+
+        <Switch android:id="@+id/swNeighbors"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/block_neighbors" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="4dp">
 
-            <EditText
-                android:id="@+id/editMyNumber"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="phone"
+            <EditText android:id="@+id/editMyNumber"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:inputType="phone"
+                android:background="@drawable/panel_round" android:padding="12dp"
                 android:hint="@string/my_number_hint" />
 
-            <Button
-                android:id="@+id/btnSaveMy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save" />
+            <Button android:id="@+id/btnSaveMy" style="@style/ActionBtn"
+                android:layout_width="wrap_content" android:paddingStart="18dp"
+                android:paddingEnd="18dp" android:text="@string/save" />
         </LinearLayout>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold"
-            android:text="@string/blocked_numbers" />
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:textStyle="bold"
+            android:textColor="@color/neon" android:text="@string/blocked_numbers" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editAddNumber"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="phone"
+            <EditText android:id="@+id/editAddNumber"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:inputType="phone"
+                android:background="@drawable/panel_round" android:padding="12dp"
+                android:layout_marginTop="6dp"
                 android:hint="@string/add_number_hint" />
 
-            <Button
-                android:id="@+id/btnAddNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add" />
+            <Button android:id="@+id/btnAddNumber" style="@style/ActionBtn"
+                android:layout_width="wrap_content" android:paddingStart="20dp"
+                android:paddingEnd="20dp" android:textSize="18sp" android:text="@string/add" />
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/listNumbers"
-            android:layout_width="match_parent"
-            android:layout_height="180dp" />
+        <ListView android:id="@+id/listNumbers"
+            android:layout_width="match_parent" android:layout_height="180dp"
+            android:background="@drawable/panel_round" android:layout_marginTop="6dp"
+            android:divider="@color/neon_dim" android:dividerHeight="0.5dp" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold"
-            android:text="@string/blocked_prefixes" />
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:textStyle="bold"
+            android:textColor="@color/neon" android:text="@string/blocked_prefixes" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/editAddPrefix"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="phone"
+            <EditText android:id="@+id/editAddPrefix"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:inputType="phone"
+                android:background="@drawable/panel_round" android:padding="12dp"
+                android:layout_marginTop="6dp"
                 android:hint="@string/add_prefix_hint" />
 
-            <Button
-                android:id="@+id/btnAddPrefix"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add" />
+            <Button android:id="@+id/btnAddPrefix" style="@style/ActionBtn"
+                android:layout_width="wrap_content" android:paddingStart="20dp"
+                android:paddingEnd="20dp" android:textSize="18sp" android:text="@string/add" />
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/listPrefixes"
-            android:layout_width="match_parent"
-            android:layout_height="180dp" />
+        <ListView android:id="@+id/listPrefixes"
+            android:layout_width="match_parent" android:layout_height="180dp"
+            android:background="@drawable/panel_round" android:layout_marginTop="6dp"
+            android:divider="@color/neon_dim" android:dividerHeight="0.5dp" />
     </LinearLayout>
 </ScrollView>

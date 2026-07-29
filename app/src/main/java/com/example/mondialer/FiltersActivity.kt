@@ -19,7 +19,6 @@ class FiltersActivity : Activity() {
         BlockRulesStore.appCtx = applicationContext
         setContentView(R.layout.activity_filters)
 
-        // Interrupteurs
         val swHidden = findViewById<Switch>(R.id.swHidden)
         val swPredefined = findViewById<Switch>(R.id.swPredefined)
         val swNeighbors = findViewById<Switch>(R.id.swNeighbors)
@@ -32,7 +31,6 @@ class FiltersActivity : Activity() {
         swPredefined.setOnCheckedChangeListener { _, v -> BlockRulesStore.usePredefined = v }
         swNeighbors.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockNeighbors = v }
 
-        // Mon numéro (pour la détection des "voisins")
         val editMy = findViewById<EditText>(R.id.editMyNumber)
         editMy.setText(BlockRulesStore.myNumber)
         findViewById<Button>(R.id.btnSaveMy).setOnClickListener {
@@ -40,9 +38,8 @@ class FiltersActivity : Activity() {
             Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
         }
 
-        // Numéros bloqués
         val listNumbers = findViewById<ListView>(R.id.listNumbers)
-        numbersAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
+        numbersAdapter = ArrayAdapter(this, R.layout.item_one_line,
             BlockRulesStore.numbers().sorted().toMutableList())
         listNumbers.adapter = numbersAdapter
         listNumbers.setOnItemLongClickListener { _, _, pos, _ ->
@@ -62,9 +59,8 @@ class FiltersActivity : Activity() {
             }
         }
 
-        // Préfixes bloqués (ex: 01 pour Paris / Île-de-France)
         val listPrefixes = findViewById<ListView>(R.id.listPrefixes)
-        prefixesAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
+        prefixesAdapter = ArrayAdapter(this, R.layout.item_one_line,
             BlockRulesStore.prefixes().sorted().toMutableList())
         listPrefixes.adapter = prefixesAdapter
         listPrefixes.setOnItemLongClickListener { _, _, pos, _ ->
