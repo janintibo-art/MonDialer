@@ -80,7 +80,7 @@ object BlockRulesStore {
 
     /** Assombrissement de l'image de fond, de 0 à 100. */
     var customDim: Int
-        get() = prefs(appCtx).getInt("custom_dim", 55)
+        get() = prefs(appCtx).getInt("custom_dim", 25)
         set(v) { prefs(appCtx).edit().putInt("custom_dim", v).apply() }
 
     var theme: String

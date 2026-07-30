@@ -145,6 +145,6 @@
     <string name="lbl_red">Rouge : %d</string>
     <string name="lbl_green">Vert : %d</string>
     <string name="lbl_blue">Bleu : %d</string>
-    <string name="lbl_dim">Assombrissement de l’image : %d %%</string>
+    <string name="lbl_dim">Assombrissement : %d %% — 0 %% = image en pleine lumière</string>
     <string name="theme_custom">Sur mesure</string>
 </resources>

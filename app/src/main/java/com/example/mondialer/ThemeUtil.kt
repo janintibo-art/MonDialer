@@ -20,9 +20,9 @@ object ThemeUtil {
 
     private val applied = HashMap<Int, String>()
 
-    /** Image de fond décodée, gardée en mémoire pour éviter de la relire. */
-    private var cachedImage: Drawable? = null
-    private var cachedImageKey: String = ""
+    /** Bitmap de fond décodé une fois, partagé entre les écrans. */
+    private var cachedBitmap: android.graphics.Bitmap? = null
+    private var cachedBitmapUri: String = ""
 
     fun apply(a: Activity) {
         BlockRulesStore.appCtx = a.applicationContext
@@ -88,12 +88,23 @@ object ThemeUtil {
         // --- Image de fond : posée derrière le contenu, donc non recolorée ---
         val uri = BlockRulesStore.customImage
         if (uri.isNotBlank()) {
-            val key = "$uri|${BlockRulesStore.customDim}"
-            if (cachedImageKey != key) {
-                cachedImage = loadImage(a, uri, BlockRulesStore.customDim)
-                cachedImageKey = key
+            if (cachedBitmapUri != uri || cachedBitmap == null) {
+                cachedBitmap = decodeBitmap(a, uri)
+                cachedBitmapUri = uri
             }
-            cachedImage?.let { a.window.setBackgroundDrawable(it) }
+            val bmp = cachedBitmap
+            if (bmp != null) {
+                // Un drawable neuf par écran : un même objet partagé entre
+                // plusieurs fenêtres ne se dessine pas correctement.
+                val image = BitmapDrawable(a.resources, bmp)
+                image.gravity = android.view.Gravity.FILL
+                val dim = BlockRulesStore.customDim.coerceIn(0, 100)
+                val bg: Drawable = if (dim == 0) image
+                else LayerDrawable(arrayOf(
+                    image,
+                    ColorDrawable(Color.argb(dim * 255 / 100, 0, 0, 0))))
+                a.window.setBackgroundDrawable(bg)
+            }
         }
 
         // --- Recoloration : l'écran est teinté vers la couleur choisie ---
@@ -107,8 +118,8 @@ object ThemeUtil {
         content.setLayerType(View.LAYER_TYPE_HARDWARE, paint)
     }
 
-    /** Charge l'image, la met à l'échelle de l'écran et applique l'assombrissement. */
-    private fun loadImage(a: Activity, uriStr: String, dim: Int): Drawable? {
+    /** Décode l'image à la résolution de l'écran, sans la charger en entier. */
+    private fun decodeBitmap(a: Activity, uriStr: String): android.graphics.Bitmap? {
         return try {
             val uri = Uri.parse(uriStr)
             val dm = a.resources.displayMetrics
@@ -120,15 +131,9 @@ object ThemeUtil {
             while (bounds.outWidth / sample > dm.widthPixels * 1.5 ||
                    bounds.outHeight / sample > dm.heightPixels * 1.5) sample *= 2
             val opts = BitmapFactory.Options().apply { inSampleSize = sample }
-            val bmp = a.contentResolver.openInputStream(uri)?.use {
+            a.contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, opts)
-            } ?: return null
-
-            val image = BitmapDrawable(a.resources, bmp)
-            image.gravity = android.view.Gravity.FILL
-            val scrim = ColorDrawable(Color.argb(
-                (dim.coerceIn(0, 100) * 255 / 100), 0, 0, 0))
-            LayerDrawable(arrayOf(image, scrim))
+            }
         } catch (e: Exception) {
             null
         }
