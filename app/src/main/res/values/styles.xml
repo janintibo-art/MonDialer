@@ -5,15 +5,17 @@
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:layout_rowWeight">1</item>
-        <item name="android:layout_margin">5dp</item>
-        <item name="android:textSize">28sp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">30sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/cText</item>
         <item name="android:background">?attr/dialBg</item>
         <item name="android:stateListAnimator">@animator/press</item>
         <item name="android:hapticFeedbackEnabled">true</item>
         <item name="android:shadowColor">?attr/cNeon</item>
-        <item name="android:shadowRadius">12</item>
+        <item name="android:shadowRadius">14</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
     </style>
@@ -25,7 +27,9 @@
 
     <style name="ActionBtn">
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">48dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">0.03</item>
         <item name="android:textColor">?attr/cText</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
@@ -42,6 +46,7 @@
     </style>
 
     <style name="NeonTitle">
+        <item name="android:shadowRadius">22</item>
         <item name="android:textColor">?attr/cText</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.24</item>
