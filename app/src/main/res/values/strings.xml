@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mon Dialer</string>
-    <string name="header">MON DIALER</string>
+    <string name="app_name">Anarchie Phone</string>
+    <string name="header">ANARCHIE PHONE</string>
     <string name="filters_title">FILTRES &amp; THÈMES</string>
     <string name="call">APPELER</string>
     <string name="delete">⌫</string>
@@ -10,7 +10,7 @@
     <string name="call_log">JOURNAL</string>
     <string name="set_default">DÉFAUT</string>
     <string name="already_default">Déjà application par défaut</string>
-    <string name="now_default">Mon Dialer est maintenant l’app Téléphone par défaut</string>
+    <string name="now_default">Anarchie Phone est maintenant l’app Téléphone par défaut</string>
     <string name="hidden_number">Numéro masqué</string>
     <string name="state_ringing">Appel entrant…</string>
     <string name="state_dialing">Appel en cours…</string>

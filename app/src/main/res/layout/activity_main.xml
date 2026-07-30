@@ -5,16 +5,15 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <TextView
-        style="@style/NeonTitle"
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/header"
-        android:textSize="26sp"
-        android:letterSpacing="0.18"
-        android:paddingTop="8dp"
-        android:paddingBottom="10dp" />
+        android:layout_height="52dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_titre" />
 
     <View
         android:layout_width="match_parent"
