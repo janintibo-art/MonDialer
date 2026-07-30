@@ -31,12 +31,14 @@ class ContactsActivity : Activity() {
     private lateinit var list: ListView
     private lateinit var adapter: ContactAdapter
     private val indexChars = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    private var pickMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
+        pickMode = intent.getBooleanExtra("pick", false)
         findViewById<TextView>(R.id.txtTitle).text = getString(R.string.contacts)
         val search = findViewById<EditText>(R.id.editSearch)
         search.hint = getString(R.string.search_contact)
@@ -62,9 +64,16 @@ class ContactsActivity : Activity() {
 
         list.setOnItemClickListener { _, _, pos, _ ->
             val c = shown[pos]
-            setResult(RESULT_OK, Intent()
-                .putExtra("number", c.number)
-                .putExtra("call", true))
+            if (pickMode) {
+                setResult(RESULT_OK, Intent()
+                    .putExtra("contact_id", c.contactId)
+                    .putExtra("name", c.name)
+                    .putExtra("number", c.number))
+            } else {
+                setResult(RESULT_OK, Intent()
+                    .putExtra("number", c.number)
+                    .putExtra("call", true))
+            }
             finish()
         }
         list.setOnItemLongClickListener { _, _, pos, _ ->

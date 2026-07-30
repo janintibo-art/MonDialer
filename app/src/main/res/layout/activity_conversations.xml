@@ -22,6 +22,9 @@
         <Button android:id="@+id/btnNewMsg" style="@style/ActionBtn"
             android:layout_width="0dp" android:layout_weight="1"
             android:text="@string/new_message" />
+        <Button android:id="@+id/btnMail" style="@style/ActionBtn"
+            android:layout_width="0dp" android:layout_weight="1"
+            android:text="@string/mail_btn" />
         <Button android:id="@+id/btnSmsDefault" style="@style/ActionBtn"
             android:layout_width="0dp" android:layout_weight="1"
             android:text="@string/sms_default" />

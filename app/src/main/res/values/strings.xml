@@ -95,4 +95,25 @@
     <string name="contact_saved">Contact enregistré</string>
     <string name="contact_save_fail">Échec de l\u0027enregistrement</string>
     <string name="need_name_or_phone">Indiquez au moins un nom ou un numéro</string>
+    <string name="email_title">NOUVEL EMAIL</string>
+    <string name="email_to">Destinataire (email)</string>
+    <string name="email_subject">Objet</string>
+    <string name="email_body">Votre message…</string>
+    <string name="email_attach">📎 PIÈCE JOINTE</string>
+    <string name="email_settings">⚙ RÉGLAGES</string>
+    <string name="email_send">ENVOYER</string>
+    <string name="smtp_config">CONFIGURATION SMTP (une seule fois)</string>
+    <string name="smtp_host">Serveur SMTP (ex : smtp.orange.fr)</string>
+    <string name="smtp_port">Port (465 ou 587)</string>
+    <string name="smtp_user">Votre adresse email</string>
+    <string name="smtp_pass">Mot de passe</string>
+    <string name="gmail_hint">Gmail : créez un « mot de passe d\u0027application » sur myaccount.google.com/apppasswords (nécessite la validation en 2 étapes). Orange/SFR/Free/Laposte : votre mot de passe habituel.</string>
+    <string name="email_sending">Envoi en cours…</string>
+    <string name="email_sent">✉ Email envoyé !</string>
+    <string name="email_fail">Échec : %s</string>
+    <string name="email_cfg_missing">Configurez d\u0027abord votre compte email (⚙ RÉGLAGES)</string>
+    <string name="email_to_missing">Indiquez un destinataire</string>
+    <string name="mail_btn">✉ MAIL</string>
+    <string name="choose_channel">Contacter %s via :</string>
+    <string name="no_contact_channel">Ce contact n\u0027a ni numéro ni email</string>
 </resources>

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.app.AlertDialog
 import android.provider.ContactsContract
 import android.widget.Button
 import android.widget.ListView
@@ -29,7 +30,11 @@ class ConversationsActivity : Activity() {
         list = findViewById(R.id.list)
 
         findViewById<Button>(R.id.btnNewMsg).setOnClickListener {
-            startActivity(Intent(this, ThreadActivity::class.java))
+            startActivityForResult(
+                Intent(this, ContactsActivity::class.java).putExtra("pick", true), 70)
+        }
+        findViewById<Button>(R.id.btnMail).setOnClickListener {
+            startActivity(Intent(this, EmailActivity::class.java))
         }
         findViewById<Button>(R.id.btnSmsDefault).setOnClickListener { requestSmsRole() }
 
@@ -144,6 +149,82 @@ class ConversationsActivity : Activity() {
                 loading = false
             }
         }.start()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 70 && resultCode == RESULT_OK) {
+            val contactId = data?.getStringExtra("contact_id") ?: return
+            val name = data.getStringExtra("name") ?: ""
+            showChannelChooser(contactId, name)
+        }
+        if (requestCode == 50) { /* rôle SMS */ }
+    }
+
+    /** Propose tous les numéros et emails du contact. */
+    private fun showChannelChooser(contactId: String, name: String) {
+        Thread {
+            val labels = mutableListOf<String>()
+            val actions = mutableListOf<Pair<String, String>>() // type, valeur
+            try {
+                contentResolver.query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
+                    arrayOf(contactId), null
+                )?.use { c ->
+                    val seen = HashSet<String>()
+                    while (c.moveToNext()) {
+                        val num = c.getString(0) ?: continue
+                        if (num in seen) continue
+                        seen.add(num)
+                        labels.add("📱 SMS — " + num)
+                        actions.add(Pair("sms", num))
+                    }
+                }
+                contentResolver.query(
+                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    arrayOf(ContactsContract.CommonDataKinds.Email.DATA1),
+                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + "=?",
+                    arrayOf(contactId), null
+                )?.use { c ->
+                    val seen = HashSet<String>()
+                    while (c.moveToNext()) {
+                        val mail = c.getString(0) ?: continue
+                        if (mail in seen) continue
+                        seen.add(mail)
+                        labels.add("✉ Email — " + mail)
+                        actions.add(Pair("email", mail))
+                    }
+                }
+            } catch (_: Exception) {}
+
+            runOnUiThread {
+                if (actions.isEmpty()) {
+                    Toast.makeText(this, R.string.no_contact_channel, Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                if (actions.size == 1) {
+                    openChannel(actions[0])
+                    return@runOnUiThread
+                }
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.choose_channel, name))
+                    .setItems(labels.toTypedArray()) { _, which ->
+                        openChannel(actions[which])
+                    }
+                    .show()
+            }
+        }.start()
+    }
+
+    private fun openChannel(action: Pair<String, String>) {
+        when (action.first) {
+            "sms" -> startActivity(Intent(this, ThreadActivity::class.java)
+                .putExtra("address", action.second))
+            "email" -> startActivity(Intent(this, EmailActivity::class.java)
+                .putExtra("to", action.second))
+        }
     }
 
     private fun requestSmsRole() {

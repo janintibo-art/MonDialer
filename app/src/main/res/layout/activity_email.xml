@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/NeonTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/email_title"
+            android:textSize="18sp"
+            android:paddingBottom="10dp" />
+
+        <EditText
+            android:id="@+id/emailTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel_round"
+            android:padding="12dp"
+            android:inputType="textEmailAddress"
+            android:hint="@string/email_to" />
+
+        <EditText
+            android:id="@+id/emailSubject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/panel_round"
+            android:padding="12dp"
+            android:inputType="textCapSentences"
+            android:hint="@string/email_subject" />
+
+        <EditText
+            android:id="@+id/emailBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/panel_round"
+            android:padding="12dp"
+            android:inputType="textCapSentences|textMultiLine"
+            android:minLines="6"
+            android:gravity="top"
+            android:hint="@string/email_body" />
+
+        <TextView
+            android:id="@+id/emailAttachChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel_round"
+            android:padding="10dp"
+            android:layout_marginTop="8dp"
+            android:textColor="?attr/cNeon"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/btnEmailAttach" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/email_attach" />
+            <Button android:id="@+id/btnEmailSettings" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/email_settings" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEmailSend"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_call"
+            android:stateListAnimator="@animator/press"
+            android:textColor="@color/bg_deep"
+            android:textStyle="bold"
+            android:text="@string/email_send" />
+
+        <!-- Réglages SMTP -->
+        <LinearLayout
+            android:id="@+id/settingsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/panel_round"
+            android:padding="12dp"
+            android:layout_marginTop="14dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="?attr/cNeon"
+                android:text="@string/smtp_config" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <Button android:id="@+id/presetGmail" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="Gmail" />
+                <Button android:id="@+id/presetOrange" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="Orange" />
+                <Button android:id="@+id/presetSfr" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="SFR" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button android:id="@+id/presetFree" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="Free" />
+                <Button android:id="@+id/presetOutlook" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="Outlook" />
+                <Button android:id="@+id/presetLaposte" style="@style/ActionBtn"
+                    android:layout_width="0dp" android:layout_weight="1" android:text="Laposte" />
+            </LinearLayout>
+
+            <EditText android:id="@+id/smtpHost"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:padding="10dp" android:inputType="textUri"
+                android:hint="@string/smtp_host" />
+
+            <EditText android:id="@+id/smtpPort"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:padding="10dp" android:inputType="number"
+                android:hint="@string/smtp_port" />
+
+            <EditText android:id="@+id/smtpUser"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:padding="10dp" android:inputType="textEmailAddress"
+                android:hint="@string/smtp_user" />
+
+            <EditText android:id="@+id/smtpPass"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:padding="10dp" android:inputType="textPassword"
+                android:hint="@string/smtp_pass" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="6dp"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp"
+                android:text="@string/gmail_hint" />
+
+            <Button android:id="@+id/btnSaveSmtp" style="@style/ActionBtn"
+                android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
+                android:text="@string/save" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
