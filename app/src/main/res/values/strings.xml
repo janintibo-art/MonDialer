@@ -265,4 +265,14 @@
     <string name="keypad_glow">Intensité du halo : %d %%</string>
     <string name="keypad_digit_accent">Chiffres à la couleur du thème</string>
     <string name="keypad_saved">Style du clavier appliqué</string>
+    <string name="msg_copy">📋 Copier le message</string>
+    <string name="msg_select">✂ Copier une partie…</string>
+    <string name="msg_select_title">Sélectionnez le passage à copier</string>
+    <string name="msg_copy_selection">Copier la sélection</string>
+    <string name="msg_forward">↪ Transférer</string>
+    <string name="msg_save_image">⬇ Enregistrer l’image</string>
+    <string name="msg_save_file">⬇ Enregistrer le fichier</string>
+    <string name="msg_share">📤 Partager</string>
+    <string name="msg_copied">Copié dans le presse-papiers</string>
+    <string name="msg_copy_fail">Copie impossible</string>
 </resources>

@@ -75,6 +75,10 @@ class ThreadActivity : Activity() {
             }
         }
 
+        intent.getStringExtra("forward")?.let {
+            findViewById<RichEditText>(R.id.editBody).setText(it)
+        }
+
         val editTo = findViewById<EditText>(R.id.editTo)
         if (address.isNotBlank()) {
             editTo.setText(address)
@@ -85,28 +89,10 @@ class ThreadActivity : Activity() {
         adapter = MsgAdapter()
         listView.adapter = adapter
 
-        // Appui long sur un message reçu : signaler, analyser ou bloquer
+        // Appui long sur un message : copier, enregistrer, partager, signaler…
         listView.setOnItemLongClickListener { _, _, pos, _ ->
-            val m = msgs.getOrNull(pos)
-            if (m == null || m.outgoing || m.body.isNullOrBlank()) {
-                return@setOnItemLongClickListener false
-            }
-            AlertDialog.Builder(this)
-                .setItems(arrayOf(
-                    getString(R.string.report_menu),
-                    getString(R.string.scan_menu),
-                    getString(R.string.action_block_number, address))) { _, which ->
-                    when (which) {
-                        0 -> Report33700.reportSms(this, m.body, address)
-                        1 -> analyzeScam()
-                        2 -> {
-                            BlockRulesStore.addNumber(address)
-                            Toast.makeText(this, R.string.number_blocked,
-                                Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-                .show()
+            val m = msgs.getOrNull(pos) ?: return@setOnItemLongClickListener false
+            showMessageMenu(m)
             true
         }
 
@@ -225,6 +211,130 @@ class ThreadActivity : Activity() {
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
+            }
+        }.start()
+    }
+
+    /** Menu d'actions adapté au contenu du message sélectionné. */
+    private fun showMessageMenu(m: Msg) {
+        val labels = mutableListOf<String>()
+        val actions = mutableListOf<() -> Unit>()
+
+        when {
+            m.imageUri != null -> {
+                val name = "image_${m.date}.jpg"
+                labels.add(getString(R.string.msg_save_image))
+                actions.add { saveToDownloads(m.imageUri, name, "image/jpeg") }
+                labels.add(getString(R.string.msg_share))
+                actions.add { shareAttachment(m.imageUri, name, "image/jpeg") }
+            }
+            m.fileUri != null -> {
+                val name = m.fileName ?: "fichier"
+                val mime = m.fileMime ?: "application/octet-stream"
+                labels.add(getString(R.string.msg_save_file))
+                actions.add { saveToDownloads(m.fileUri, name, mime) }
+                labels.add(getString(R.string.msg_share))
+                actions.add { shareAttachment(m.fileUri, name, mime) }
+            }
+            !m.body.isNullOrBlank() -> {
+                labels.add(getString(R.string.msg_copy))
+                actions.add { copyText(m.body) }
+                labels.add(getString(R.string.msg_select))
+                actions.add { selectPartial(m.body) }
+                labels.add(getString(R.string.msg_forward))
+                actions.add { forward(m.body) }
+            }
+        }
+
+        // Actions réservées aux messages reçus
+        if (!m.outgoing && !m.body.isNullOrBlank()) {
+            labels.add(getString(R.string.report_menu))
+            actions.add { Report33700.reportSms(this, m.body, address) }
+            labels.add(getString(R.string.scan_menu))
+            actions.add { analyzeScam() }
+            labels.add(getString(R.string.action_block_number, address))
+            actions.add {
+                BlockRulesStore.addNumber(address)
+                Toast.makeText(this, R.string.number_blocked, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        if (labels.isEmpty()) return
+        AlertDialog.Builder(this)
+            .setItems(labels.toTypedArray()) { _, which -> actions[which]() }
+            .show()
+    }
+
+    /** Copie dans le presse-papiers du système. */
+    private fun copyText(text: String) {
+        try {
+            val cm = getSystemService(android.content.ClipboardManager::class.java)
+            cm.setPrimaryClip(android.content.ClipData.newPlainText("message", text))
+            Toast.makeText(this, R.string.msg_copied, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, R.string.msg_copy_fail, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Ouvre le texte dans un champ où la sélection est libre : on peut copier
+     * seulement le passage voulu, un numéro ou une adresse par exemple.
+     */
+    private fun selectPartial(text: String) {
+        val field = EditText(this)
+        field.setText(text)
+        field.setTextIsSelectable(true)
+        field.setPadding(48, 32, 48, 16)
+        field.setTextColor(ThemeRes.color(this, R.attr.cText))
+        field.setBackgroundResource(0)
+        field.setSelection(0, text.length)
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.msg_select_title)
+            .setView(field)
+            .setPositiveButton(R.string.msg_copy_selection) { _, _ ->
+                val start = field.selectionStart.coerceAtLeast(0)
+                val end = field.selectionEnd.coerceAtLeast(0)
+                val part = if (start != end)
+                    field.text.substring(minOf(start, end), maxOf(start, end))
+                else field.text.toString()
+                copyText(part)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /** Prépare le message pour un autre destinataire. */
+    private fun forward(text: String) {
+        startActivity(Intent(this, ThreadActivity::class.java)
+            .putExtra("forward", text))
+    }
+
+    /** Partage une pièce jointe vers une autre application. */
+    private fun shareAttachment(uri: Uri, name: String, mime: String) {
+        Thread {
+            try {
+                val dir = File(cacheDir, "share")
+                dir.mkdirs()
+                val safe = name.replace(Regex("[^A-Za-z0-9._-]"), "_")
+                val file = File(dir, safe)
+                contentResolver.openInputStream(uri)?.use { input ->
+                    file.outputStream().use { out -> input.copyTo(out) }
+                }
+                val shared = FileProvider.getUriForFile(
+                    this, "com.example.mondialer.files", file)
+                val send = Intent(Intent.ACTION_SEND)
+                    .setType(mime)
+                    .putExtra(Intent.EXTRA_STREAM, shared)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                runOnUiThread {
+                    startActivity(Intent.createChooser(
+                        send, getString(R.string.msg_share)))
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
+                }
             }
         }.start()
     }
