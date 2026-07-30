@@ -8,26 +8,47 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
+import java.text.Normalizer
 
 class ContactsActivity : Activity() {
 
-    private var all = listOf<Map<String, String>>()
+    data class Contact(val name: String, val number: String, val contactId: String)
+
+    private var all = listOf<Contact>()
+    private var shown = listOf<Contact>()
+    private val letterPos = HashMap<Char, Int>()
     private lateinit var list: ListView
+    private lateinit var adapter: ContactAdapter
+    private val indexChars = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+        setContentView(R.layout.activity_contacts)
 
         findViewById<TextView>(R.id.txtTitle).text = getString(R.string.contacts)
         val search = findViewById<EditText>(R.id.editSearch)
         search.hint = getString(R.string.search_contact)
         list = findViewById(R.id.list)
+        adapter = ContactAdapter()
+        list.adapter = adapter
+
+        findViewById<Button>(R.id.btnNewContact).setOnClickListener {
+            startActivity(Intent(this, EditContactActivity::class.java))
+        }
+
+        buildIndexBar()
 
         if (checkSelfPermission(Manifest.permission.READ_CONTACTS)
             == PackageManager.PERMISSION_GRANTED) load()
@@ -39,64 +60,146 @@ class ContactsActivity : Activity() {
             override fun afterTextChanged(s: Editable?) = filter(s?.toString() ?: "")
         })
 
-        // Appui simple : appeler directement
         list.setOnItemClickListener { _, _, pos, _ ->
-            @Suppress("UNCHECKED_CAST")
-            val item = list.adapter.getItem(pos) as Map<String, String>
+            val c = shown[pos]
             setResult(RESULT_OK, Intent()
-                .putExtra("number", item["sub"] ?: "")
+                .putExtra("number", c.number)
                 .putExtra("call", true))
             finish()
         }
-        // Appui long : mettre le numéro au clavier sans appeler
         list.setOnItemLongClickListener { _, _, pos, _ ->
-            @Suppress("UNCHECKED_CAST")
-            val item = list.adapter.getItem(pos) as Map<String, String>
-            setResult(RESULT_OK, Intent().putExtra("number", item["sub"] ?: ""))
+            val c = shown[pos]
+            setResult(RESULT_OK, Intent().putExtra("number", c.number))
             finish()
             true
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (checkSelfPermission(Manifest.permission.READ_CONTACTS)
+            == PackageManager.PERMISSION_GRANTED) load()
+    }
+
+    private fun initialOf(name: String): Char {
+        val clean = Normalizer.normalize(name, Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}"), "")
+            .uppercase()
+        for (ch in clean) if (ch in 'A'..'Z') return ch
+        return '#'
+    }
+
     private fun load() {
-        val out = mutableListOf<Map<String, String>>()
-        contentResolver.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            arrayOf(
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.STARRED
-            ),
-            null, null,
-            ContactsContract.CommonDataKinds.Phone.STARRED + " DESC, " +
-            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " COLLATE NOCASE ASC"
-        )?.use { c ->
-            while (c.moveToNext()) {
-                val star = if (c.getInt(2) == 1) "★ " else ""
-                out.add(mapOf(
-                    "title" to star + (c.getString(0) ?: ""),
-                    "sub" to (c.getString(1) ?: "")
-                ))
+        val out = mutableListOf<Contact>()
+        try {
+            contentResolver.query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                arrayOf(
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER,
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                ),
+                null, null,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " COLLATE NOCASE ASC"
+            )?.use { c ->
+                while (c.moveToNext()) {
+                    out.add(Contact(
+                        c.getString(0) ?: "",
+                        c.getString(1) ?: "",
+                        c.getString(2) ?: ""
+                    ))
+                }
             }
-        }
+        } catch (_: Exception) {}
         all = out
         show(out)
     }
 
-    private fun show(items: List<Map<String, String>>) {
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-        )
+    private fun show(items: List<Contact>) {
+        shown = items
+        letterPos.clear()
+        for ((i, c) in items.withIndex()) {
+            val l = initialOf(c.name)
+            if (l !in letterPos) letterPos[l] = i
+        }
+        adapter.notifyDataSetChanged()
     }
 
     private fun filter(q: String) {
         val query = q.trim().lowercase()
         if (query.isEmpty()) { show(all); return }
         show(all.filter {
-            (it["title"] ?: "").lowercase().contains(query) ||
-            (it["sub"] ?: "").contains(query)
+            it.name.lowercase().contains(query) || it.number.contains(query)
         })
+    }
+
+    // ---- Index alphabétique tactile ----
+    private fun buildIndexBar() {
+        val bar = findViewById<LinearLayout>(R.id.indexBar)
+        val overlay = findViewById<TextView>(R.id.letterOverlay)
+        bar.removeAllViews()
+        for (ch in indexChars) {
+            val tv = TextView(this)
+            tv.text = ch.toString()
+            tv.textSize = 11f
+            tv.gravity = Gravity.CENTER
+            tv.setTextColor(resolveNeon())
+            val lp = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
+            bar.addView(tv, lp)
+        }
+        bar.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    val idx = ((event.y / v.height) * indexChars.length)
+                        .toInt().coerceIn(0, indexChars.length - 1)
+                    val ch = indexChars[idx]
+                    overlay.text = ch.toString()
+                    overlay.visibility = View.VISIBLE
+                    jumpTo(ch)
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    overlay.visibility = View.GONE
+                    v.performClick()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun jumpTo(ch: Char) {
+        letterPos[ch]?.let { list.setSelection(it); return }
+        // Lettre absente : aller à la suivante disponible
+        val start = indexChars.indexOf(ch)
+        for (i in start until indexChars.length) {
+            letterPos[indexChars[i]]?.let { list.setSelection(it); return }
+        }
+    }
+
+    private fun resolveNeon(): Int {
+        val tv = android.util.TypedValue()
+        theme.resolveAttribute(R.attr.cNeon, tv, true)
+        return tv.data
+    }
+
+    inner class ContactAdapter : BaseAdapter() {
+        override fun getCount() = shown.size
+        override fun getItem(position: Int) = shown[position]
+        override fun getItemId(position: Int) = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val v = convertView ?: layoutInflater.inflate(R.layout.item_contact, parent, false)
+            val c = shown[position]
+            v.findViewById<TextView>(R.id.text1).text = c.name
+            v.findViewById<TextView>(R.id.text2).text = c.number
+            v.findViewById<Button>(R.id.btnEdit).setOnClickListener {
+                startActivity(Intent(this@ContactsActivity, EditContactActivity::class.java)
+                    .putExtra("contact_id", c.contactId))
+            }
+            return v
+        }
     }
 
     override fun onRequestPermissionsResult(

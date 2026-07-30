@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
@@ -45,6 +46,7 @@
 
         <activity android:name=".FiltersActivity" android:exported="false" />
         <activity android:name=".ContactsActivity" android:exported="false" />
+        <activity android:name=".EditContactActivity" android:exported="false" />
         <activity android:name=".CallLogActivity" android:exported="false" />
         <activity android:name=".BlockedLogActivity" android:exported="false" />
         <activity android:name=".VoicemailActivity" android:exported="false" />

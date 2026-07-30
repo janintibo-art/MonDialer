@@ -83,4 +83,16 @@
     <string name="mms_dl_fail">Téléchargement impossible : consultez votre ancienne app Messages</string>
     <string name="tap_to_save">appuyez pour enregistrer</string>
     <string name="saved_downloads">%s enregistré dans Téléchargements</string>
+    <string name="edit_contact">MODIFIER LE CONTACT</string>
+    <string name="new_contact">NOUVEAU CONTACT</string>
+    <string name="tap_photo">Appuyez sur l\u0027image pour choisir une photo</string>
+    <string name="hint_name">Nom</string>
+    <string name="hint_phone">Téléphone</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_address">Adresse postale</string>
+    <string name="save_contact">ENREGISTRER</string>
+    <string name="open_system_editor">Ouvrir dans l\u0027éditeur système (plus d\u0027options)</string>
+    <string name="contact_saved">Contact enregistré</string>
+    <string name="contact_save_fail">Échec de l\u0027enregistrement</string>
+    <string name="need_name_or_phone">Indiquez au moins un nom ou un numéro</string>
 </resources>
