@@ -47,7 +47,10 @@ class ThreadActivity : Activity() {
     private lateinit var adapter: MsgAdapter
     private lateinit var listView: ListView
 
-    // Pièce jointe en attente
+    @Volatile private var loading = false
+    private val bmpCache = HashMap<Uri, Bitmap?>()
+    private val decoding = HashSet<Uri>()
+
     private var attachData: ByteArray? = null
     private var attachName: String? = null
     private var attachMime: String? = null
@@ -89,7 +92,6 @@ class ThreadActivity : Activity() {
             else if (body.isNotBlank()) sendSms(to, body)
         }
 
-        // Panneau emoji
         val emojiPanel = findViewById<View>(R.id.emojiPanel)
         findViewById<Button>(R.id.btnEmoji).setOnClickListener {
             emojiPanel.visibility =
@@ -114,26 +116,19 @@ class ThreadActivity : Activity() {
             findViewById<EditText>(R.id.editBody).append(list[pos])
         }
 
-        // GIF depuis la galerie
         findViewById<Button>(R.id.btnGif).setOnClickListener {
             val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
             i.addCategory(Intent.CATEGORY_OPENABLE)
             i.type = "image/gif"
             startActivityForResult(i, 61)
         }
-
-        // Pièce jointe (tout type de fichier)
         findViewById<Button>(R.id.btnAttach).setOnClickListener {
             val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
             i.addCategory(Intent.CATEGORY_OPENABLE)
             i.type = "*/*"
             startActivityForResult(i, 60)
         }
-
         findViewById<TextView>(R.id.txtAttach).setOnClickListener { clearAttachment() }
-
-        if (checkSelfPermission(Manifest.permission.READ_SMS)
-            == PackageManager.PERMISSION_GRANTED && address.isNotBlank()) load()
     }
 
     private fun splitEmojis(s: String): List<String> {
@@ -144,7 +139,6 @@ class ThreadActivity : Activity() {
             val len = Character.charCount(cp)
             var chunk = s.substring(i, i + len)
             i += len
-            // Coller les sélecteurs de variation et modificateurs
             while (i < s.length) {
                 val c2 = s.codePointAt(i)
                 if (c2 == 0xFE0F || c2 in 0x1F3FB..0x1F3FF || c2 == 0x200D) {
@@ -161,27 +155,36 @@ class ThreadActivity : Activity() {
     override fun onResume() {
         super.onResume()
         if (checkSelfPermission(Manifest.permission.READ_SMS)
-            == PackageManager.PERMISSION_GRANTED && address.isNotBlank()) load()
+            == PackageManager.PERMISSION_GRANTED && address.isNotBlank()) loadAsync()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == 60 || requestCode == 61) && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
-            try {
-                val bytes = contentResolver.openInputStream(uri)?.readBytes() ?: return
-                if (bytes.size > 1_000_000) {
-                    Toast.makeText(this, R.string.attach_too_big, Toast.LENGTH_LONG).show()
+            Thread {
+                try {
+                    val bytes = contentResolver.openInputStream(uri)?.readBytes()
+                        ?: return@Thread
+                    val mime = contentResolver.getType(uri) ?: "application/octet-stream"
+                    val name = queryName(uri) ?: "fichier"
+                    runOnUiThread {
+                        if (bytes.size > 1_000_000) {
+                            Toast.makeText(this, R.string.attach_too_big, Toast.LENGTH_LONG).show()
+                        }
+                        attachData = bytes
+                        attachMime = mime
+                        attachName = name
+                        val chip = findViewById<TextView>(R.id.txtAttach)
+                        chip.text = "📎 $name (${bytes.size / 1024} Ko) ✕"
+                        chip.visibility = View.VISIBLE
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
+                    }
                 }
-                attachData = bytes
-                attachMime = contentResolver.getType(uri) ?: "application/octet-stream"
-                attachName = queryName(uri) ?: "fichier"
-                val chip = findViewById<TextView>(R.id.txtAttach)
-                chip.text = "📎 $attachName (${bytes.size / 1024} Ko) ✕"
-                chip.visibility = View.VISIBLE
-            } catch (e: Exception) {
-                Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
-            }
+            }.start()
         }
     }
 
@@ -197,58 +200,68 @@ class ThreadActivity : Activity() {
         findViewById<TextView>(R.id.txtAttach).visibility = View.GONE
     }
 
-    // ---- Chargement SMS + MMS fusionnés ----
-    private fun load() {
-        msgs.clear()
-        try {
-            val (sel, args) = if (threadId != null)
-                Pair("thread_id=?", arrayOf(threadId!!))
-            else Pair("address=?", arrayOf(address))
-            contentResolver.query(
-                Uri.parse("content://sms"),
-                arrayOf("body", "date", "type"),
-                sel, args, null
-            )?.use { c ->
-                while (c.moveToNext()) {
-                    val type = c.getInt(2)
-                    msgs.add(Msg(c.getString(0) ?: "", c.getLong(1),
-                        type == 2 || type == 4 || type == 6))
-                }
-            }
-        } catch (_: Exception) {}
-
-        // MMS du fil
-        try {
-            val tid = threadId ?: findThreadId()
-            if (tid != null) {
+    // ---- Chargement ASYNCHRONE (SMS + MMS) ----
+    private fun loadAsync() {
+        if (loading) return
+        loading = true
+        Thread {
+            val result = mutableListOf<Msg>()
+            try {
+                val (sel, args) = if (threadId != null)
+                    Pair("thread_id=?", arrayOf(threadId!!))
+                else Pair("address=?", arrayOf(address))
                 contentResolver.query(
-                    Uri.parse("content://mms"),
-                    arrayOf("_id", "date", "msg_box"),
-                    "thread_id=?", arrayOf(tid), null
+                    Uri.parse("content://sms"),
+                    arrayOf("body", "date", "type"),
+                    sel, args, "date DESC LIMIT 300"
                 )?.use { c ->
                     while (c.moveToNext()) {
-                        val mid = c.getString(0)
-                        val date = c.getLong(1) * 1000
-                        val outgoing = c.getInt(2) == 2
-                        loadMmsParts(mid, date, outgoing)
+                        val type = c.getInt(2)
+                        result.add(Msg(c.getString(0) ?: "", c.getLong(1),
+                            type == 2 || type == 4 || type == 6))
                     }
                 }
+            } catch (_: Exception) {}
+
+            try {
+                val tid = threadId ?: findThreadId()
+                if (tid != null) {
+                    contentResolver.query(
+                        Uri.parse("content://mms"),
+                        arrayOf("_id", "date", "msg_box"),
+                        "thread_id=?", arrayOf(tid), "date DESC LIMIT 50"
+                    )?.use { c ->
+                        while (c.moveToNext()) {
+                            val mid = c.getString(0)
+                            val date = c.getLong(1) * 1000
+                            val outgoing = c.getInt(2) == 2
+                            loadMmsParts(result, mid, date, outgoing)
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+
+            result.sortBy { it.date }
+
+            // Marquer comme lus (en arrière-plan)
+            try {
+                val v = ContentValues().apply { put("read", 1); put("seen", 1) }
+                if (threadId != null)
+                    contentResolver.update(Uri.parse("content://sms"), v,
+                        "thread_id=?", arrayOf(threadId))
+                else
+                    contentResolver.update(Uri.parse("content://sms"), v,
+                        "address=?", arrayOf(address))
+            } catch (_: Exception) {}
+
+            runOnUiThread {
+                msgs.clear()
+                msgs.addAll(result)
+                adapter.notifyDataSetChanged()
+                if (msgs.isNotEmpty()) listView.setSelection(msgs.size - 1)
+                loading = false
             }
-        } catch (_: Exception) {}
-
-        msgs.sortBy { it.date }
-        adapter.notifyDataSetChanged()
-        if (msgs.isNotEmpty()) listView.setSelection(msgs.size - 1)
-
-        try {
-            val v = ContentValues().apply { put("read", 1); put("seen", 1) }
-            if (threadId != null)
-                contentResolver.update(Uri.parse("content://sms"), v,
-                    "thread_id=?", arrayOf(threadId))
-            else
-                contentResolver.update(Uri.parse("content://sms"), v,
-                    "address=?", arrayOf(address))
-        } catch (_: Exception) {}
+        }.start()
     }
 
     private fun findThreadId(): String? = try {
@@ -260,7 +273,7 @@ class ThreadActivity : Activity() {
         tid
     } catch (_: Exception) { null }
 
-    private fun loadMmsParts(mid: String, date: Long, outgoing: Boolean) {
+    private fun loadMmsParts(result: MutableList<Msg>, mid: String, date: Long, outgoing: Boolean) {
         try {
             var text: String? = null
             val extra = mutableListOf<Msg>()
@@ -286,8 +299,8 @@ class ThreadActivity : Activity() {
                     }
                 }
             }
-            if (!text.isNullOrBlank()) msgs.add(Msg(text, date, outgoing))
-            msgs.addAll(extra)
+            if (!text.isNullOrBlank()) result.add(Msg(text, date, outgoing))
+            result.addAll(extra)
         } catch (_: Exception) {}
     }
 
@@ -302,14 +315,16 @@ class ThreadActivity : Activity() {
             val sm = SmsManager.getDefault()
             val parts = sm.divideMessage(body)
             sm.sendMultipartTextMessage(to, null, parts, null, null)
-            try {
-                val values = ContentValues().apply {
-                    put("address", to); put("body", body)
-                    put("date", System.currentTimeMillis())
-                    put("read", 1); put("type", 2)
-                }
-                contentResolver.insert(Uri.parse("content://sms/sent"), values)
-            } catch (_: Exception) {}
+            Thread {
+                try {
+                    val values = ContentValues().apply {
+                        put("address", to); put("body", body)
+                        put("date", System.currentTimeMillis())
+                        put("read", 1); put("type", 2)
+                    }
+                    contentResolver.insert(Uri.parse("content://sms/sent"), values)
+                } catch (_: Exception) {}
+            }.start()
             findViewById<EditText>(R.id.editBody).setText("")
             if (address.isBlank()) address = to
             msgs.add(Msg(body, System.currentTimeMillis(), true))
@@ -329,50 +344,62 @@ class ThreadActivity : Activity() {
         val data = attachData ?: return
         val name = attachName ?: "fichier"
         val mime = attachMime ?: "application/octet-stream"
-        try {
-            val parts = mutableListOf<MmsCodec.Part>()
-            if (body.isNotBlank())
-                parts.add(MmsCodec.Part("text/plain", null, body.toByteArray()))
-            parts.add(MmsCodec.Part(mime, name, data))
+        findViewById<EditText>(R.id.editBody).setText("")
+        clearAttachment()
+        Toast.makeText(this, R.string.mms_sending, Toast.LENGTH_SHORT).show()
+        Thread {
+            try {
+                val parts = mutableListOf<MmsCodec.Part>()
+                if (body.isNotBlank())
+                    parts.add(MmsCodec.Part("text/plain", null, body.toByteArray()))
+                parts.add(MmsCodec.Part(mime, name, data))
 
-            val pdu = MmsCodec.composeSendReq(to, parts)
-            val dir = File(cacheDir, "mms"); dir.mkdirs()
-            val file = File(dir, "out_${System.currentTimeMillis()}.pdu")
-            file.writeBytes(pdu)
-            val uri = FileProvider.getUriForFile(this, "com.example.mondialer.files", file)
+                val pdu = MmsCodec.composeSendReq(to, parts)
+                val dir = File(cacheDir, "mms"); dir.mkdirs()
+                val file = File(dir, "out_${System.currentTimeMillis()}.pdu")
+                file.writeBytes(pdu)
+                val uri = FileProvider.getUriForFile(
+                    this, "com.example.mondialer.files", file)
 
-            SmsManager.getDefault().sendMultimediaMessage(this, uri, null, null, null)
+                SmsManager.getDefault().sendMultimediaMessage(this, uri, null, null, null)
+                MmsStore.insert(this, to, parts, outgoing = true)
 
-            // Enregistrer dans le fournisseur pour l'historique
-            MmsStore.insert(this, to, parts, outgoing = true)
-
-            findViewById<EditText>(R.id.editBody).setText("")
-            clearAttachment()
-            if (address.isBlank()) address = to
-            Toast.makeText(this, R.string.mms_sending, Toast.LENGTH_SHORT).show()
-            load()
-        } catch (e: Exception) {
-            Toast.makeText(this, R.string.sms_fail, Toast.LENGTH_SHORT).show()
-        }
+                runOnUiThread {
+                    if (address.isBlank()) address = to
+                    loadAsync()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, R.string.sms_fail, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 
     private fun saveToDownloads(uri: Uri, name: String, mime: String) {
-        try {
-            val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, name)
-                put(MediaStore.Downloads.MIME_TYPE, mime)
-            }
-            val out = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-                ?: return
-            contentResolver.openInputStream(uri)?.use { input ->
-                contentResolver.openOutputStream(out)?.use { output ->
-                    input.copyTo(output)
+        Thread {
+            try {
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(MediaStore.Downloads.MIME_TYPE, mime)
+                }
+                val out = contentResolver.insert(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return@Thread
+                contentResolver.openInputStream(uri)?.use { input ->
+                    contentResolver.openOutputStream(out)?.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                runOnUiThread {
+                    Toast.makeText(this,
+                        getString(R.string.saved_downloads, name), Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
                 }
             }
-            Toast.makeText(this, getString(R.string.saved_downloads, name), Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
-        }
+        }.start()
     }
 
     inner class MsgAdapter : BaseAdapter() {
@@ -396,14 +423,19 @@ class ThreadActivity : Activity() {
             bubble.visibility = View.GONE
             img.visibility = View.GONE
             bubble.setOnClickListener(null)
+            img.setOnClickListener(null)
 
             when {
                 m.imageUri != null -> {
                     img.visibility = View.VISIBLE
                     img.setBackgroundResource(bg)
-                    val bmp = decodePart(m.imageUri)
-                    if (bmp != null) img.setImageBitmap(bmp)
-                    else img.setImageResource(android.R.drawable.ic_menu_report_image)
+                    val cached = bmpCache[m.imageUri]
+                    if (cached != null) {
+                        img.setImageBitmap(cached)
+                    } else {
+                        img.setImageResource(android.R.drawable.ic_menu_gallery)
+                        decodeAsync(m.imageUri)
+                    }
                     img.setOnClickListener {
                         saveToDownloads(m.imageUri, "mms_${m.date}.jpg", "image/jpeg")
                     }
@@ -427,11 +459,25 @@ class ThreadActivity : Activity() {
             return v
         }
 
-        private fun decodePart(uri: Uri): Bitmap? = try {
-            contentResolver.openInputStream(uri)?.use { input ->
-                val opts = BitmapFactory.Options().apply { inSampleSize = 2 }
-                BitmapFactory.decodeStream(input, null, opts)
+        /** Décode l'image en arrière-plan puis rafraîchit la liste. */
+        private fun decodeAsync(uri: Uri) {
+            synchronized(decoding) {
+                if (uri in decoding || bmpCache.containsKey(uri)) return
+                decoding.add(uri)
             }
-        } catch (_: Exception) { null }
+            Thread {
+                val bmp = try {
+                    contentResolver.openInputStream(uri)?.use { input ->
+                        val opts = BitmapFactory.Options().apply { inSampleSize = 2 }
+                        BitmapFactory.decodeStream(input, null, opts)
+                    }
+                } catch (_: Exception) { null }
+                runOnUiThread {
+                    bmpCache[uri] = bmp
+                    synchronized(decoding) { decoding.remove(uri) }
+                    notifyDataSetChanged()
+                }
+            }.start()
+        }
     }
 }

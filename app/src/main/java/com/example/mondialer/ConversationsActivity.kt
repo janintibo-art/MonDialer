@@ -66,75 +66,84 @@ class ConversationsActivity : Activity() {
         } catch (_: Exception) { null }
     }
 
+    @Volatile private var loading = false
+
     private fun load() {
-        val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
-        val seen = HashSet<String>()
-        val items = mutableListOf<Map<String, String>>()
-        try {
-            contentResolver.query(
-                Uri.parse("content://sms"),
-                arrayOf("thread_id", "address", "body", "date"),
-                null, null, "date DESC"
-            )?.use { c ->
-                while (c.moveToNext() && items.size < 100) {
-                    val tid = c.getString(0) ?: continue
-                    if (tid in seen) continue
-                    seen.add(tid)
-                    val address = c.getString(1) ?: ""
-                    val body = c.getString(2) ?: ""
-                    val date = fmt.format(Date(c.getLong(3)))
-                    val name = lookupName(address)
-                    items.add(mapOf(
-                        "title" to (name ?: address),
-                        "sub" to "${body.take(60)}  •  $date",
-                        "address" to address,
-                        "tid" to tid
-                    ))
+        if (loading) return
+        loading = true
+        Thread {
+            val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
+            val seen = HashSet<String>()
+            val items = mutableListOf<Map<String, String>>()
+            try {
+                contentResolver.query(
+                    Uri.parse("content://sms"),
+                    arrayOf("thread_id", "address", "body", "date"),
+                    null, null, "date DESC LIMIT 200"
+                )?.use { c ->
+                    while (c.moveToNext() && items.size < 100) {
+                        val tid = c.getString(0) ?: continue
+                        if (tid in seen) continue
+                        seen.add(tid)
+                        val address = c.getString(1) ?: ""
+                        val body = c.getString(2) ?: ""
+                        val date = fmt.format(Date(c.getLong(3)))
+                        val name = lookupName(address)
+                        items.add(mapOf(
+                            "title" to (name ?: address),
+                            "sub" to "${body.take(60)}  •  $date",
+                            "address" to address,
+                            "tid" to tid
+                        ))
+                    }
                 }
-            }
-        } catch (_: Exception) {}
+            } catch (_: Exception) {}
 
-        // Fils MMS absents de la liste SMS
-        try {
-            contentResolver.query(
-                Uri.parse("content://mms"),
-                arrayOf("_id", "thread_id", "date"),
-                null, null, "date DESC"
-            )?.use { c ->
-                while (c.moveToNext() && items.size < 120) {
-                    val tid = c.getString(1) ?: continue
-                    if (tid in seen) continue
-                    seen.add(tid)
-                    val mid = c.getString(0)
-                    val date = fmt.format(Date(c.getLong(2) * 1000))
-                    var addr = ""
-                    contentResolver.query(
-                        Uri.parse("content://mms/" + mid + "/addr"),
-                        arrayOf("address"), "type=137", null, null
-                    )?.use { a -> if (a.moveToFirst()) addr = a.getString(0) ?: "" }
-                    if (addr.isBlank()) continue
-                    val name = lookupName(addr)
-                    items.add(mapOf(
-                        "title" to (name ?: addr),
-                        "sub" to "📷 MMS  •  " + date,
-                        "address" to addr,
-                        "tid" to tid
-                    ))
+            // Fils MMS absents de la liste SMS
+            try {
+                contentResolver.query(
+                    Uri.parse("content://mms"),
+                    arrayOf("_id", "thread_id", "date"),
+                    null, null, "date DESC LIMIT 60"
+                )?.use { c ->
+                    while (c.moveToNext() && items.size < 120) {
+                        val tid = c.getString(1) ?: continue
+                        if (tid in seen) continue
+                        seen.add(tid)
+                        val mid = c.getString(0)
+                        val date = fmt.format(Date(c.getLong(2) * 1000))
+                        var addr = ""
+                        contentResolver.query(
+                            Uri.parse("content://mms/" + mid + "/addr"),
+                            arrayOf("address"), "type=137", null, null
+                        )?.use { a -> if (a.moveToFirst()) addr = a.getString(0) ?: "" }
+                        if (addr.isBlank()) continue
+                        val name = lookupName(addr)
+                        items.add(mapOf(
+                            "title" to (name ?: addr),
+                            "sub" to "📷 MMS  •  " + date,
+                            "address" to addr,
+                            "tid" to tid
+                        ))
+                    }
                 }
-            }
-        } catch (_: Exception) {}
+            } catch (_: Exception) {}
 
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-        )
-        list.setOnItemClickListener { _, _, pos, _ ->
-            @Suppress("UNCHECKED_CAST")
-            val item = list.adapter.getItem(pos) as Map<String, String>
-            startActivity(Intent(this, ThreadActivity::class.java)
-                .putExtra("address", item["address"])
-                .putExtra("thread_id", item["tid"]))
-        }
+            runOnUiThread {
+                list.adapter = SimpleAdapter(
+                    this, items, R.layout.item_two_lines,
+                    arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
+                )
+                list.setOnItemClickListener { _, _, pos, _ ->
+                    @Suppress("UNCHECKED_CAST")
+                    val item = list.adapter.getItem(pos) as Map<String, String>
+                    startActivity(Intent(this, ThreadActivity::class.java)
+                        .putExtra("address", item["address"])
+                        .putExtra("thread_id", item["tid"]))
+                }
+                loading = false
+            }
+        }.start()
     }
 
     private fun requestSmsRole() {
