@@ -11,8 +11,8 @@ android {
         applicationId "com.example.mondialer"
         minSdk 29
         targetSdk 34
-        versionCode 12
-        versionName "5.5"
+        versionCode 13
+        versionName "5.5.1"
     }
 
     buildTypes {
@@ -26,6 +26,24 @@ android {
     }
     kotlinOptions {
         jvmTarget = '17'
+    }
+
+    // Les bibliothèques mail embarquent chacune leurs fichiers META-INF :
+    // on les exclut pour éviter les conflits de doublons à l'empaquetage.
+    packaging {
+        resources {
+            excludes += [
+                'META-INF/LICENSE.md',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/NOTICE.md',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/DEPENDENCIES',
+                'META-INF/INDEX.LIST',
+                'META-INF/*.kotlin_module'
+            ]
+        }
     }
 }
 
