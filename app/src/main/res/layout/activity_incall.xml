@@ -77,18 +77,18 @@
             android:rowCount="4"
             android:visibility="gone">
 
-            <Button android:id="@+id/dt1" style="@style/DialpadMini" android:text="1" />
-            <Button android:id="@+id/dt2" style="@style/DialpadMini" android:text="2" />
-            <Button android:id="@+id/dt3" style="@style/DialpadMini" android:text="3" />
-            <Button android:id="@+id/dt4" style="@style/DialpadMini" android:text="4" />
-            <Button android:id="@+id/dt5" style="@style/DialpadMini" android:text="5" />
-            <Button android:id="@+id/dt6" style="@style/DialpadMini" android:text="6" />
-            <Button android:id="@+id/dt7" style="@style/DialpadMini" android:text="7" />
-            <Button android:id="@+id/dt8" style="@style/DialpadMini" android:text="8" />
-            <Button android:id="@+id/dt9" style="@style/DialpadMini" android:text="9" />
-            <Button android:id="@+id/dtStar" style="@style/DialpadMini" android:text="*" />
-            <Button android:id="@+id/dt0" style="@style/DialpadMini" android:text="0" />
-            <Button android:id="@+id/dtHash" style="@style/DialpadMini" android:text="#" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt1" style="@style/DialpadMini" android:text="1" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt2" style="@style/DialpadMini" android:text="2" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt3" style="@style/DialpadMini" android:text="3" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt4" style="@style/DialpadMini" android:text="4" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt5" style="@style/DialpadMini" android:text="5" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt6" style="@style/DialpadMini" android:text="6" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt7" style="@style/DialpadMini" android:text="7" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt8" style="@style/DialpadMini" android:text="8" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt9" style="@style/DialpadMini" android:text="9" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dtStar" style="@style/DialpadMini" android:text="*" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dt0" style="@style/DialpadMini" android:text="0" />
+            <com.example.mondialer.Neon3DButton android:id="@+id/dtHash" style="@style/DialpadMini" android:text="#" />
         </GridLayout>
 
         <Button

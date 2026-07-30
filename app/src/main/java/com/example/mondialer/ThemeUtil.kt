@@ -72,6 +72,17 @@ object ThemeUtil {
         decorate(a)
     }
 
+    /** Famille de formes du thème actif : orb, tuile ou hud. */
+    fun currentShape(ctx: android.content.Context): String {
+        BlockRulesStore.appCtx = ctx.applicationContext
+        return when (BlockRulesStore.theme) {
+            "violet", "orange", "or" -> "tuile"
+            "rouge", "graphite", "ardoise" -> "hud"
+            "custom" -> BlockRulesStore.customShape
+            else -> "orb"
+        }
+    }
+
     fun forget(a: Activity) {
         applied.remove(System.identityHashCode(a))
     }

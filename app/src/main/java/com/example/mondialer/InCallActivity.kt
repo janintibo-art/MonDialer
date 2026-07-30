@@ -92,7 +92,10 @@ class InCallActivity : Activity() {
         // Réinflater le fond avec le thème courant (contourne le cache de drawables)
         keys.keys.forEach { id ->
             findViewById<Button>(id)?.let { b ->
-                b.background = resources.getDrawable(ThemeRes.res(this, R.attr.dialBg), theme)
+                if (b !is Neon3DButton) {
+                    b.background = resources.getDrawable(
+                        ThemeRes.res(this, R.attr.dialBg), theme)
+                }
             }
         }
 

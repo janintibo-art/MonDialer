@@ -237,7 +237,10 @@ class MainActivity : Activity() {
         val bgRes = ThemeRes.res(this, R.attr.dialBg)
         for (id in ids) {
             val b = findViewById<Button>(id) ?: continue
-            b.background = resources.getDrawable(bgRes, theme)
+            // Les touches 3D se dessinent elles-mêmes : pas de fond XML
+            if (b !is Neon3DButton) {
+                b.background = resources.getDrawable(bgRes, theme)
+            }
             b.setShadowLayer(14f, 0f, 0f, neon)
 
             // Le libellé courant sert de source pour le chiffre/symbole
