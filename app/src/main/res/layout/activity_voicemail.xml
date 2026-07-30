@@ -20,7 +20,7 @@
         android:layout_height="56dp"
         android:background="@drawable/btn_call"
         android:stateListAnimator="@animator/press"
-        android:textColor="@color/bg_deep"
+        android:textColor="?attr/cOnAccent"
         android:textStyle="bold"
         android:text="@string/call_voicemail" />
 

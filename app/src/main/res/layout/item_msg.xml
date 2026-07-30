@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:maxWidth="280dp"
         android:padding="12dp"
-        android:textColor="@color/text_main"
+        android:textColor="?attr/cText"
         android:textSize="15sp"
         android:visibility="gone" />
 
@@ -35,6 +35,6 @@
         android:layout_height="wrap_content"
         android:paddingStart="6dp"
         android:paddingTop="2dp"
-        android:textColor="@color/text_dim"
+        android:textColor="?attr/cTextDim"
         android:textSize="11sp" />
 </LinearLayout>

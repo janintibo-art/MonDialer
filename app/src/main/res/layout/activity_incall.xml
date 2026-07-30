@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="@color/text_main"
+            android:textColor="?attr/cText"
             android:textSize="26sp"
             android:textStyle="bold"
             android:visibility="gone" />
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@color/text_dim"
+            android:textColor="?attr/cTextDim"
             android:textSize="18sp"
             android:letterSpacing="0.2" />
 
@@ -98,7 +98,7 @@
             android:layout_marginTop="32dp"
             android:background="@drawable/btn_call"
             android:stateListAnimator="@animator/press"
-            android:textColor="@color/bg_deep"
+            android:textColor="?attr/cOnAccent"
             android:textStyle="bold"
             android:text="@string/answer" />
 
@@ -109,7 +109,7 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/btn_danger"
             android:stateListAnimator="@animator/press"
-            android:textColor="@color/text_main"
+            android:textColor="?attr/cText"
             android:textStyle="bold"
             android:text="@string/hangup" />
     </LinearLayout>

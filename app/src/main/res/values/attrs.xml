@@ -2,6 +2,29 @@
 <resources>
     <attr name="cNeon" format="color" />
     <attr name="cNeonDim" format="color" />
+    <attr name="cAccent2" format="color" />
+    <attr name="cAccent3" format="color" />
     <attr name="cHalo" format="color" />
     <attr name="cHaloStrong" format="color" />
+    <attr name="cHaloAlt" format="color" />
+
+    <attr name="cBgStart" format="color" />
+    <attr name="cBgMid" format="color" />
+    <attr name="cBgEnd" format="color" />
+    <attr name="cPanelStart" format="color" />
+    <attr name="cPanelEnd" format="color" />
+    <attr name="cButtonStart" format="color" />
+    <attr name="cButtonEnd" format="color" />
+    <attr name="cDialStart" format="color" />
+    <attr name="cDialEnd" format="color" />
+
+    <attr name="cCallStart" format="color" />
+    <attr name="cCallEnd" format="color" />
+    <attr name="cCallHalo" format="color" />
+    <attr name="cDangerStart" format="color" />
+    <attr name="cDangerEnd" format="color" />
+
+    <attr name="cText" format="color" />
+    <attr name="cTextDim" format="color" />
+    <attr name="cOnAccent" format="color" />
 </resources>

@@ -80,7 +80,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/btn_call"
             android:stateListAnimator="@animator/press"
-            android:textColor="@color/bg_deep"
+            android:textColor="?attr/cOnAccent"
             android:textStyle="bold"
             android:text="@string/email_send" />
 
@@ -157,7 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="6dp"
-                android:textColor="@color/text_dim"
+                android:textColor="?attr/cTextDim"
                 android:textSize="12sp"
                 android:text="@string/gmail_hint" />
 

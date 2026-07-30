@@ -125,7 +125,7 @@
             android:layout_margin="4dp"
             android:background="@drawable/btn_call"
             android:stateListAnimator="@animator/press"
-            android:textColor="@color/bg_deep"
+            android:textColor="?attr/cOnAccent"
             android:textStyle="bold"
             android:letterSpacing="0.15"
             android:text="@string/call" />

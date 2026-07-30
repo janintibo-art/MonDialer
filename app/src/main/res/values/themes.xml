@@ -1,60 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- OCÉAN CYBER — cyan, bleu électrique et magenta -->
     <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@drawable/bg_gradient</item>
         <item name="android:colorAccent">?attr/cNeon</item>
-        <item name="android:textColor">@color/text_main</item>
-        <item name="android:textColorPrimary">@color/text_main</item>
-        <item name="android:textColorSecondary">@color/text_dim</item>
-        <item name="android:editTextColor">@color/text_main</item>
-        <item name="android:textColorHint">@color/text_dim</item>
-        <item name="android:statusBarColor">@color/bg_deep</item>
-        <item name="android:navigationBarColor">@color/bg_deep</item>
-        <!-- Palette cyan (défaut) -->
-        <item name="cNeon">#00E5FF</item>
-        <item name="cNeonDim">#00B8D4</item>
-        <item name="cHalo">#3300E5FF</item>
-        <item name="cHaloStrong">#8000E5FF</item>
+        <item name="android:textColor">?attr/cText</item>
+        <item name="android:textColorPrimary">?attr/cText</item>
+        <item name="android:textColorSecondary">?attr/cTextDim</item>
+        <item name="android:editTextColor">?attr/cText</item>
+        <item name="android:textColorHint">?attr/cTextDim</item>
+        <item name="android:statusBarColor">?attr/cBgStart</item>
+        <item name="android:navigationBarColor">?attr/cBgEnd</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:fontFamily">sans</item>
+
+        <item name="cNeon">#45E9FF</item>
+        <item name="cNeonDim">#00A6FF</item>
+        <item name="cAccent2">#FF3CAC</item>
+        <item name="cAccent3">#7B61FF</item>
+        <item name="cHalo">#3345E9FF</item>
+        <item name="cHaloStrong">#8045E9FF</item>
+        <item name="cHaloAlt">#33FF3CAC</item>
+        <item name="cBgStart">#020611</item>
+        <item name="cBgMid">#071A33</item>
+        <item name="cBgEnd">#100521</item>
+        <item name="cPanelStart">#081C31</item>
+        <item name="cPanelEnd">#18355E</item>
+        <item name="cButtonStart">#0D2940</item>
+        <item name="cButtonEnd">#24426F</item>
+        <item name="cDialStart">#0B1A31</item>
+        <item name="cDialEnd">#21507D</item>
+        <item name="cCallStart">#00BFA6</item>
+        <item name="cCallEnd">#63FFB2</item>
+        <item name="cCallHalo">#6600E7C2</item>
+        <item name="cDangerStart">#B51F58</item>
+        <item name="cDangerEnd">#FF4D87</item>
+        <item name="cText">#F7FCFF</item>
+        <item name="cTextDim">#B0D1E2</item>
+        <item name="cOnAccent">#03110E</item>
     </style>
 
+    <!-- SYNTHWAVE — violet, rose laser et cyan -->
     <style name="AppTheme.Violet">
-        <item name="cNeon">#C77DFF</item>
-        <item name="cNeonDim">#9D4EDD</item>
-        <item name="cHalo">#33C77DFF</item>
-        <item name="cHaloStrong">#80C77DFF</item>
+        <item name="cNeon">#D58CFF</item>
+        <item name="cNeonDim">#8A4DFF</item>
+        <item name="cAccent2">#FF3DAA</item>
+        <item name="cAccent3">#25E6FF</item>
+        <item name="cHalo">#33D58CFF</item>
+        <item name="cHaloStrong">#80D58CFF</item>
+        <item name="cHaloAlt">#3DFF3DAA</item>
+        <item name="cBgStart">#090316</item>
+        <item name="cBgMid">#1B0A36</item>
+        <item name="cBgEnd">#07182D</item>
+        <item name="cPanelStart">#1A0D31</item>
+        <item name="cPanelEnd">#362262</item>
+        <item name="cButtonStart">#281243</item>
+        <item name="cButtonEnd">#4B2D73</item>
+        <item name="cDialStart">#180B31</item>
+        <item name="cDialEnd">#56317F</item>
+        <item name="cCallStart">#00BFD6</item>
+        <item name="cCallEnd">#62F5FF</item>
+        <item name="cCallHalo">#6625E6FF</item>
+        <item name="cDangerStart">#C21F68</item>
+        <item name="cDangerEnd">#FF4A9E</item>
+        <item name="cText">#FFF8FF</item>
+        <item name="cTextDim">#D8C0E9</item>
+        <item name="cOnAccent">#061014</item>
     </style>
 
+    <!-- PUNK TOXIQUE — vert acide, jaune et violet -->
     <style name="AppTheme.Green">
-        <item name="cNeon">#00FF66</item>
-        <item name="cNeonDim">#00CC52</item>
-        <item name="cHalo">#3300FF66</item>
-        <item name="cHaloStrong">#8000FF66</item>
+        <item name="cNeon">#63FF6B</item>
+        <item name="cNeonDim">#14D95A</item>
+        <item name="cAccent2">#E7FF3C</item>
+        <item name="cAccent3">#A855F7</item>
+        <item name="cHalo">#3363FF6B</item>
+        <item name="cHaloStrong">#8063FF6B</item>
+        <item name="cHaloAlt">#3DE7FF3C</item>
+        <item name="cBgStart">#020B08</item>
+        <item name="cBgMid">#09251B</item>
+        <item name="cBgEnd">#160722</item>
+        <item name="cPanelStart">#0B241A</item>
+        <item name="cPanelEnd">#20432F</item>
+        <item name="cButtonStart">#133022</item>
+        <item name="cButtonEnd">#34543B</item>
+        <item name="cDialStart">#0A2117</item>
+        <item name="cDialEnd">#316544</item>
+        <item name="cCallStart">#B6D900</item>
+        <item name="cCallEnd">#EFFF4F</item>
+        <item name="cCallHalo">#66DFFF24</item>
+        <item name="cDangerStart">#B41E52</item>
+        <item name="cDangerEnd">#FF426D</item>
+        <item name="cText">#F6FFF5</item>
+        <item name="cTextDim">#C0DBBF</item>
+        <item name="cOnAccent">#101500</item>
     </style>
 
+    <!-- ÉRUPTION SOLAIRE — orange, rouge corail et or -->
     <style name="AppTheme.Orange">
-        <item name="cNeon">#FF9E00</item>
-        <item name="cNeonDim">#E08700</item>
-        <item name="cHalo">#33FF9E00</item>
-        <item name="cHaloStrong">#80FF9E00</item>
+        <item name="cNeon">#FFB12E</item>
+        <item name="cNeonDim">#FF6A21</item>
+        <item name="cAccent2">#FF3D5A</item>
+        <item name="cAccent3">#FFE66D</item>
+        <item name="cHalo">#38FFB12E</item>
+        <item name="cHaloStrong">#80FFB12E</item>
+        <item name="cHaloAlt">#3DFF3D5A</item>
+        <item name="cBgStart">#100602</item>
+        <item name="cBgMid">#351307</item>
+        <item name="cBgEnd">#250516</item>
+        <item name="cPanelStart">#30140A</item>
+        <item name="cPanelEnd">#5E2A15</item>
+        <item name="cButtonStart">#38190E</item>
+        <item name="cButtonEnd">#714326</item>
+        <item name="cDialStart">#2A1108</item>
+        <item name="cDialEnd">#7F4B22</item>
+        <item name="cCallStart">#FF8A00</item>
+        <item name="cCallEnd">#FFE15A</item>
+        <item name="cCallHalo">#66FFB000</item>
+        <item name="cDangerStart">#B81F32</item>
+        <item name="cDangerEnd">#FF4D62</item>
+        <item name="cText">#FFFAF1</item>
+        <item name="cTextDim">#ECC8AF</item>
+        <item name="cOnAccent">#1B0D00</item>
     </style>
+
+    <!-- CANDY PULSE — rose, cyan et violet profond -->
     <style name="AppTheme.Rose">
-        <item name="cNeon">#FF4FD8</item>
-        <item name="cNeonDim">#D633B0</item>
-        <item name="cHalo">#33FF4FD8</item>
-        <item name="cHaloStrong">#80FF4FD8</item>
+        <item name="cNeon">#FF72D8</item>
+        <item name="cNeonDim">#E238A9</item>
+        <item name="cAccent2">#55E7FF</item>
+        <item name="cAccent3">#8C5CFF</item>
+        <item name="cHalo">#38FF72D8</item>
+        <item name="cHaloStrong">#80FF72D8</item>
+        <item name="cHaloAlt">#3855E7FF</item>
+        <item name="cBgStart">#100517</item>
+        <item name="cBgMid">#2F0D34</item>
+        <item name="cBgEnd">#071C33</item>
+        <item name="cPanelStart">#2D1235</item>
+        <item name="cPanelEnd">#55295E</item>
+        <item name="cButtonStart">#381743</item>
+        <item name="cButtonEnd">#66346E</item>
+        <item name="cDialStart">#260F30</item>
+        <item name="cDialEnd">#733A7D</item>
+        <item name="cCallStart">#00BBD4</item>
+        <item name="cCallEnd">#5AF2FF</item>
+        <item name="cCallHalo">#6655E7FF</item>
+        <item name="cDangerStart">#B31E63</item>
+        <item name="cDangerEnd">#FF4D9A</item>
+        <item name="cText">#FFF8FE</item>
+        <item name="cTextDim">#E3BEDB</item>
+        <item name="cOnAccent">#051217</item>
     </style>
 
+    <!-- GLACE ÉCARLATE — rouge, bleu glacier et indigo -->
     <style name="AppTheme.Rouge">
-        <item name="cNeon">#FF3355</item>
-        <item name="cNeonDim">#D91F42</item>
-        <item name="cHalo">#33FF3355</item>
-        <item name="cHaloStrong">#80FF3355</item>
+        <item name="cNeon">#FF526D</item>
+        <item name="cNeonDim">#D9284B</item>
+        <item name="cAccent2">#65E8FF</item>
+        <item name="cAccent3">#5967FF</item>
+        <item name="cHalo">#38FF526D</item>
+        <item name="cHaloStrong">#80FF526D</item>
+        <item name="cHaloAlt">#3865E8FF</item>
+        <item name="cBgStart">#0E0308</item>
+        <item name="cBgMid">#2B0B18</item>
+        <item name="cBgEnd">#07142C</item>
+        <item name="cPanelStart">#2A0E1A</item>
+        <item name="cPanelEnd">#45263A</item>
+        <item name="cButtonStart">#341320</item>
+        <item name="cButtonEnd">#593047</item>
+        <item name="cDialStart">#240D18</item>
+        <item name="cDialEnd">#683449</item>
+        <item name="cCallStart">#15BBD1</item>
+        <item name="cCallEnd">#7CEEFF</item>
+        <item name="cCallHalo">#6665E8FF</item>
+        <item name="cDangerStart">#A91035</item>
+        <item name="cDangerEnd">#FF405E</item>
+        <item name="cText">#FFF8FA</item>
+        <item name="cTextDim">#DBB9C3</item>
+        <item name="cOnAccent">#061419</item>
     </style>
 
+    <!-- OR ROYAL — or, turquoise et pourpre -->
     <style name="AppTheme.Or">
-        <item name="cNeon">#FFD24A</item>
-        <item name="cNeonDim">#E0B02E</item>
-        <item name="cHalo">#33FFD24A</item>
-        <item name="cHaloStrong">#80FFD24A</item>
+        <item name="cNeon">#FFD85A</item>
+        <item name="cNeonDim">#D8A82D</item>
+        <item name="cAccent2">#35E0C1</item>
+        <item name="cAccent3">#B55CFF</item>
+        <item name="cHalo">#38FFD85A</item>
+        <item name="cHaloStrong">#80FFD85A</item>
+        <item name="cHaloAlt">#3835E0C1</item>
+        <item name="cBgStart">#0C0902</item>
+        <item name="cBgMid">#2B2108</item>
+        <item name="cBgEnd">#160925</item>
+        <item name="cPanelStart">#291F0B</item>
+        <item name="cPanelEnd">#4D3E18</item>
+        <item name="cButtonStart">#342911</item>
+        <item name="cButtonEnd">#5A4C26</item>
+        <item name="cDialStart">#251E09</item>
+        <item name="cDialEnd">#685728</item>
+        <item name="cCallStart">#0EA88D</item>
+        <item name="cCallEnd">#58F0CD</item>
+        <item name="cCallHalo">#6635E0C1</item>
+        <item name="cDangerStart">#A92749</item>
+        <item name="cDangerEnd">#F45A76</item>
+        <item name="cText">#FFFCF2</item>
+        <item name="cTextDim">#E1D5B0</item>
+        <item name="cOnAccent">#04130F</item>
+    </style>
+
+    <!-- OBSIDIENNE PRO — sobre, pro, graphite et bleu acier -->
+    <style name="AppTheme.Graphite">
+        <item name="cNeon">#BFD8FF</item>
+        <item name="cNeonDim">#6F91C5</item>
+        <item name="cAccent2">#7DA0D8</item>
+        <item name="cAccent3">#D7E2F3</item>
+        <item name="cHalo">#2ABFD8FF</item>
+        <item name="cHaloStrong">#66BFD8FF</item>
+        <item name="cHaloAlt">#2A7DA0D8</item>
+        <item name="cBgStart">#080A0D</item>
+        <item name="cBgMid">#12171D</item>
+        <item name="cBgEnd">#1D222B</item>
+        <item name="cPanelStart">#151A20</item>
+        <item name="cPanelEnd">#242C36</item>
+        <item name="cButtonStart">#1A2028</item>
+        <item name="cButtonEnd">#303B47</item>
+        <item name="cDialStart">#13181F</item>
+        <item name="cDialEnd">#33414F</item>
+        <item name="cCallStart">#6A88B8</item>
+        <item name="cCallEnd">#AFC6E8</item>
+        <item name="cCallHalo">#507D9FD3</item>
+        <item name="cDangerStart">#834356</item>
+        <item name="cDangerEnd">#B9697C</item>
+        <item name="cText">#F5F8FC</item>
+        <item name="cTextDim">#B2BDC9</item>
+        <item name="cOnAccent">#071019</item>
+    </style>
+
+    <!-- ARDOISE NUIT — anthracite, argent et bleu pétrole -->
+    <style name="AppTheme.Ardoise">
+        <item name="cNeon">#D8E0EA</item>
+        <item name="cNeonDim">#7E95A8</item>
+        <item name="cAccent2">#5D8AA6</item>
+        <item name="cAccent3">#B7C3CF</item>
+        <item name="cHalo">#22D8E0EA</item>
+        <item name="cHaloStrong">#4DD8E0EA</item>
+        <item name="cHaloAlt">#265D8AA6</item>
+        <item name="cBgStart">#050608</item>
+        <item name="cBgMid">#111419</item>
+        <item name="cBgEnd">#1A1F26</item>
+        <item name="cPanelStart">#12161B</item>
+        <item name="cPanelEnd">#20262F</item>
+        <item name="cButtonStart">#171C22</item>
+        <item name="cButtonEnd">#2A333D</item>
+        <item name="cDialStart">#101419</item>
+        <item name="cDialEnd">#303843</item>
+        <item name="cCallStart">#52758A</item>
+        <item name="cCallEnd">#8FB2C8</item>
+        <item name="cCallHalo">#405D8AA6</item>
+        <item name="cDangerStart">#7E4B57</item>
+        <item name="cDangerEnd">#B56E7C</item>
+        <item name="cText">#F3F6F9</item>
+        <item name="cTextDim">#A7B2BE</item>
+        <item name="cOnAccent">#061018</item>
     </style>
 </resources>

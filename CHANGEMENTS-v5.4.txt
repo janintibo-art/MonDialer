@@ -1,0 +1,11 @@
+MONDIALER 5.4 — REFONTE GRAPHIQUE
+
+- 7 thèmes multicolores complets au lieu de simples variantes monochromes.
+- Nouveau sélecteur « THEME STUDIO » avec cartes d'aperçu.
+- Thème actif marqué par une coche, une taille et une élévation renforcées.
+- Fonds à double halo coloré.
+- Panneaux, touches du clavier et boutons recolorés par palette.
+- Bouton d'appel dynamique et fortement contrasté.
+- Bulles SMS adaptées à chaque thème.
+- Couleurs de texte harmonisées dans toutes les activités.
+- Version de l'application portée à 5.4 (versionCode 11).

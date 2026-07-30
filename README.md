@@ -15,3 +15,17 @@ Application Téléphone par défaut pour Android (min. Android 10) — design fu
 
 ## Compilation
 Push sur `main` → GitHub Actions compile l'APK → onglet **Actions → Artifacts → MonDialer-debug-apk**.
+
+## Version 5.4 — Theme Studio
+
+L'interface utilise maintenant sept palettes multicolores complètes :
+
+- Océan Cyber — cyan, bleu électrique, magenta
+- Synthwave — violet, rose laser, cyan
+- Punk Toxique — vert acide, jaune, violet
+- Éruption Solaire — orange, corail, or
+- Candy Pulse — rose, cyan, violet
+- Glace Écarlate — rouge, bleu glacier, indigo
+- Or Royal — or, turquoise, pourpre
+
+Chaque palette pilote le fond, les panneaux, le clavier, les halos, les bulles de messages, les boutons d'action et le bouton d'appel. Le sélecteur de thèmes affiche désormais de vraies cartes d'aperçu et met en évidence la palette active.

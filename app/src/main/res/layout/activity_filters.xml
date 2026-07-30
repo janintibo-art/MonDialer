@@ -34,39 +34,82 @@
                 android:text="@string/import_btn" />
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            style="@style/SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="14dp"
+            android:text="@string/theme_studio_title" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="5dp"
+            android:text="@string/theme_studio_subtitle"
+            android:textColor="?attr/cTextDim"
+            android:textSize="12sp" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:rowCount="5">
 
             <TextView
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="@string/theme_label" android:textColor="@color/text_dim"
-                android:layout_marginEnd="12dp" />
-            <View android:id="@+id/themeCyan" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_cyan" />
-            <View android:id="@+id/themeViolet" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_violet" />
-            <View android:id="@+id/themeGreen" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_green" />
-            <View android:id="@+id/themeOrange" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_orange" />
-            <View android:id="@+id/themeRose" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_rose" />
-            <View android:id="@+id/themeRouge" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_rouge" />
-            <View android:id="@+id/themeOr" android:layout_width="34dp"
-                android:layout_height="34dp" android:layout_margin="5dp"
-                android:background="@drawable/dot_or" />
-        </LinearLayout>
+                android:id="@+id/themeCyan"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_cyan"
+                android:text="@string/theme_cyber_ocean" />
+
+            <TextView
+                android:id="@+id/themeViolet"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_violet"
+                android:text="@string/theme_synthwave" />
+
+            <TextView
+                android:id="@+id/themeGreen"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_green"
+                android:text="@string/theme_toxic_punk" />
+
+            <TextView
+                android:id="@+id/themeOrange"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_orange"
+                android:text="@string/theme_solar_flare" />
+
+            <TextView
+                android:id="@+id/themeRose"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_rose"
+                android:text="@string/theme_candy_pulse" />
+
+            <TextView
+                android:id="@+id/themeRouge"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_rouge"
+                android:text="@string/theme_crimson_ice" />
+
+            <TextView
+                android:id="@+id/themeOr"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_or"
+                android:text="@string/theme_royal_gold" />
+
+            <TextView
+                android:id="@+id/themeGraphite"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_graphite"
+                android:text="@string/theme_obsidian_pro" />
+
+            <TextView
+                android:id="@+id/themeArdoise"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_ardoise"
+                android:text="@string/theme_ardoise_nuit" />
+        </GridLayout>
 
         <Switch android:id="@+id/swSilent"
             android:layout_width="match_parent" android:layout_height="wrap_content"

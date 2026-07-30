@@ -12,6 +12,8 @@ object ThemeUtil {
             "rose" -> R.style.AppTheme_Rose
             "rouge" -> R.style.AppTheme_Rouge
             "or" -> R.style.AppTheme_Or
+            "graphite" -> R.style.AppTheme_Graphite
+            "ardoise" -> R.style.AppTheme_Ardoise
             else -> R.style.AppTheme
         }
         a.setTheme(style)

@@ -5,35 +5,40 @@
             <item>
                 <shape>
                     <gradient android:angle="270"
-                        android:startColor="#0A1420" android:endColor="#1E4A63" />
-                    <corners android:radius="24dp" />
-                    <stroke android:width="1.5dp" android:color="?attr/cNeon" />
+                        android:startColor="?attr/cButtonEnd"
+                        android:centerColor="?attr/cPanelEnd"
+                        android:endColor="?attr/cButtonStart" />
+                    <corners android:radius="26dp" />
+                    <stroke android:width="2dp" android:color="?attr/cAccent2" />
                 </shape>
             </item>
         </layer-list>
     </item>
     <item>
         <layer-list>
-            <item android:top="3dp">
+            <item android:top="4dp">
                 <shape>
-                    <solid android:color="#66000000" />
-                    <corners android:radius="24dp" />
+                    <solid android:color="#76000000" />
+                    <corners android:radius="26dp" />
                 </shape>
             </item>
-            <item android:bottom="3dp">
+            <item android:bottom="4dp">
                 <shape>
                     <gradient android:angle="90"
-                        android:startColor="#0C1B2A" android:endColor="#1A3D52" />
-                    <corners android:radius="24dp" />
-                    <stroke android:width="1dp" android:color="?attr/cNeonDim" />
+                        android:startColor="?attr/cButtonStart"
+                        android:centerColor="?attr/cPanelEnd"
+                        android:endColor="?attr/cButtonEnd" />
+                    <corners android:radius="26dp" />
+                    <stroke android:width="1.6dp" android:color="?attr/cNeonDim" />
                 </shape>
             </item>
-            <item android:bottom="3dp">
+            <item android:bottom="4dp" android:left="1dp" android:right="1dp" android:top="1dp">
                 <shape>
                     <gradient android:angle="270"
-                        android:startColor="#2EFFFFFF" android:centerColor="#00FFFFFF"
+                        android:startColor="#40FFFFFF"
+                        android:centerColor="#12FFFFFF"
                         android:endColor="#00FFFFFF" />
-                    <corners android:radius="24dp" />
+                    <corners android:radius="25dp" />
                 </shape>
             </item>
         </layer-list>

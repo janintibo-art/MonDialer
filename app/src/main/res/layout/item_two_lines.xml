@@ -9,7 +9,7 @@
         android:id="@+id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_main"
+        android:textColor="?attr/cText"
         android:textSize="17sp"
         android:textStyle="bold" />
 
@@ -17,6 +17,6 @@
         android:id="@+id/text2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/neon_dim"
+        android:textColor="?attr/cNeonDim"
         android:textSize="14sp" />
 </LinearLayout>

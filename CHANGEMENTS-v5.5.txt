@@ -1,0 +1,11 @@
+MonDialer v5.5 — rendu premium + 2 thèmes sobres
+
+Nouveautés :
+- amélioration générale du rendu graphique (plus de profondeur, contrastes renforcés, boutons plus élégants)
+- refonte des fonds, panneaux, bulles SMS et boutons pour un style plus premium
+- 2 nouveaux thèmes sobres : OBSIDIENNE PRO et ARDOISE NUIT
+- Theme Studio étendu à 9 palettes au total
+- contraste global revu pour une meilleure lisibilité
+
+Compilation :
+- le projet source est prêt ; l’APK peut être compilé via le workflow GitHub Actions ou Android Studio.

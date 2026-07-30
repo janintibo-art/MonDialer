@@ -5,36 +5,38 @@
             <item>
                 <shape>
                     <gradient android:angle="270"
-                        android:startColor="#00A868" android:endColor="#00FF9C" />
+                        android:startColor="?attr/cCallEnd"
+                        android:centerColor="?attr/cNeon"
+                        android:endColor="?attr/cCallStart" />
                     <corners android:radius="32dp" />
-                    <stroke android:width="2dp" android:color="#B3FFFFFF" />
+                    <stroke android:width="2dp" android:color="#CCFFFFFF" />
                 </shape>
             </item>
         </layer-list>
     </item>
     <item>
         <layer-list>
-            <!-- Halo vert -->
             <item>
                 <shape>
-                    <gradient android:type="radial" android:gradientRadius="140dp"
-                        android:startColor="#4D00FF9C" android:endColor="#0000FF9C" />
-                    <corners android:radius="36dp" />
+                    <gradient android:type="radial" android:gradientRadius="160dp"
+                        android:startColor="?attr/cCallHalo" android:endColor="#00000000" />
+                    <corners android:radius="40dp" />
                 </shape>
             </item>
-            <!-- Corps bombé -->
             <item android:top="4dp" android:bottom="6dp" android:left="4dp" android:right="4dp">
                 <shape>
                     <gradient android:angle="90"
-                        android:startColor="#00B26E" android:endColor="#00FF9C" />
+                        android:startColor="?attr/cCallStart"
+                        android:centerColor="?attr/cNeon"
+                        android:endColor="?attr/cCallEnd" />
                     <corners android:radius="30dp" />
+                    <stroke android:width="1.2dp" android:color="#99FFFFFF" />
                 </shape>
             </item>
-            <!-- Reflet -->
-            <item android:top="5dp" android:bottom="30dp" android:left="14dp" android:right="14dp">
+            <item android:top="5dp" android:bottom="28dp" android:left="14dp" android:right="14dp">
                 <shape>
                     <gradient android:angle="270"
-                        android:startColor="#59FFFFFF" android:endColor="#00FFFFFF" />
+                        android:startColor="#70FFFFFF" android:endColor="#00FFFFFF" />
                     <corners android:radius="24dp" />
                 </shape>
             </item>

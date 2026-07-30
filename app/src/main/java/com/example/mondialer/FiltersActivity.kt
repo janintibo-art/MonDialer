@@ -11,8 +11,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
-import android.view.View
 
 class FiltersActivity : Activity() {
 
@@ -36,18 +36,28 @@ class FiltersActivity : Activity() {
             startActivityForResult(i, 40)
         }
 
-        // Thèmes de couleur
-        val themeMap = mapOf(
-            R.id.themeCyan to "cyan",
-            R.id.themeViolet to "violet",
-            R.id.themeGreen to "green",
-            R.id.themeOrange to "orange",
-            R.id.themeRose to "rose",
-            R.id.themeRouge to "rouge",
-            R.id.themeOr to "or"
+        // Palettes complètes avec aperçu multicolore et thème actif mis en avant.
+        val themeOptions = listOf(
+            Triple(R.id.themeCyan, "cyan", R.string.theme_cyber_ocean),
+            Triple(R.id.themeViolet, "violet", R.string.theme_synthwave),
+            Triple(R.id.themeGreen, "green", R.string.theme_toxic_punk),
+            Triple(R.id.themeOrange, "orange", R.string.theme_solar_flare),
+            Triple(R.id.themeRose, "rose", R.string.theme_candy_pulse),
+            Triple(R.id.themeRouge, "rouge", R.string.theme_crimson_ice),
+            Triple(R.id.themeOr, "or", R.string.theme_royal_gold),
+            Triple(R.id.themeGraphite, "graphite", R.string.theme_obsidian_pro),
+            Triple(R.id.themeArdoise, "ardoise", R.string.theme_ardoise_nuit)
         )
-        themeMap.forEach { (id, name) ->
-            findViewById<View>(id).setOnClickListener {
+        val density = resources.displayMetrics.density
+        themeOptions.forEach { (id, name, labelRes) ->
+            val card = findViewById<TextView>(id)
+            val active = BlockRulesStore.theme == name
+            card.text = if (active) "✓ ${getString(labelRes)}" else getString(labelRes)
+            card.alpha = if (active) 1f else 0.72f
+            card.scaleX = if (active) 1.02f else 0.97f
+            card.scaleY = if (active) 1.02f else 0.97f
+            card.elevation = (if (active) 14f else 5f) * density
+            card.setOnClickListener {
                 BlockRulesStore.theme = name
                 recreate()
             }
