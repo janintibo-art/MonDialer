@@ -62,6 +62,81 @@ object BlockRulesStore {
         get() = prefs(appCtx).getBoolean("silent", false)
         set(v) { prefs(appCtx).edit().putBoolean("silent", v).apply() }
 
+    /** Bloque tout numéro absent du carnet d'adresses. */
+    var blockUnknown: Boolean
+        get() = prefs(appCtx).getBoolean("block_unknown", false)
+        set(v) { prefs(appCtx).edit().putBoolean("block_unknown", v).apply() }
+
+    /** Mode strict : tout est bloqué sauf ce qui est explicitement autorisé. */
+    var allowOnlyMode: Boolean
+        get() = prefs(appCtx).getBoolean("allow_only", false)
+        set(v) { prefs(appCtx).edit().putBoolean("allow_only", v).apply() }
+
+    /** En mode strict, les contacts enregistrés restent autorisés. */
+    var allowContacts: Boolean
+        get() = prefs(appCtx).getBoolean("allow_contacts", true)
+        set(v) { prefs(appCtx).edit().putBoolean("allow_contacts", v).apply() }
+
+    // ---- Listes nommées ----
+    /** Liste personnalisée : soit d'autorisation, soit de blocage. */
+    data class NamedList(
+        val id: String,
+        var name: String,
+        var type: String,               // "allow" ou "block"
+        var enabled: Boolean,
+        val numbers: MutableSet<String>
+    )
+
+    fun namedLists(): MutableList<NamedList> {
+        val out = mutableListOf<NamedList>()
+        try {
+            val arr = JSONArray(prefs(appCtx).getString("named_lists", "[]"))
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                val nums = HashSet<String>()
+                val na = o.optJSONArray("numbers") ?: JSONArray()
+                for (j in 0 until na.length()) nums.add(na.getString(j))
+                out.add(NamedList(
+                    o.optString("id"), o.optString("name"),
+                    o.optString("type", "block"), o.optBoolean("enabled", true), nums))
+            }
+        } catch (_: Exception) {}
+        return out
+    }
+
+    fun saveNamedLists(lists: List<NamedList>) {
+        val arr = JSONArray()
+        for (l in lists) {
+            arr.put(JSONObject()
+                .put("id", l.id)
+                .put("name", l.name)
+                .put("type", l.type)
+                .put("enabled", l.enabled)
+                .put("numbers", JSONArray(l.numbers.toList())))
+        }
+        prefs(appCtx).edit().putString("named_lists", arr.toString()).apply()
+    }
+
+    fun newListId(): String = "L" + System.currentTimeMillis()
+
+    /** Le numéro figure-t-il dans le carnet d'adresses du téléphone ? */
+    fun isInContacts(rawNumber: String?): Boolean {
+        val n = rawNumber ?: return false
+        if (n.isBlank()) return false
+        return try {
+            if (appCtx.checkSelfPermission(android.Manifest.permission.READ_CONTACTS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) return false
+            val uri = android.net.Uri.withAppendedPath(
+                android.provider.ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                android.net.Uri.encode(n))
+            appCtx.contentResolver.query(uri,
+                arrayOf(android.provider.ContactsContract.PhoneLookup._ID),
+                null, null, null)?.use { it.count > 0 } ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     // ---- Thème personnalisé ----
     /** Couleur d'accent choisie par l'utilisateur. */
     var customAccent: Int
@@ -145,6 +220,30 @@ object BlockRulesStore {
         val n = normalize(rawNumber)
 
         if (n.isEmpty()) return if (blockHidden) "Numéro masqué" else null
+
+        val lists = namedLists().filter { it.enabled }
+
+        // 1. Une liste d'autorisation active laisse toujours passer l'appel
+        for (l in lists) {
+            if (l.type == "allow" && n in l.numbers) return null
+        }
+
+        val known = isInContacts(rawNumber)
+
+        // 2. Mode strict : tout est refusé sauf autorisations explicites
+        if (allowOnlyMode) {
+            if (allowContacts && known) return null
+            return "Hors liste autorisée"
+        }
+
+        // 3. Blocage des numéros absents du carnet d'adresses
+        if (blockUnknown && !known) return "Numéro inconnu"
+
+        // 4. Listes de blocage nommées
+        for (l in lists) {
+            if (l.type == "block" && n in l.numbers) return "Liste " + l.name
+        }
+
         if (n in numbers()) return "Numéro bloqué"
 
         for (pre in prefixes()) {

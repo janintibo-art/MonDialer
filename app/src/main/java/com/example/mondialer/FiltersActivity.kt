@@ -86,6 +86,31 @@ class FiltersActivity : Activity() {
             }
         }
 
+        // Listes nommées
+        findViewById<Button>(R.id.btnLists).setOnClickListener {
+            startActivity(Intent(this, ListsActivity::class.java))
+        }
+
+        // Filtrage par carnet d'adresses
+        val swUnknown = findViewById<Switch>(R.id.swUnknown)
+        val swAllowOnly = findViewById<Switch>(R.id.swAllowOnly)
+        val swAllowContacts = findViewById<Switch>(R.id.swAllowContacts)
+        swUnknown.isChecked = BlockRulesStore.blockUnknown
+        swAllowOnly.isChecked = BlockRulesStore.allowOnlyMode
+        swAllowContacts.isChecked = BlockRulesStore.allowContacts
+        swAllowContacts.isEnabled = BlockRulesStore.allowOnlyMode
+
+        swUnknown.setOnCheckedChangeListener { _, v ->
+            BlockRulesStore.blockUnknown = v
+            if (v) askContactsPermission()
+        }
+        swAllowOnly.setOnCheckedChangeListener { _, v ->
+            BlockRulesStore.allowOnlyMode = v
+            swAllowContacts.isEnabled = v
+            if (v) askContactsPermission()
+        }
+        swAllowContacts.setOnCheckedChangeListener { _, v -> BlockRulesStore.allowContacts = v }
+
         // Options simples
         val swHidden = findViewById<Switch>(R.id.swHidden)
         val swNeighbors = findViewById<Switch>(R.id.swNeighbors)
@@ -201,6 +226,14 @@ class FiltersActivity : Activity() {
             } catch (e: Exception) {
                 Toast.makeText(this, R.string.import_fail, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    /** Sans accès aux contacts, ces filtres ne peuvent pas savoir qui est connu. */
+    private fun askContactsPermission() {
+        if (checkSelfPermission(android.Manifest.permission.READ_CONTACTS)
+            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(android.Manifest.permission.READ_CONTACTS), 5)
         }
     }
 
