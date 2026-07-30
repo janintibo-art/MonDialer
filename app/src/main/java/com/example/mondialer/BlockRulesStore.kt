@@ -183,6 +183,22 @@ object BlockRulesStore {
         }
     }
 
+    // ---- Style du clavier ----
+    /** Forme des touches : auto (suit le thème), orb, tuile ou hud. */
+    var keypadShape: String
+        get() = prefs(appCtx).getString("keypad_shape", "auto") ?: "auto"
+        set(v) { prefs(appCtx).edit().putString("keypad_shape", v).apply() }
+
+    /** Intensité du halo des touches, de 0 à 200 (100 = normal). */
+    var keypadGlow: Int
+        get() = prefs(appCtx).getInt("keypad_glow", 100)
+        set(v) { prefs(appCtx).edit().putInt("keypad_glow", v).apply() }
+
+    /** Couleur des chiffres : auto (clair) ou accent du thème. */
+    var keypadDigitAccent: Boolean
+        get() = prefs(appCtx).getBoolean("keypad_digit_accent", false)
+        set(v) { prefs(appCtx).edit().putBoolean("keypad_digit_accent", v).apply() }
+
     // ---- Faux appel ----
     var fakeCallName: String
         get() = prefs(appCtx).getString("fake_name", "") ?: ""

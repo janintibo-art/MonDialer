@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 
@@ -92,10 +93,54 @@ class CustomThemeActivity : Activity() {
             override fun onStopTrackingTouch(sb: SeekBar?) {}
         })
 
+        setupKeypadSection()
+
         findViewById<Button>(R.id.btnApply).setOnClickListener { save() }
 
         loadImagePreview()
         updatePreview()
+    }
+
+    /**
+     * Réglages propres au clavier téléphonique. Ils s'appliquent quel que soit
+     * le thème choisi, et sont enregistrés dès la modification.
+     */
+    private fun setupKeypadSection() {
+        val shapes = mapOf(
+            R.id.kpAuto to "auto", R.id.kpOrb to "orb",
+            R.id.kpTuile to "tuile", R.id.kpHud to "hud")
+
+        fun highlight() {
+            val current = BlockRulesStore.keypadShape
+            shapes.forEach { (id, name) ->
+                findViewById<Button>(id).alpha = if (name == current) 1f else 0.45f
+            }
+        }
+        shapes.forEach { (id, name) ->
+            findViewById<Button>(id).setOnClickListener {
+                BlockRulesStore.keypadShape = name
+                highlight()
+                Toast.makeText(this, R.string.keypad_saved, Toast.LENGTH_SHORT).show()
+            }
+        }
+        highlight()
+
+        val glow = findViewById<SeekBar>(R.id.seekGlow)
+        val lbl = findViewById<TextView>(R.id.lblGlow)
+        glow.progress = BlockRulesStore.keypadGlow
+        lbl.text = getString(R.string.keypad_glow, BlockRulesStore.keypadGlow)
+        glow.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, p: Int, fromUser: Boolean) {
+                lbl.text = getString(R.string.keypad_glow, p)
+                if (fromUser) BlockRulesStore.keypadGlow = p
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) {}
+            override fun onStopTrackingTouch(sb: SeekBar?) {}
+        })
+
+        val sw = findViewById<Switch>(R.id.swDigitAccent)
+        sw.isChecked = BlockRulesStore.keypadDigitAccent
+        sw.setOnCheckedChangeListener { _, v -> BlockRulesStore.keypadDigitAccent = v }
     }
 
     private fun buildSwatches(rowId: Int, colors: List<Int>) {

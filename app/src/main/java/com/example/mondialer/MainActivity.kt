@@ -258,6 +258,10 @@ class MainActivity : Activity() {
                 b.background = resources.getDrawable(bgRes, theme)
             }
             b.setShadowLayer(14f, 0f, 0f, neon)
+            // Chiffres : blanc cassé par défaut, ou couleur d'accent au choix
+            b.setTextColor(
+                if (BlockRulesStore.keypadDigitAccent) neon
+                else ThemeRes.color(this, R.attr.cText))
 
         }
     }

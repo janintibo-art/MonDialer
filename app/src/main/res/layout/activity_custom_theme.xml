@@ -88,6 +88,48 @@
 
         <TextView
             android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:textStyle="bold"
+            android:textColor="?attr/cNeon" android:text="@string/keypad_section" />
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/text_dim" android:textSize="11sp"
+            android:paddingBottom="4dp"
+            android:text="@string/keypad_hint" />
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/kpAuto" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/keypad_auto" />
+            <Button android:id="@+id/kpOrb" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_orb" />
+            <Button android:id="@+id/kpTuile" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_tuile" />
+            <Button android:id="@+id/kpHud" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_hud" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/lblGlow"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/text_dim" android:textSize="12sp" />
+
+        <SeekBar android:id="@+id/seekGlow"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:max="200" />
+
+        <Switch android:id="@+id/swDigitAccent"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/keypad_digit_accent" />
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:textStyle="bold"
             android:textColor="?attr/cNeon" android:text="@string/custom_image" />
 

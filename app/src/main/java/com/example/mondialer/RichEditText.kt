@@ -17,7 +17,11 @@ import androidx.core.view.inputmethod.InputContentInfoCompat
  * transmet l'image choisie à l'application, sans aucune clé d'API.
  */
 class RichEditText @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyle: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    // Sans le style par défaut des champs de saisie, la vue perd son
+    // comportement éditable et le clavier ne s'ouvre plus.
+    defStyle: Int = android.R.attr.editTextStyle
 ) : EditText(context, attrs, defStyle) {
 
     /** Appelé avec l'URI du contenu reçu (GIF, image, autocollant). */
@@ -25,19 +29,26 @@ class RichEditText @JvmOverloads constructor(
 
     override fun onCreateInputConnection(editorInfo: EditorInfo): InputConnection? {
         val ic = super.onCreateInputConnection(editorInfo) ?: return null
-        EditorInfoCompat.setContentMimeTypes(editorInfo,
-            arrayOf("image/gif", "image/png", "image/jpeg", "image/webp"))
+        return try {
+            EditorInfoCompat.setContentMimeTypes(editorInfo,
+                arrayOf("image/gif", "image/png", "image/jpeg", "image/webp"))
 
-        val callback = InputConnectionCompat.OnCommitContentListener {
-            info: InputContentInfoCompat, flags: Int, _: Bundle? ->
-            // Sur les versions récentes, il faut demander l'accès au contenu
-            if (flags and InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION != 0) {
-                try { info.requestPermission() } catch (e: Exception) { return@OnCommitContentListener false }
+            val callback = InputConnectionCompat.OnCommitContentListener {
+                info: InputContentInfoCompat, flags: Int, _: Bundle? ->
+                // Sur les versions récentes, l'accès au contenu doit être demandé
+                if (flags and
+                    InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION != 0) {
+                    try { info.requestPermission() }
+                    catch (e: Exception) { return@OnCommitContentListener false }
+                }
+                val mime = info.description.getMimeType(0) ?: "image/gif"
+                onRichContent?.invoke(info.contentUri, mime)
+                true
             }
-            val mime = info.description.getMimeType(0) ?: "image/gif"
-            onRichContent?.invoke(info.contentUri, mime)
-            true
+            InputConnectionCompat.createWrapper(ic, editorInfo, callback)
+        } catch (e: Exception) {
+            // En cas de souci, on rend la connexion simple : écrire reste possible
+            ic
         }
-        return InputConnectionCompat.createWrapper(ic, editorInfo, callback)
     }
 }

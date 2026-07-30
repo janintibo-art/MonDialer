@@ -75,6 +75,9 @@ object ThemeUtil {
     /** Famille de formes du thème actif : orb, tuile ou hud. */
     fun currentShape(ctx: android.content.Context): String {
         BlockRulesStore.appCtx = ctx.applicationContext
+        // Le clavier peut imposer sa propre forme, indépendamment du thème
+        val forced = BlockRulesStore.keypadShape
+        if (forced != "auto") return forced
         return when (BlockRulesStore.theme) {
             "violet", "orange", "or" -> "tuile"
             "rouge", "graphite", "ardoise" -> "hud"

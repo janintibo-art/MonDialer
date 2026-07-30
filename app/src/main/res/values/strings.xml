@@ -259,4 +259,10 @@
     <string name="contact_delete_yes">Supprimer</string>
     <string name="contact_deleted">Contact supprimé</string>
     <string name="contact_delete_fail">Suppression impossible : ce contact provient peut-être d’un compte synchronisé en lecture seule.</string>
+    <string name="keypad_section">STYLE DU CLAVIER</string>
+    <string name="keypad_hint">Ces réglages s’appliquent au clavier téléphonique, quel que soit le thème choisi.</string>
+    <string name="keypad_auto">Auto</string>
+    <string name="keypad_glow">Intensité du halo : %d %%</string>
+    <string name="keypad_digit_accent">Chiffres à la couleur du thème</string>
+    <string name="keypad_saved">Style du clavier appliqué</string>
 </resources>

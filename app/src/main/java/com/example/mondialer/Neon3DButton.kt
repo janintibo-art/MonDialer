@@ -71,6 +71,8 @@ class Neon3DButton @JvmOverloads constructor(
         val d = resources.displayMetrics.density
         val neon = try { ThemeRes.color(context, R.attr.cNeon) }
                    catch (e: Exception) { 0xFF45E9FF.toInt() }
+        // Intensité du halo réglable dans les préférences (100 = normal)
+        val glow = try { BlockRulesStore.keypadGlow / 100f } catch (e: Exception) { 1f }
 
         val pad = 6f * d
         body.set(pad, pad, w - pad, h - pad)
@@ -93,7 +95,7 @@ class Neon3DButton @JvmOverloads constructor(
         paint.style = Paint.Style.STROKE
         for (i in 6 downTo 1) {
             paint.strokeWidth = i * 2.2f * d
-            paint.color = a(neon, (10 + (6 - i) * 9 + press * 60).toInt())
+            paint.color = a(neon, ((10 + (6 - i) * 9 + press * 60) * glow).toInt())
             canvas.drawRoundRect(body, r, r, paint)
         }
 
@@ -118,7 +120,7 @@ class Neon3DButton @JvmOverloads constructor(
         paint.shader = RadialGradient(
             body.centerX(), body.top + body.height() * (0.10f + press * 0.72f),
             body.width() * 0.72f,
-            intArrayOf(a(neon, (70 * lift + 26).toInt()), Color.TRANSPARENT),
+            intArrayOf(a(neon, ((70 * lift + 26) * glow).toInt()), Color.TRANSPARENT),
             null, Shader.TileMode.CLAMP)
         canvas.drawRect(body, paint)
 
@@ -154,7 +156,7 @@ class Neon3DButton @JvmOverloads constructor(
         // 8. Lumière rebondie : liseré coloré près du bord inférieur
         paint.shader = LinearGradient(
             0f, body.bottom - body.height() * 0.22f, 0f, body.bottom,
-            Color.TRANSPARENT, a(neon, (95 * lift + 18).toInt()),
+            Color.TRANSPARENT, a(neon, ((95 * lift + 18) * glow).toInt()),
             Shader.TileMode.CLAMP)
         canvas.drawRect(body, paint)
 
