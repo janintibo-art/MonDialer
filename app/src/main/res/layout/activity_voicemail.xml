@@ -18,7 +18,7 @@
         android:id="@+id/btnCallVm"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@drawable/btn_call"
+        android:background="?attr/callBg"
         android:stateListAnimator="@animator/press"
         android:textColor="?attr/cOnAccent"
         android:textStyle="bold"

@@ -48,11 +48,18 @@ class FiltersActivity : Activity() {
             Triple(R.id.themeGraphite, "graphite", R.string.theme_obsidian_pro),
             Triple(R.id.themeArdoise, "ardoise", R.string.theme_ardoise_nuit)
         )
+        // Glyphe indiquant la famille de formes du thème
+        val shapeGlyph = mapOf(
+            "cyan" to "●", "green" to "●", "rose" to "●",          // touches rondes
+            "violet" to "▢", "orange" to "▢", "or" to "▢",          // tuiles arrondies
+            "rouge" to "◤", "graphite" to "◤", "ardoise" to "◤"     // plaques anguleuses
+        )
         val density = resources.displayMetrics.density
         themeOptions.forEach { (id, name, labelRes) ->
             val card = findViewById<TextView>(id)
             val active = BlockRulesStore.theme == name
-            card.text = if (active) "✓ ${getString(labelRes)}" else getString(labelRes)
+            val g = shapeGlyph[name] ?: ""
+            card.text = if (active) "✓ $g ${getString(labelRes)}" else "$g ${getString(labelRes)}"
             card.alpha = if (active) 1f else 0.72f
             card.scaleX = if (active) 1.02f else 0.97f
             card.scaleY = if (active) 1.02f else 0.97f
@@ -60,6 +67,8 @@ class FiltersActivity : Activity() {
             card.setOnClickListener {
                 BlockRulesStore.theme = name
                 recreate()
+                overridePendingTransition(
+                    android.R.anim.fade_in, android.R.anim.fade_out)
             }
         }
 

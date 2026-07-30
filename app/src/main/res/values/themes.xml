@@ -2,7 +2,7 @@
 <resources>
     <!-- OCÉAN CYBER — cyan, bleu électrique et magenta -->
     <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@drawable/bg_gradient</item>
+        <item name="android:windowBackground">@drawable/bg_flow</item>
         <item name="android:colorAccent">?attr/cNeon</item>
         <item name="android:textColor">?attr/cText</item>
         <item name="android:textColorPrimary">?attr/cText</item>
@@ -39,6 +39,13 @@
         <item name="cText">#F7FCFF</item>
         <item name="cTextDim">#B0D1E2</item>
         <item name="cOnAccent">#03110E</item>
+        <item name="dialBg">@drawable/dial_orb</item>
+        <item name="actionBg">@drawable/action_pill</item>
+        <item name="panelBg">@drawable/panel_orb</item>
+        <item name="callBg">@drawable/call_pill</item>
+        <item name="dangerBg">@drawable/danger_pill</item>
+        <item name="bubbleInBg">@drawable/bubble_in_orb</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_orb</item>
     </style>
 
     <!-- SYNTHWAVE — violet, rose laser et cyan -->
@@ -67,6 +74,14 @@
         <item name="cText">#FFF8FF</item>
         <item name="cTextDim">#D8C0E9</item>
         <item name="cOnAccent">#061014</item>
+        <item name="dialBg">@drawable/dial_squircle</item>
+        <item name="actionBg">@drawable/action_soft</item>
+        <item name="panelBg">@drawable/panel_squircle</item>
+        <item name="callBg">@drawable/call_soft</item>
+        <item name="dangerBg">@drawable/danger_soft</item>
+        <item name="bubbleInBg">@drawable/bubble_in_squircle</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_squircle</item>
+        <item name="android:windowBackground">@drawable/bg_vignette</item>
     </style>
 
     <!-- PUNK TOXIQUE — vert acide, jaune et violet -->
@@ -95,6 +110,14 @@
         <item name="cText">#F6FFF5</item>
         <item name="cTextDim">#C0DBBF</item>
         <item name="cOnAccent">#101500</item>
+        <item name="dialBg">@drawable/dial_orb</item>
+        <item name="actionBg">@drawable/action_pill</item>
+        <item name="panelBg">@drawable/panel_orb</item>
+        <item name="callBg">@drawable/call_pill</item>
+        <item name="dangerBg">@drawable/danger_pill</item>
+        <item name="bubbleInBg">@drawable/bubble_in_orb</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_orb</item>
+        <item name="android:windowBackground">@drawable/bg_flow</item>
     </style>
 
     <!-- ÉRUPTION SOLAIRE — orange, rouge corail et or -->
@@ -123,6 +146,14 @@
         <item name="cText">#FFFAF1</item>
         <item name="cTextDim">#ECC8AF</item>
         <item name="cOnAccent">#1B0D00</item>
+        <item name="dialBg">@drawable/dial_squircle</item>
+        <item name="actionBg">@drawable/action_soft</item>
+        <item name="panelBg">@drawable/panel_squircle</item>
+        <item name="callBg">@drawable/call_soft</item>
+        <item name="dangerBg">@drawable/danger_soft</item>
+        <item name="bubbleInBg">@drawable/bubble_in_squircle</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_squircle</item>
+        <item name="android:windowBackground">@drawable/bg_vignette</item>
     </style>
 
     <!-- CANDY PULSE — rose, cyan et violet profond -->
@@ -151,6 +182,14 @@
         <item name="cText">#FFF8FE</item>
         <item name="cTextDim">#E3BEDB</item>
         <item name="cOnAccent">#051217</item>
+        <item name="dialBg">@drawable/dial_orb</item>
+        <item name="actionBg">@drawable/action_pill</item>
+        <item name="panelBg">@drawable/panel_orb</item>
+        <item name="callBg">@drawable/call_pill</item>
+        <item name="dangerBg">@drawable/danger_pill</item>
+        <item name="bubbleInBg">@drawable/bubble_in_orb</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_orb</item>
+        <item name="android:windowBackground">@drawable/bg_flow</item>
     </style>
 
     <!-- GLACE ÉCARLATE — rouge, bleu glacier et indigo -->
@@ -179,6 +218,14 @@
         <item name="cText">#FFF8FA</item>
         <item name="cTextDim">#DBB9C3</item>
         <item name="cOnAccent">#061419</item>
+        <item name="dialBg">@drawable/dial_angular</item>
+        <item name="actionBg">@drawable/action_cut</item>
+        <item name="panelBg">@drawable/panel_angular</item>
+        <item name="callBg">@drawable/call_cut</item>
+        <item name="dangerBg">@drawable/danger_cut</item>
+        <item name="bubbleInBg">@drawable/bubble_in_angular</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_angular</item>
+        <item name="android:windowBackground">@drawable/bg_beam</item>
     </style>
 
     <!-- OR ROYAL — or, turquoise et pourpre -->
@@ -207,6 +254,14 @@
         <item name="cText">#FFFCF2</item>
         <item name="cTextDim">#E1D5B0</item>
         <item name="cOnAccent">#04130F</item>
+        <item name="dialBg">@drawable/dial_squircle</item>
+        <item name="actionBg">@drawable/action_soft</item>
+        <item name="panelBg">@drawable/panel_squircle</item>
+        <item name="callBg">@drawable/call_soft</item>
+        <item name="dangerBg">@drawable/danger_soft</item>
+        <item name="bubbleInBg">@drawable/bubble_in_squircle</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_squircle</item>
+        <item name="android:windowBackground">@drawable/bg_vignette</item>
     </style>
 
     <!-- OBSIDIENNE PRO — sobre, pro, graphite et bleu acier -->
@@ -235,6 +290,14 @@
         <item name="cText">#F5F8FC</item>
         <item name="cTextDim">#B2BDC9</item>
         <item name="cOnAccent">#071019</item>
+        <item name="dialBg">@drawable/dial_angular</item>
+        <item name="actionBg">@drawable/action_cut</item>
+        <item name="panelBg">@drawable/panel_angular</item>
+        <item name="callBg">@drawable/call_cut</item>
+        <item name="dangerBg">@drawable/danger_cut</item>
+        <item name="bubbleInBg">@drawable/bubble_in_angular</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_angular</item>
+        <item name="android:windowBackground">@drawable/bg_beam</item>
     </style>
 
     <!-- ARDOISE NUIT — anthracite, argent et bleu pétrole -->
@@ -263,5 +326,13 @@
         <item name="cText">#F3F6F9</item>
         <item name="cTextDim">#A7B2BE</item>
         <item name="cOnAccent">#061018</item>
+        <item name="dialBg">@drawable/dial_angular</item>
+        <item name="actionBg">@drawable/action_cut</item>
+        <item name="panelBg">@drawable/panel_angular</item>
+        <item name="callBg">@drawable/call_cut</item>
+        <item name="dangerBg">@drawable/danger_cut</item>
+        <item name="bubbleInBg">@drawable/bubble_in_angular</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_angular</item>
+        <item name="android:windowBackground">@drawable/bg_beam</item>
     </style>
 </resources>

@@ -22,7 +22,7 @@
             android:id="@+id/emailTo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="12dp"
             android:inputType="textEmailAddress"
             android:hint="@string/email_to" />
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="12dp"
             android:inputType="textCapSentences"
             android:hint="@string/email_subject" />
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="12dp"
             android:inputType="textCapSentences|textMultiLine"
             android:minLines="6"
@@ -53,7 +53,7 @@
             android:id="@+id/emailAttachChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="10dp"
             android:layout_marginTop="8dp"
             android:textColor="?attr/cNeon"
@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/btn_call"
+            android:background="?attr/callBg"
             android:stateListAnimator="@animator/press"
             android:textColor="?attr/cOnAccent"
             android:textStyle="bold"
@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="12dp"
             android:layout_marginTop="14dp"
             android:visibility="gone">
@@ -131,25 +131,25 @@
 
             <EditText android:id="@+id/smtpHost"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:layout_marginTop="6dp" android:background="?attr/panelBg"
                 android:padding="10dp" android:inputType="textUri"
                 android:hint="@string/smtp_host" />
 
             <EditText android:id="@+id/smtpPort"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:layout_marginTop="6dp" android:background="?attr/panelBg"
                 android:padding="10dp" android:inputType="number"
                 android:hint="@string/smtp_port" />
 
             <EditText android:id="@+id/smtpUser"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:layout_marginTop="6dp" android:background="?attr/panelBg"
                 android:padding="10dp" android:inputType="textEmailAddress"
                 android:hint="@string/smtp_user" />
 
             <EditText android:id="@+id/smtpPass"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="@drawable/panel_round"
+                android:layout_marginTop="6dp" android:background="?attr/panelBg"
                 android:padding="10dp" android:inputType="textPassword"
                 android:hint="@string/smtp_pass" />
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:top="4dp"><shape>
+        <solid android:color="#88000000" />
+        <corners android:topLeftRadius="16dp" android:topRightRadius="3dp"
+            android:bottomLeftRadius="3dp" android:bottomRightRadius="16dp" />
+    </shape></item>
+    <item android:bottom="4dp"><shape>
+        <gradient android:angle="90"
+            android:startColor="?attr/cPanelStart"
+            android:centerColor="?attr/cButtonStart"
+            android:endColor="?attr/cPanelEnd" />
+        <corners android:topLeftRadius="16dp" android:topRightRadius="3dp"
+            android:bottomLeftRadius="3dp" android:bottomRightRadius="16dp" />
+        <stroke android:width="1.4dp" android:color="?attr/cNeonDim" />
+    </shape></item>
+    <!-- Double liseré interne -->
+    <item android:bottom="7dp" android:left="3dp" android:right="3dp" android:top="3dp">
+        <shape>
+            <stroke android:width="1dp" android:color="#1EFFFFFF" />
+            <corners android:topLeftRadius="13dp" android:topRightRadius="2dp"
+                android:bottomLeftRadius="2dp" android:bottomRightRadius="13dp" />
+        </shape>
+    </item>
+</layer-list>

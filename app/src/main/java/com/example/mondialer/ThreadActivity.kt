@@ -419,7 +419,8 @@ class ThreadActivity : Activity() {
 
             time.text = fmt.format(Date(m.date))
             row.gravity = if (m.outgoing) Gravity.END else Gravity.START
-            val bg = if (m.outgoing) R.drawable.bubble_out else R.drawable.bubble_in
+            val bg = if (m.outgoing) ThemeRes.res(this@ThreadActivity, R.attr.bubbleOutBg)
+                     else ThemeRes.res(this@ThreadActivity, R.attr.bubbleInBg)
 
             bubble.visibility = View.GONE
             img.visibility = View.GONE

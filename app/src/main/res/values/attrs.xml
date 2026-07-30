@@ -27,4 +27,13 @@
     <attr name="cText" format="color" />
     <attr name="cTextDim" format="color" />
     <attr name="cOnAccent" format="color" />
+
+    <!-- Formes : chaque thème pointe vers sa propre famille de drawables -->
+    <attr name="dialBg" format="reference" />
+    <attr name="actionBg" format="reference" />
+    <attr name="panelBg" format="reference" />
+    <attr name="callBg" format="reference" />
+    <attr name="dangerBg" format="reference" />
+    <attr name="bubbleInBg" format="reference" />
+    <attr name="bubbleOutBg" format="reference" />
 </resources>

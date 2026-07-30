@@ -28,7 +28,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/panel_round"
+                android:background="?attr/panelBg"
                 android:padding="12dp"
                 android:inputType="text" />
 
@@ -72,7 +72,7 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_gravity="center"
-        android:background="@drawable/panel_round"
+        android:background="?attr/panelBg"
         android:gravity="center"
         android:textColor="?attr/cNeon"
         android:textSize="44sp"

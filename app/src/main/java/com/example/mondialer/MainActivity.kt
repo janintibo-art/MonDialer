@@ -155,7 +155,7 @@ class MainActivity : Activity() {
             tv.setTextColor(resolveNeon())
             tv.textSize = 13f
             tv.setPadding(28, 16, 28, 16)
-            tv.setBackgroundResource(R.drawable.btn_action)
+            tv.setBackgroundResource(ThemeRes.res(this, R.attr.actionBg))
             tv.setOnClickListener {
                 display.setText(number.filter { ch -> ch.isDigit() || ch == '+' })
                 display.setSelection(display.text.length)
@@ -200,7 +200,7 @@ class MainActivity : Activity() {
             tv.setTextColor(resolveNeon())
             tv.textSize = 13f
             tv.setPadding(28, 16, 28, 16)
-            tv.setBackgroundResource(R.drawable.btn_action)
+            tv.setBackgroundResource(ThemeRes.res(this, R.attr.actionBg))
             tv.setOnClickListener {
                 display.setText(number.filter { ch -> ch.isDigit() || ch == '+' })
                 placeCall()
@@ -223,7 +223,7 @@ class MainActivity : Activity() {
         val neon = resolveNeon()
         for (id in ids) {
             val b = findViewById<Button>(id) ?: continue
-            b.background = resources.getDrawable(R.drawable.btn_dial, theme)
+            b.background = resources.getDrawable(ThemeRes.res(this, R.attr.dialBg), theme)
             b.setShadowLayer(12f, 0f, 0f, neon)
         }
     }

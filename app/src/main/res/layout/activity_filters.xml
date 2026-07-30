@@ -134,7 +134,7 @@
             <EditText android:id="@+id/editMyNumber"
                 android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:inputType="phone"
-                android:background="@drawable/panel_round" android:padding="12dp"
+                android:background="?attr/panelBg" android:padding="12dp"
                 android:hint="@string/my_number_hint" />
 
             <Button android:id="@+id/btnSaveMy" style="@style/ActionBtn"
@@ -152,7 +152,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="8dp"
             android:layout_marginTop="6dp" />
 
@@ -168,7 +168,7 @@
             <EditText android:id="@+id/editAddNumber"
                 android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:inputType="phone"
-                android:background="@drawable/panel_round" android:padding="12dp"
+                android:background="?attr/panelBg" android:padding="12dp"
                 android:layout_marginTop="6dp"
                 android:hint="@string/add_number_hint" />
 
@@ -179,7 +179,7 @@
 
         <ListView android:id="@+id/listNumbers"
             android:layout_width="match_parent" android:layout_height="180dp"
-            android:background="@drawable/panel_round" android:layout_marginTop="6dp"
+            android:background="?attr/panelBg" android:layout_marginTop="6dp"
             android:divider="?attr/cNeonDim" android:dividerHeight="0.5dp" />
 
         <TextView
@@ -194,7 +194,7 @@
             <EditText android:id="@+id/editAddPrefix"
                 android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:inputType="phone"
-                android:background="@drawable/panel_round" android:padding="12dp"
+                android:background="?attr/panelBg" android:padding="12dp"
                 android:layout_marginTop="6dp"
                 android:hint="@string/add_prefix_hint" />
 
@@ -205,7 +205,7 @@
 
         <ListView android:id="@+id/listPrefixes"
             android:layout_width="match_parent" android:layout_height="180dp"
-            android:background="@drawable/panel_round" android:layout_marginTop="6dp"
+            android:background="?attr/panelBg" android:layout_marginTop="6dp"
             android:divider="?attr/cNeonDim" android:dividerHeight="0.5dp" />
     </LinearLayout>
 </ScrollView>

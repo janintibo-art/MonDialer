@@ -36,6 +36,8 @@ object ThemeUtil {
         if (was != BlockRulesStore.theme) {
             applied.remove(key)
             a.recreate()
+            a.overridePendingTransition(
+                android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 

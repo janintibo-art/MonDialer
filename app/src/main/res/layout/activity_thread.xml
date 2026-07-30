@@ -9,7 +9,7 @@
         android:id="@+id/editTo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/panel_round"
+        android:background="?attr/panelBg"
         android:padding="12dp"
         android:inputType="phone"
         android:hint="@string/to_hint" />
@@ -29,7 +29,7 @@
         android:id="@+id/txtAttach"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/panel_round"
+        android:background="?attr/panelBg"
         android:padding="10dp"
         android:layout_marginTop="6dp"
         android:textColor="?attr/cNeon"
@@ -62,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/panel_round"
+            android:background="?attr/panelBg"
             android:padding="12dp"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="4"
@@ -83,7 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="230dp"
         android:orientation="vertical"
-        android:background="@drawable/panel_round"
+        android:background="?attr/panelBg"
         android:layout_marginTop="6dp"
         android:visibility="gone">
 
