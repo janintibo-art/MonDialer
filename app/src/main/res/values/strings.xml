@@ -252,4 +252,11 @@
     <string name="sched_change">Modifier</string>
     <string name="sched_remove">Retirer l’horaire</string>
     <string name="sched_saved">Liste active de %1$s à %2$s</string>
+    <string name="gif_hint">Ouvrez la recherche de GIF de votre clavier (touche 😊 ou GIF), choisissez-en un : il sera joint au message.</string>
+    <string name="contact_delete">🗑 SUPPRIMER CE CONTACT</string>
+    <string name="contact_this_one">ce contact</string>
+    <string name="contact_delete_confirm">Supprimer définitivement « %s » du carnet d’adresses ? Cette action est irréversible.</string>
+    <string name="contact_delete_yes">Supprimer</string>
+    <string name="contact_deleted">Contact supprimé</string>
+    <string name="contact_delete_fail">Suppression impossible : ce contact provient peut-être d’un compte synchronisé en lecture seule.</string>
 </resources>

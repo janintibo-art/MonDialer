@@ -2,7 +2,6 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
-import android.app.role.RoleManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -36,7 +35,6 @@ class ConversationsActivity : Activity() {
         findViewById<Button>(R.id.btnMail).setOnClickListener {
             startActivity(Intent(this, EmailActivity::class.java))
         }
-        findViewById<Button>(R.id.btnSmsDefault).setOnClickListener { requestSmsRole() }
 
         val perms = mutableListOf(
             Manifest.permission.READ_SMS,
@@ -228,14 +226,6 @@ class ConversationsActivity : Activity() {
         }
     }
 
-    private fun requestSmsRole() {
-        val rm = getSystemService(RoleManager::class.java)
-        if (rm.isRoleAvailable(RoleManager.ROLE_SMS) && !rm.isRoleHeld(RoleManager.ROLE_SMS)) {
-            startActivityForResult(rm.createRequestRoleIntent(RoleManager.ROLE_SMS), 50)
-        } else if (rm.isRoleHeld(RoleManager.ROLE_SMS)) {
-            Toast.makeText(this, R.string.already_sms_default, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray

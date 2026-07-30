@@ -112,7 +112,7 @@ class ThreadActivity : Activity() {
 
         findViewById<Button>(R.id.btnSend).setOnClickListener {
             val to = editTo.text.toString().trim()
-            val body = findViewById<EditText>(R.id.editBody).text.toString().trim()
+            val body = findViewById<RichEditText>(R.id.editBody).text.toString().trim()
             if (to.isBlank()) return@setOnClickListener
             if (attachData != null) sendMms(to, body)
             else if (body.isNotBlank()) sendSms(to, body)
@@ -139,14 +139,21 @@ class ThreadActivity : Activity() {
             }
         }
         grid.setOnItemClickListener { _, _, pos, _ ->
-            findViewById<EditText>(R.id.editBody).append(list[pos])
+            findViewById<RichEditText>(R.id.editBody).append(list[pos])
         }
 
+        // Le clavier (Gboard et consorts) transmet directement le GIF choisi
+        findViewById<RichEditText>(R.id.editBody).onRichContent = { uri, mime ->
+            attachFromUri(uri, mime, "gif")
+        }
+
+        // Le bouton ouvre le clavier et rappelle où trouver la recherche de GIF
         findViewById<Button>(R.id.btnGif).setOnClickListener {
-            val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            i.addCategory(Intent.CATEGORY_OPENABLE)
-            i.type = "image/gif"
-            startActivityForResult(i, 61)
+            val e = findViewById<RichEditText>(R.id.editBody)
+            e.requestFocus()
+            val imm = getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+            imm?.showSoftInput(e, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            Toast.makeText(this, R.string.gif_hint, Toast.LENGTH_LONG).show()
         }
         findViewById<Button>(R.id.btnAttach).setOnClickListener {
             val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -184,7 +191,7 @@ class ThreadActivity : Activity() {
         val recent = msgs.takeLast(10).joinToString("\n") {
             (if (it.outgoing) "Moi : " else "Correspondant : ") + (it.body ?: "[pièce jointe]")
         }
-        val draft = findViewById<EditText>(R.id.editBody).text.toString().trim()
+        val draft = findViewById<RichEditText>(R.id.editBody).text.toString().trim()
         val context = if (draft.isEmpty()) recent
                       else recent + "\n\nIntention de réponse à développer : " + draft
 
@@ -214,7 +221,7 @@ class ThreadActivity : Activity() {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.ai_pick)
                     .setItems(result.toTypedArray()) { _, which ->
-                        findViewById<EditText>(R.id.editBody).setText(result[which])
+                        findViewById<RichEditText>(R.id.editBody).setText(result[which])
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
@@ -324,6 +331,33 @@ class ThreadActivity : Activity() {
                 }
             }.start()
         }
+    }
+
+    /** Charge un contenu (GIF du clavier ou fichier choisi) en pièce jointe. */
+    private fun attachFromUri(uri: Uri, mimeHint: String?, nameHint: String) {
+        Thread {
+            try {
+                val bytes = contentResolver.openInputStream(uri)?.readBytes() ?: return@Thread
+                val mime = mimeHint ?: contentResolver.getType(uri) ?: "application/octet-stream"
+                val ext = mime.substringAfterLast('/', "bin")
+                val name = queryName(uri) ?: "$nameHint.$ext"
+                runOnUiThread {
+                    if (bytes.size > 1_000_000) {
+                        Toast.makeText(this, R.string.attach_too_big, Toast.LENGTH_LONG).show()
+                    }
+                    attachData = bytes
+                    attachMime = mime
+                    attachName = name
+                    val chip = findViewById<TextView>(R.id.txtAttach)
+                    chip.text = "📎 $name (${bytes.size / 1024} Ko) ✕"
+                    chip.visibility = View.VISIBLE
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 
     private fun queryName(uri: Uri): String? = try {
@@ -463,7 +497,7 @@ class ThreadActivity : Activity() {
                     contentResolver.insert(Uri.parse("content://sms/sent"), values)
                 } catch (_: Exception) {}
             }.start()
-            findViewById<EditText>(R.id.editBody).setText("")
+            findViewById<RichEditText>(R.id.editBody).setText("")
             if (address.isBlank()) address = to
             msgs.add(Msg(body, System.currentTimeMillis(), true))
             adapter.notifyDataSetChanged()
@@ -482,7 +516,7 @@ class ThreadActivity : Activity() {
         val data = attachData ?: return
         val name = attachName ?: "fichier"
         val mime = attachMime ?: "application/octet-stream"
-        findViewById<EditText>(R.id.editBody).setText("")
+        findViewById<RichEditText>(R.id.editBody).setText("")
         clearAttachment()
         Toast.makeText(this, R.string.mms_sending, Toast.LENGTH_SHORT).show()
         Thread {

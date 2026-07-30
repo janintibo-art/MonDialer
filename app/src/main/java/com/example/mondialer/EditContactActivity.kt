@@ -2,6 +2,7 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
@@ -42,6 +43,11 @@ class EditContactActivity : Activity() {
         }
 
         findViewById<Button>(R.id.btnSave).setOnClickListener { save() }
+
+        // Suppression : seulement pour un contact existant
+        val btnDelete = findViewById<Button>(R.id.btnDelete)
+        if (contactId == null) btnDelete.visibility = android.view.View.GONE
+        else btnDelete.setOnClickListener { confirmDelete() }
 
         val btnSys = findViewById<Button>(R.id.btnSystemEdit)
         if (contactId == null) btnSys.visibility = android.view.View.GONE
@@ -107,6 +113,58 @@ class EditContactActivity : Activity() {
                 }
             } catch (_: Exception) {}
         } catch (_: Exception) {}
+    }
+
+    /** Demande confirmation puis retire le contact du carnet d'adresses. */
+    private fun confirmDelete() {
+        val name = findViewById<EditText>(R.id.editName).text.toString().trim()
+            .ifEmpty { getString(R.string.contact_this_one) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.contact_delete)
+            .setMessage(getString(R.string.contact_delete_confirm, name))
+            .setPositiveButton(R.string.contact_delete_yes) { _, _ -> deleteContact() }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun deleteContact() {
+        val id = contactId ?: return
+        if (checkSelfPermission(Manifest.permission.WRITE_CONTACTS)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_CONTACTS), 1)
+            return
+        }
+        try {
+            // On passe par la clé de recherche : c'est la méthode fiable, elle
+            // supprime le contact et toutes ses fiches liées d'un seul coup.
+            var deleted = 0
+            contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                arrayOf(ContactsContract.Contacts.LOOKUP_KEY),
+                ContactsContract.Contacts._ID + "=?", arrayOf(id), null
+            )?.use { c ->
+                if (c.moveToFirst()) {
+                    val key = c.getString(0)
+                    val uri = Uri.withAppendedPath(
+                        ContactsContract.Contacts.CONTENT_LOOKUP_URI, key)
+                    deleted = contentResolver.delete(uri, null, null)
+                }
+            }
+            if (deleted == 0) {
+                // Repli : suppression des fiches brutes rattachées
+                deleted = contentResolver.delete(
+                    ContactsContract.RawContacts.CONTENT_URI,
+                    ContactsContract.RawContacts.CONTACT_ID + "=?", arrayOf(id))
+            }
+            if (deleted > 0) {
+                Toast.makeText(this, R.string.contact_deleted, Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this, R.string.contact_delete_fail, Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, R.string.contact_delete_fail, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setIfEmpty(id: Int, value: String) {

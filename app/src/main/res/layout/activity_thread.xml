@@ -35,6 +35,7 @@
         android:textColor="?attr/cNeon"
         android:visibility="gone" />
 
+    <!-- Rangée d'outils, compacte, au-dessus de la zone de saisie -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,45 +45,77 @@
         <Button
             android:id="@+id/btnEmoji"
             style="@style/ActionBtn"
-            android:layout_width="46dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:paddingStart="0dp" android:paddingEnd="0dp"
-            android:textSize="16sp"
+            android:paddingTop="8dp" android:paddingBottom="8dp"
+            android:textSize="15sp"
             android:text="😊" />
+
+        <Button
+            android:id="@+id/btnGif"
+            style="@style/ActionBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:paddingStart="0dp" android:paddingEnd="0dp"
+            android:paddingTop="8dp" android:paddingBottom="8dp"
+            android:textSize="12sp"
+            android:text="@string/gif_btn" />
 
         <Button
             android:id="@+id/btnAi"
             style="@style/ActionBtn"
-            android:layout_width="46dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:paddingStart="0dp" android:paddingEnd="0dp"
-            android:textSize="16sp"
+            android:paddingTop="8dp" android:paddingBottom="8dp"
+            android:textSize="15sp"
             android:text="@string/ai_button" />
 
         <Button
             android:id="@+id/btnAttach"
             style="@style/ActionBtn"
-            android:layout_width="46dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:paddingStart="0dp" android:paddingEnd="0dp"
-            android:textSize="16sp"
+            android:paddingTop="8dp" android:paddingBottom="8dp"
+            android:textSize="15sp"
             android:text="📎" />
+    </LinearLayout>
 
-        <EditText
+    <!-- Zone de saisie : une vraie bulle large, dans la continuité du fil -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal"
+        android:gravity="bottom">
+
+        <com.example.mondialer.RichEditText
             android:id="@+id/editBody"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?attr/panelBg"
-            android:padding="12dp"
+            android:background="?attr/bubbleOutBg"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
             android:inputType="textCapSentences|textMultiLine"
-            android:maxLines="4"
+            android:minLines="1"
+            android:maxLines="6"
+            android:textSize="16sp"
+            android:gravity="top|start"
             android:hint="@string/message_hint" />
 
         <Button
             android:id="@+id/btnSend"
             style="@style/ActionBtn"
             android:layout_width="wrap_content"
+            android:layout_marginStart="6dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:text="@string/send" />
     </LinearLayout>
 
@@ -94,20 +127,6 @@
         android:background="?attr/panelBg"
         android:layout_marginTop="6dp"
         android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
-
-            <Button
-                android:id="@+id/btnGif"
-                style="@style/ActionBtn"
-                android:layout_width="wrap_content"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
-                android:text="@string/gif_btn" />
-        </LinearLayout>
 
         <GridView
             android:id="@+id/emojiGrid"

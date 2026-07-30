@@ -89,6 +89,14 @@
             android:text="@string/save_contact" />
 
         <Button
+            android:id="@+id/btnDelete"
+            style="@style/ActionBtn"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:textColor="#FF6B84"
+            android:text="@string/contact_delete" />
+
+        <Button
             android:id="@+id/btnSystemEdit"
             style="@style/ActionBtn"
             android:layout_width="match_parent"
