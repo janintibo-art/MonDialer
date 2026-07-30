@@ -154,14 +154,27 @@ class Neon3DButton @JvmOverloads constructor(
         paint.color = a(neon, 235)
         canvas.drawRoundRect(body, r, r, paint)
 
+        // Arêtes internes : on trace le contour arrondi complet, mais en
+        // limitant le dessin à la moitié haute puis à la moitié basse.
+        // (Un drawArc tracerait l'ellipse inscrite, pas le bord de la touche.)
         paint.strokeWidth = 1.8f * d
         tmp.set(body); tmp.inset(3.6f * d, 3.6f * d)
+        val ri = maxOf(r - 3.6f * d, 0f)
+        val midY = tmp.centerY()
+
         // arête claire en haut : le bord qui accroche la lumière
+        canvas.save()
+        canvas.clipRect(tmp.left - d, tmp.top - d, tmp.right + d, midY)
         paint.color = a(Color.WHITE, (95 * lift + 12).toInt())
-        canvas.drawArc(tmp, 195f, 150f, false, paint)
+        canvas.drawRoundRect(tmp, ri, ri, paint)
+        canvas.restore()
+
         // arête sombre en bas : le bord dans l'ombre
+        canvas.save()
+        canvas.clipRect(tmp.left - d, midY, tmp.right + d, tmp.bottom + d)
         paint.color = a(Color.BLACK, 140)
-        canvas.drawArc(tmp, 15f, 150f, false, paint)
+        canvas.drawRoundRect(tmp, ri, ri, paint)
+        canvas.restore()
 
         body.offset(0f, -sink)
 
