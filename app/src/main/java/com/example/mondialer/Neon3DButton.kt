@@ -128,8 +128,8 @@ class Neon3DButton @JvmOverloads constructor(
         paint.shader = LinearGradient(
             0f, tmp.top, 0f, tmp.bottom,
             intArrayOf(
-                a(Color.WHITE, (150 * lift + 14).toInt()),
-                a(Color.WHITE, (58 * lift + 6).toInt()),
+                a(Color.WHITE, (185 * lift + 16).toInt()),
+                a(Color.WHITE, (72 * lift + 8).toInt()),
                 Color.TRANSPARENT),
             floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP)
         canvas.drawRect(tmp, paint)
@@ -140,14 +140,14 @@ class Neon3DButton @JvmOverloads constructor(
             body.right - body.width() * 0.14f, body.top + body.height() * 0.26f)
         paint.shader = LinearGradient(
             0f, tmp.top, 0f, tmp.bottom,
-            a(Color.WHITE, (200 * lift + 10).toInt()), Color.TRANSPARENT,
+            a(Color.WHITE, (225 * lift + 10).toInt()), Color.TRANSPARENT,
             Shader.TileMode.CLAMP)
         canvas.drawRoundRect(tmp, tmp.height(), tmp.height(), paint)
 
         // 7. Ombre interne au bas : creuse la matière
         paint.shader = LinearGradient(
             0f, body.bottom - body.height() * 0.45f, 0f, body.bottom,
-            Color.TRANSPARENT, a(Color.BLACK, (165 * lift + 60).toInt()),
+            Color.TRANSPARENT, a(Color.BLACK, (195 * lift + 65).toInt()),
             Shader.TileMode.CLAMP)
         canvas.drawRect(body, paint)
 
@@ -158,16 +158,30 @@ class Neon3DButton @JvmOverloads constructor(
             Shader.TileMode.CLAMP)
         canvas.drawRect(body, paint)
 
-        // 9. Biseau : mince arête claire posée sur le bord haut, suit la forme
+        // 9. Biseau : arête claire limitée au bord HAUT (sinon l'anneau
+        //    ferait le tour de la touche et écraserait le relief)
         paint.shader = null
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2.4f * d
-        paint.color = a(Color.WHITE, (165 * lift + 12).toInt())
-        canvas.drawRoundRect(body, r, r, paint)   // rogné par le clip : reste net
+        paint.strokeWidth = 2.6f * d
+        paint.color = a(Color.WHITE, (205 * lift + 10).toInt())
+        canvas.save()
+        canvas.clipRect(body.left, body.top,
+                        body.right, body.top + body.height() * 0.30f)
+        canvas.drawRoundRect(body, r, r, paint)
+        canvas.restore()
+
+        // 10. Épaisseur : arête sombre limitée au bord BAS
+        paint.strokeWidth = 2.6f * d
+        paint.color = a(Color.BLACK, (185 * lift + 60).toInt())
+        canvas.save()
+        canvas.clipRect(body.left, body.bottom - body.height() * 0.28f,
+                        body.right, body.bottom)
+        canvas.drawRoundRect(body, r, r, paint)
+        canvas.restore()
 
         canvas.restore()
 
-        // ---------- 10. Contour néon, net et complet ----------
+        // ---------- 11. Contour néon, net et complet ----------
         paint.shader = null
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 2f * d
@@ -176,7 +190,7 @@ class Neon3DButton @JvmOverloads constructor(
 
         body.offset(0f, -sink)
 
-        // ---------- 11. Contenu, solidaire de l'enfoncement ----------
+        // ---------- 12. Contenu, solidaire de l'enfoncement ----------
         canvas.save()
         canvas.translate(0f, sink)
         super.onDraw(canvas)
