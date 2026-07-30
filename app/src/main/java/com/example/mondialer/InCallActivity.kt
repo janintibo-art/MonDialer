@@ -89,6 +89,13 @@ class InCallActivity : Activity() {
             R.id.dt7 to '7', R.id.dt8 to '8', R.id.dt9 to '9',
             R.id.dtStar to '*', R.id.dt0 to '0', R.id.dtHash to '#'
         )
+        // Réinflater le fond avec le thème courant (contourne le cache de drawables)
+        keys.keys.forEach { id ->
+            findViewById<Button>(id)?.let { b ->
+                b.background = resources.getDrawable(R.drawable.btn_dial, theme)
+            }
+        }
+
         keys.forEach { (id, ch) ->
             findViewById<Button>(id).setOnClickListener {
                 call?.playDtmfTone(ch)
@@ -154,7 +161,13 @@ class InCallActivity : Activity() {
     }
 
     override fun onDestroy() {
+        ThemeUtil.forget(this)
         call?.unregisterCallback(callback)
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
     }
 }

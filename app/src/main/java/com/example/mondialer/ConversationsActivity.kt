@@ -53,6 +53,7 @@ class ConversationsActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
         if (checkSelfPermission(Manifest.permission.READ_SMS)
             == PackageManager.PERMISSION_GRANTED) load()
     }
@@ -242,5 +243,10 @@ class ConversationsActivity : Activity() {
         if (requestCode == 1 &&
             checkSelfPermission(Manifest.permission.READ_SMS)
             == PackageManager.PERMISSION_GRANTED) load()
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
     }
 }

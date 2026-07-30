@@ -52,6 +52,8 @@ class MainActivity : Activity() {
             }
         }
 
+        refreshDialpadTheme(digits.keys)
+
         findViewById<Button>(R.id.btnDelete).setOnClickListener { v ->
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val t = display.text.toString()
@@ -211,10 +213,25 @@ class MainActivity : Activity() {
         }
     }
 
+
+    /**
+     * Réapplique le fond du clavier en résolvant le drawable avec le thème courant.
+     * Nécessaire car le cache de drawables d'Android peut conserver les couleurs
+     * de l'ancien thème après un changement de palette.
+     */
+    private fun refreshDialpadTheme(ids: Collection<Int>) {
+        val neon = resolveNeon()
+        for (id in ids) {
+            val b = findViewById<Button>(id) ?: continue
+            b.background = resources.getDrawable(R.drawable.btn_dial, theme)
+            b.setShadowLayer(12f, 0f, 0f, neon)
+        }
+    }
+
     private fun resolveNeon(): Int {
         val tv = android.util.TypedValue()
         theme.resolveAttribute(R.attr.cNeon, tv, true)
-        return tv.data
+        return if (tv.resourceId != 0) getColor(tv.resourceId) else tv.data
     }
 
     // ---- Appel vidéo (nécessite le support ViLTE de l'opérateur) ----
@@ -291,5 +308,15 @@ class MainActivity : Activity() {
                 if (data.getBooleanExtra("call", false)) placeCall()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
     }
 }

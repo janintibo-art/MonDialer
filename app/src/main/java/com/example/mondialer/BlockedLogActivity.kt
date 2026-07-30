@@ -56,4 +56,14 @@ class BlockedLogActivity : Activity() {
             arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
         )
     }
+
+    override fun onResume() {
+        super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
+    }
 }

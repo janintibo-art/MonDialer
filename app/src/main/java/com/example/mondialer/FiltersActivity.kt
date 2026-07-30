@@ -192,4 +192,14 @@ class FiltersActivity : Activity() {
         prefixesAdapter.addAll(BlockRulesStore.prefixes().sorted())
         prefixesAdapter.notifyDataSetChanged()
     }
+
+    override fun onResume() {
+        super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
+    }
 }

@@ -154,6 +154,7 @@ class ThreadActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
         if (checkSelfPermission(Manifest.permission.READ_SMS)
             == PackageManager.PERMISSION_GRANTED && address.isNotBlank()) loadAsync()
     }
@@ -479,5 +480,10 @@ class ThreadActivity : Activity() {
                 }
             }.start()
         }
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
     }
 }

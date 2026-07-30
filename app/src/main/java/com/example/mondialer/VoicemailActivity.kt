@@ -138,7 +138,13 @@ class VoicemailActivity : Activity() {
     }
 
     override fun onDestroy() {
+        ThemeUtil.forget(this)
         player?.release()
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
     }
 }

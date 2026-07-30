@@ -86,6 +86,7 @@ class ContactsActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        ThemeUtil.refreshIfNeeded(this)
         if (checkSelfPermission(Manifest.permission.READ_CONTACTS)
             == PackageManager.PERMISSION_GRANTED) load()
     }
@@ -217,5 +218,10 @@ class ContactsActivity : Activity() {
         if (requestCode == 1 && grantResults.isNotEmpty()
             && grantResults[0] == PackageManager.PERMISSION_GRANTED) load()
         else Toast.makeText(this, R.string.perm_needed, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroy() {
+        ThemeUtil.forget(this)
+        super.onDestroy()
     }
 }
