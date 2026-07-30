@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Base quasi noire -->
     <item><shape><solid android:color="#03050A" /></shape></item>
-    <!-- Teinte du thème très atténuée -->
+    <!-- Teinte diagonale très atténuée, pleine surface -->
     <item><shape>
         <gradient android:angle="135"
             android:startColor="#00000000"
             android:centerColor="?attr/cBgMid"
             android:endColor="#00000000" />
     </shape></item>
-    <!-- Voile noir qui écrase la teinte -->
-    <item><shape><solid android:color="#B3000000" /></shape></item>
-    <!-- Lueur d'ambiance en haut -->
-    <item android:bottom="420dp"><shape>
-        <gradient android:type="radial" android:gradientRadius="480dp"
-            android:centerX="0.5" android:centerY="0.02"
+    <item><shape><solid android:color="#B8000000" /></shape></item>
+    <!-- Lueur haute : radial pleine surface, aucun bord franc -->
+    <item><shape>
+        <gradient android:type="radial" android:gradientRadius="70%p"
+            android:centerX="0.5" android:centerY="0.04"
             android:startColor="?attr/cHalo" android:endColor="#00000000" />
     </shape></item>
-    <!-- Lueur basse -->
-    <item android:top="520dp"><shape>
-        <gradient android:type="radial" android:gradientRadius="420dp"
+    <!-- Lueur basse, même teinte pour rester monochrome -->
+    <item><shape>
+        <gradient android:type="radial" android:gradientRadius="55%p"
             android:centerX="0.5" android:centerY="1.0"
-            android:startColor="?attr/cHaloAlt" android:endColor="#00000000" />
+            android:startColor="?attr/cHalo" android:endColor="#00000000" />
     </shape></item>
 </layer-list>

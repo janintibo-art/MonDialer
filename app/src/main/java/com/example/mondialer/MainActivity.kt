@@ -240,22 +240,24 @@ class MainActivity : Activity() {
             b.background = resources.getDrawable(bgRes, theme)
             b.setShadowLayer(14f, 0f, 0f, neon)
 
-            val digit = b.text.toString().take(1).ifEmpty { "" }
-            val letters = keyLetters[id] ?: ""
-            if (digit.isNotEmpty() && letters.isNotEmpty()) {
-                val full = "$digit\n$letters"
-                val sp = SpannableString(full)
-                val from = digit.length + 1
-                sp.setSpan(RelativeSizeSpan(0.42f), from, full.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sp.setSpan(ForegroundColorSpan(dim), from, full.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                b.isSingleLine = false
-                b.maxLines = 2
-                b.setLineSpacing(0f, 0.82f)
-                b.includeFontPadding = false
-                b.text = sp
-            }
+            // Le libellé courant sert de source pour le chiffre/symbole
+            val label = b.text.toString().lineSequence().first().trim()
+            if (label.isEmpty()) continue
+            // Ligne de lettres, ou espace insécable pour garder la même
+            // hauteur sur les touches 1, * et # (chiffres alignés entre eux)
+            val letters = keyLetters[id]?.takeIf { it.isNotEmpty() } ?: "\u00A0"
+            val full = "$label\n$letters"
+            val sp = SpannableString(full)
+            val from = label.length + 1
+            sp.setSpan(RelativeSizeSpan(0.40f), from, full.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sp.setSpan(ForegroundColorSpan(dim), from, full.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            b.isSingleLine = false
+            b.maxLines = 2
+            b.setLineSpacing(0f, 0.88f)
+            b.includeFontPadding = false
+            b.text = sp
         }
     }
 

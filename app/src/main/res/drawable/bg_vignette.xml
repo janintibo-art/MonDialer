@@ -2,20 +2,20 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item><shape><solid android:color="#04060B" /></shape></item>
     <item><shape>
-        <gradient android:type="radial" android:gradientRadius="600dp"
+        <gradient android:type="radial" android:gradientRadius="85%p"
             android:centerX="0.5" android:centerY="0.40"
             android:startColor="?attr/cBgMid" android:endColor="#00000000" />
     </shape></item>
-    <item><shape><solid android:color="#BF000000" /></shape></item>
+    <item><shape><solid android:color="#C2000000" /></shape></item>
     <item><shape>
-        <gradient android:type="radial" android:gradientRadius="560dp"
-            android:centerX="0.5" android:centerY="0.38"
+        <gradient android:type="radial" android:gradientRadius="65%p"
+            android:centerX="0.5" android:centerY="0.36"
             android:startColor="?attr/cHalo" android:endColor="#00000000" />
     </shape></item>
-    <!-- Vignette : bords très sombres -->
+    <!-- Vignette progressive, pleine surface -->
     <item><shape>
-        <gradient android:type="radial" android:gradientRadius="700dp"
+        <gradient android:type="radial" android:gradientRadius="95%p"
             android:centerX="0.5" android:centerY="0.5"
-            android:startColor="#00000000" android:endColor="#99000000" />
+            android:startColor="#00000000" android:endColor="#8C000000" />
     </shape></item>
 </layer-list>

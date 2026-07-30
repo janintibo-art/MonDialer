@@ -8,15 +8,17 @@
             android:endColor="#00000000" />
     </shape></item>
     <item><shape><solid android:color="#C4000000" /></shape></item>
-    <!-- Faisceau oblique -->
+    <!-- Faisceau oblique doux, sans bord -->
     <item><shape>
         <gradient android:angle="45"
             android:startColor="#00000000"
             android:centerColor="?attr/cHalo"
             android:endColor="#00000000" />
     </shape></item>
-    <item android:bottom="560dp"><shape>
-        <gradient android:angle="270"
-            android:startColor="?attr/cHaloAlt" android:endColor="#00000000" />
+    <!-- Lueur haute -->
+    <item><shape>
+        <gradient android:type="radial" android:gradientRadius="60%p"
+            android:centerX="0.3" android:centerY="0.02"
+            android:startColor="?attr/cHalo" android:endColor="#00000000" />
     </shape></item>
 </layer-list>
