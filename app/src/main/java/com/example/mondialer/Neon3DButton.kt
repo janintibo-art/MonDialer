@@ -92,9 +92,9 @@ class Neon3DButton @JvmOverloads constructor(
 
         // ---- 3. Corps : verre sombre, lumière inversée à l'appui ----
         paint.style = Paint.Style.FILL
-        val litTop = 0xFF102A3D.toInt()
-        val dark = 0xFF030810.toInt()
-        val mid = 0xFF081826.toInt()
+        val litTop = 0xFF1E4E6B.toInt()
+        val dark = 0xFF020509.toInt()
+        val mid = 0xFF0A1F30.toInt()
         val cTop = blend(litTop, dark, press)
         val cBot = blend(dark, litTop, press)
         paint.shader = LinearGradient(
@@ -107,25 +107,43 @@ class Neon3DButton @JvmOverloads constructor(
         paint.shader = RadialGradient(
             w / 2f, body.top + body.height() * (0.16f + press * 0.55f),
             body.width() * 0.78f,
-            intArrayOf(a(neon, (42 * lift + 20).toInt()), Color.TRANSPARENT),
+            intArrayOf(a(neon, (78 * lift + 30).toInt()), Color.TRANSPARENT),
             null, Shader.TileMode.CLAMP)
         canvas.drawRoundRect(body, r, r, paint)
 
-        // ---- 5. Reflet spéculaire (bande brillante du haut) ----
-        val specH = body.height() * 0.44f
+        // ---- 5. Reflet spéculaire : nappe large + éclat intense ----
+        // Nappe de brillance sur la moitié haute
+        val specH = body.height() * 0.50f
         tmp.set(
-            body.left + body.width() * 0.13f, body.top + 2f * d,
-            body.right - body.width() * 0.13f, body.top + specH)
+            body.left + body.width() * 0.10f, body.top + 2.5f * d,
+            body.right - body.width() * 0.10f, body.top + specH)
         paint.shader = LinearGradient(
             0f, tmp.top, 0f, tmp.bottom,
-            a(Color.WHITE, (85 * lift + 12).toInt()), Color.TRANSPARENT,
+            a(Color.WHITE, (110 * lift + 18).toInt()), Color.TRANSPARENT,
             Shader.TileMode.CLAMP)
-        canvas.drawRoundRect(tmp, r * 0.85f, r * 0.85f, paint)
+        canvas.drawRoundRect(tmp, r * 0.9f, r * 0.9f, paint)
+        // Éclat concentré tout en haut, comme un vernis
+        tmp.set(
+            body.left + body.width() * 0.20f, body.top + 2.5f * d,
+            body.right - body.width() * 0.20f, body.top + body.height() * 0.24f)
+        paint.shader = LinearGradient(
+            0f, tmp.top, 0f, tmp.bottom,
+            a(Color.WHITE, (165 * lift + 20).toInt()), a(Color.WHITE, 15),
+            Shader.TileMode.CLAMP)
+        canvas.drawRoundRect(tmp, tmp.height() / 2f, tmp.height() / 2f, paint)
+        // Lumière rebondie en bas (réflexion du sol, teinte du thème)
+        paint.shader = LinearGradient(
+            0f, body.bottom - body.height() * 0.20f, 0f, body.bottom - 2f * d,
+            Color.TRANSPARENT, a(neon, (55 * lift + 12).toInt()),
+            Shader.TileMode.CLAMP)
+        tmp.set(body.left + body.width() * 0.16f, body.bottom - body.height() * 0.20f,
+                body.right - body.width() * 0.16f, body.bottom - 2f * d)
+        canvas.drawRoundRect(tmp, r * 0.6f, r * 0.6f, paint)
 
         // ---- 6. Ombre interne au bas (donne le creux) ----
         paint.shader = LinearGradient(
             0f, body.bottom - body.height() * 0.34f, 0f, body.bottom,
-            Color.TRANSPARENT, a(Color.BLACK, (110 * lift + 40).toInt()),
+            Color.TRANSPARENT, a(Color.BLACK, (85 * lift + 30).toInt()),
             Shader.TileMode.CLAMP)
         canvas.drawRoundRect(body, r, r, paint)
 
@@ -136,14 +154,14 @@ class Neon3DButton @JvmOverloads constructor(
         paint.color = a(neon, 235)
         canvas.drawRoundRect(body, r, r, paint)
 
-        paint.strokeWidth = 1f * d
-        tmp.set(body); tmp.inset(3.4f * d, 3.4f * d)
-        // arête claire en haut
-        paint.color = a(Color.WHITE, (52 * lift + 8).toInt())
-        canvas.drawArc(tmp, 180f, 180f, false, paint)
-        // arête sombre en bas
-        paint.color = a(Color.BLACK, 90)
-        canvas.drawArc(tmp, 0f, 180f, false, paint)
+        paint.strokeWidth = 1.8f * d
+        tmp.set(body); tmp.inset(3.6f * d, 3.6f * d)
+        // arête claire en haut : le bord qui accroche la lumière
+        paint.color = a(Color.WHITE, (95 * lift + 12).toInt())
+        canvas.drawArc(tmp, 195f, 150f, false, paint)
+        // arête sombre en bas : le bord dans l'ombre
+        paint.color = a(Color.BLACK, 140)
+        canvas.drawArc(tmp, 15f, 150f, false, paint)
 
         body.offset(0f, -sink)
 
