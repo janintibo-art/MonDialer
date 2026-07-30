@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -50,6 +52,15 @@
         <activity android:name=".CustomThemeActivity" android:exported="false" />
         <activity android:name=".ListsActivity" android:exported="false" />
         <activity android:name=".AiSettingsActivity" android:exported="false" />
+        <activity android:name=".StatsActivity" android:exported="false" />
+        <activity android:name=".EasterEggActivity" android:exported="false" />
+        <activity
+            android:name=".FakeCallActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:launchMode="singleTask" />
+        <receiver android:name=".FakeCallReceiver" android:exported="false" />
         <activity android:name=".ListDetailActivity" android:exported="false" />
         <activity android:name=".ContactsActivity" android:exported="false" />
         <activity android:name=".EditContactActivity" android:exported="false" />

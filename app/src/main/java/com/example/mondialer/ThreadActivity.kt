@@ -132,6 +132,7 @@ class ThreadActivity : Activity() {
         findViewById<TextView>(R.id.txtAttach).setOnClickListener { clearAttachment() }
 
         findViewById<Button>(R.id.btnAi).setOnClickListener { suggestReply() }
+        findViewById<Button>(R.id.btnAi).setOnLongClickListener { analyzeScam(); true }
     }
 
     /**
@@ -191,6 +192,49 @@ class ThreadActivity : Activity() {
                         findViewById<EditText>(R.id.editBody).setText(result[which])
                     }
                     .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }.start()
+    }
+
+    /** Soumet le dernier message reçu à l'analyse anti-arnaque. */
+    private fun analyzeScam() {
+        if (BlockRulesStore.aiKey.isBlank()) {
+            Toast.makeText(this, R.string.ai_no_key_short, Toast.LENGTH_LONG).show()
+            return
+        }
+        val incoming = msgs.lastOrNull { !it.outgoing && !it.body.isNullOrBlank() }
+        if (incoming == null) {
+            Toast.makeText(this, R.string.scan_no_message, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val progress = AlertDialog.Builder(this)
+            .setMessage(R.string.scan_running)
+            .setCancelable(true)
+            .show()
+
+        Thread {
+            val verdict = try {
+                AiClient.analyzeScam(incoming.body ?: "")
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progress.dismiss()
+                    Toast.makeText(this,
+                        getString(R.string.ai_error, e.message ?: ""),
+                        Toast.LENGTH_LONG).show()
+                }
+                return@Thread
+            }
+            runOnUiThread {
+                progress.dismiss()
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.scan_title)
+                    .setMessage(verdict)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNeutralButton(R.string.scan_block) { _, _ ->
+                        BlockRulesStore.addNumber(address)
+                        Toast.makeText(this, R.string.number_blocked, Toast.LENGTH_SHORT).show()
+                    }
                     .show()
             }
         }.start()

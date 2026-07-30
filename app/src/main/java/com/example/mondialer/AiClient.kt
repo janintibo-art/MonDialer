@@ -82,6 +82,26 @@ object AiClient {
     }
 
     /**
+     * Analyse un message suspect et renvoie un verdict lisible.
+     * Le modèle est cadré pour répondre court et sans jargon.
+     */
+    fun analyzeScam(message: String): String {
+        val system = buildString {
+            append("Tu es un expert francophone en fraudes par SMS et email. ")
+            append("Analyse le message fourni et réponds en français, en 4 lignes maximum, ")
+            append("dans ce format exact :\n")
+            append("VERDICT : sûr / douteux / arnaque\n")
+            append("POURQUOI : les indices concrets relevés\n")
+            append("PIÈGE : ce que l'expéditeur cherche à obtenir\n")
+            append("À FAIRE : la conduite à tenir en une phrase\n")
+            append("Sois direct. Signale notamment les liens raccourcis, l'urgence artificielle, ")
+            append("les fautes, les demandes de données bancaires ou de codes, ")
+            append("les usurpations d'organismes connus (banque, impôts, colis, CPF).")
+        }
+        return ask(system, message).trim()
+    }
+
+    /**
      * Demande trois réponses possibles à un message, et les sépare.
      * Le modèle est prié de numéroter, ce qui rend l'analyse simple et fiable.
      */

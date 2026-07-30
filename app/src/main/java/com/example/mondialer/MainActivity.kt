@@ -2,11 +2,14 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.AlertDialog
 import android.app.role.RoleManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Bundle as OsBundle
 import android.provider.ContactsContract
@@ -82,6 +85,13 @@ class MainActivity : Activity() {
         }
         findViewById<Button>(R.id.btnVideo).setOnClickListener { placeVideoCall() }
 
+        // Codes secrets : certaines séquences déclenchent des surprises
+        display.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: Editable?) = checkSecretCode(s?.toString() ?: "")
+        })
+
         // T9 : suggestions de contacts pendant la frappe
         display.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
@@ -95,6 +105,28 @@ class MainActivity : Activity() {
             loadContacts(); loadFavorites()
         } else {
             requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), 2)
+        }
+    }
+
+    /** Séquences cachées, à composer comme un numéro. */
+    private fun checkSecretCode(typed: String) {
+        when (typed) {
+            "*#1871#" -> {                      // Commune de Paris
+                display.setText("")
+                startActivity(Intent(this, EasterEggActivity::class.java))
+            }
+            "*#666#" -> {                       // Bascule express en rouge
+                display.setText("")
+                BlockRulesStore.theme = "rouge"
+                Toast.makeText(this, R.string.egg_red, Toast.LENGTH_SHORT).show()
+                recreate()
+            }
+            "*#1936#" -> {                       // Révolution espagnole
+                display.setText("")
+                BlockRulesStore.theme = "cyan"
+                Toast.makeText(this, R.string.egg_reset, Toast.LENGTH_SHORT).show()
+                recreate()
+            }
         }
     }
 
@@ -297,7 +329,9 @@ class MainActivity : Activity() {
             getString(R.string.menu_theme),
             getString(R.string.menu_default_dialer),
             getString(R.string.menu_default_sms),
-            getString(R.string.menu_ai)
+            getString(R.string.menu_ai),
+            getString(R.string.menu_fake_call),
+            getString(R.string.menu_stats)
         )
         AlertDialog.Builder(this)
             .setTitle(R.string.menu_title)
@@ -309,9 +343,65 @@ class MainActivity : Activity() {
                     3 -> requestDefaultDialer()
                     4 -> requestDefaultSms()
                     5 -> startActivity(Intent(this, AiSettingsActivity::class.java))
+                    6 -> scheduleFakeCall()
+                    7 -> startActivity(Intent(this, StatsActivity::class.java))
                 }
             }
             .show()
+    }
+
+    /** Programme un appel fictif, pour s'extraire d'une situation pénible. */
+    private fun scheduleFakeCall() {
+        val name = EditText(this)
+        name.hint = getString(R.string.fake_name_hint)
+        name.setText(BlockRulesStore.fakeCallName)
+        val number = EditText(this)
+        number.hint = getString(R.string.fake_number_hint)
+        number.inputType = android.text.InputType.TYPE_CLASS_PHONE
+        number.setText(BlockRulesStore.fakeCallNumber)
+
+        val box = LinearLayout(this)
+        box.orientation = LinearLayout.VERTICAL
+        val pad = (16 * resources.displayMetrics.density).toInt()
+        box.setPadding(pad, pad, pad, 0)
+        box.addView(name)
+        box.addView(number)
+
+        val delays = intArrayOf(10, 30, 60, 300)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.fake_title)
+            .setView(box)
+            .setItems(resources.getStringArray(R.array.fake_delays)) { _, which ->
+                BlockRulesStore.fakeCallName = name.text.toString().trim()
+                BlockRulesStore.fakeCallNumber = number.text.toString().trim()
+                armFakeCall(delays[which])
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun armFakeCall(seconds: Int) {
+        val intent = Intent(this, FakeCallReceiver::class.java)
+            .putExtra("name", BlockRulesStore.fakeCallName
+                .ifBlank { getString(R.string.fake_default_name) })
+            .putExtra("number", BlockRulesStore.fakeCallNumber
+                .ifBlank { "06 12 34 56 78" })
+        val pi = PendingIntent.getBroadcast(this, 77, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val at = System.currentTimeMillis() + seconds * 1000L
+        val am = getSystemService(AlarmManager::class.java)
+        try {
+            // Une alarme exacte demande une autorisation sur les versions récentes
+            if (Build.VERSION.SDK_INT >= 31 && !am.canScheduleExactAlarms()) {
+                am.set(AlarmManager.RTC_WAKEUP, at, pi)
+            } else {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi)
+            }
+        } catch (e: Exception) {
+            am.set(AlarmManager.RTC_WAKEUP, at, pi)
+        }
+        Toast.makeText(this,
+            getString(R.string.fake_armed, seconds), Toast.LENGTH_LONG).show()
     }
 
     /** Propose l'application comme application SMS par défaut. */

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="stats_total">
+        <item quantity="one">appel indésirable bloqué</item>
+        <item quantity="other">appels indésirables bloqués</item>
+    </plurals>
+</resources>

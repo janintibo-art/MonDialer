@@ -137,6 +137,15 @@ object BlockRulesStore {
         }
     }
 
+    // ---- Faux appel ----
+    var fakeCallName: String
+        get() = prefs(appCtx).getString("fake_name", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("fake_name", v).apply() }
+
+    var fakeCallNumber: String
+        get() = prefs(appCtx).getString("fake_number", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("fake_number", v).apply() }
+
     // ---- Assistant IA ----
     var aiKey: String
         get() = prefs(appCtx).getString("ai_key", "") ?: ""

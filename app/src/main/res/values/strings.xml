@@ -201,4 +201,29 @@
     <string name="ai_no_context">Aucun message dans cette conversation</string>
     <string name="ai_no_context_mail">Renseignez d’abord un objet ou quelques notes à développer</string>
     <string name="ai_privacy">Confidentialité : le contenu concerné est transmis à Google Gemini uniquement lorsque vous appuyez sur ✨. Rien n’est envoyé automatiquement, et votre clé reste sur cet appareil.</string>
+    <string name="ai_no_key_short">Configurez d’abord l’assistant dans Menu → ✨</string>
+    <string name="scan_title">🔍 ANALYSE DU MESSAGE</string>
+    <string name="scan_running">Analyse du message…</string>
+    <string name="scan_no_message">Aucun message reçu à analyser</string>
+    <string name="scan_block">Bloquer ce numéro</string>
+
+    <string name="menu_fake_call">🎭 Programmer un faux appel</string>
+    <string name="fake_title">Faux appel entrant</string>
+    <string name="fake_name_hint">Nom affiché (ex : Le Boulot)</string>
+    <string name="fake_number_hint">Numéro affiché</string>
+    <string name="fake_default_name">Appel urgent</string>
+    <string name="fake_armed">Faux appel programmé dans %d secondes. Rangez le téléphone !</string>
+
+    <string name="menu_stats">📊 Mur de la honte</string>
+    <string name="stats_title">MUR DE LA HONTE</string>
+    <string name="stats_empty">Aucun blocage enregistré pour l’instant. Les filtres veillent.</string>
+    <string name="stats_week">SUR LES 7 DERNIERS JOURS</string>
+    <string name="stats_prefixes">PRÉFIXES LES PLUS INSISTANTS</string>
+    <string name="stats_reasons">MOTIFS DE BLOCAGE</string>
+    <string name="stats_worst">CHAMPION DE L’ACHARNEMENT</string>
+    <string name="stats_worst_line">%1$s a tenté sa chance %2$d fois. En vain.</string>
+
+    <string name="egg_red">Mode insurrection activé</string>
+    <string name="egg_reset">Retour au calme</string>
+    <string name="egg_tap">Touchez la citation pour en changer</string>
 </resources>
