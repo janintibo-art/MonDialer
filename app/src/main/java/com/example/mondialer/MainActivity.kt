@@ -296,7 +296,8 @@ class MainActivity : Activity() {
             getString(R.string.menu_blocked),
             getString(R.string.menu_theme),
             getString(R.string.menu_default_dialer),
-            getString(R.string.menu_default_sms)
+            getString(R.string.menu_default_sms),
+            getString(R.string.menu_ai)
         )
         AlertDialog.Builder(this)
             .setTitle(R.string.menu_title)
@@ -307,6 +308,7 @@ class MainActivity : Activity() {
                     2 -> startActivity(Intent(this, CustomThemeActivity::class.java))
                     3 -> requestDefaultDialer()
                     4 -> requestDefaultSms()
+                    5 -> startActivity(Intent(this, AiSettingsActivity::class.java))
                 }
             }
             .show()

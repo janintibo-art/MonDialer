@@ -50,6 +50,14 @@
             android:text="😊" />
 
         <Button
+            android:id="@+id/btnAi"
+            style="@style/ActionBtn"
+            android:layout_width="46dp"
+            android:paddingStart="0dp" android:paddingEnd="0dp"
+            android:textSize="16sp"
+            android:text="@string/ai_button" />
+
+        <Button
             android:id="@+id/btnAttach"
             style="@style/ActionBtn"
             android:layout_width="46dp"

@@ -1,6 +1,7 @@
 package com.example.mondialer
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -94,10 +95,70 @@ class EmailActivity : Activity() {
             it.visibility = View.GONE
         }
 
+        findViewById<Button>(R.id.btnEmailAi).setOnClickListener { suggestBody() }
         findViewById<Button>(R.id.btnEmailSend).setOnClickListener { send() }
     }
 
     private fun text(id: Int) = findViewById<EditText>(id).text.toString().trim()
+
+    /** Propose trois rédactions à partir de l'objet et des notes déjà saisies. */
+    private fun suggestBody() {
+        if (BlockRulesStore.aiKey.isBlank()) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.ai_no_key)
+                .setPositiveButton(R.string.ai_configure) { _, _ ->
+                    startActivity(Intent(this, AiSettingsActivity::class.java))
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            return
+        }
+        val subject = text(R.id.emailSubject)
+        val body = findViewById<EditText>(R.id.emailBody).text.toString().trim()
+        if (subject.isEmpty() && body.isEmpty()) {
+            Toast.makeText(this, R.string.ai_no_context_mail, Toast.LENGTH_LONG).show()
+            return
+        }
+        val context = buildString {
+            if (subject.isNotEmpty()) append("Objet : ").append(subject).append("\n")
+            if (body.isNotEmpty()) append("Notes ou message reçu :\n").append(body)
+        }
+
+        val progress = AlertDialog.Builder(this)
+            .setMessage(R.string.ai_thinking)
+            .setCancelable(true)
+            .show()
+
+        Thread {
+            val result = try {
+                AiClient.suggestReplies(context, "mail")
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progress.dismiss()
+                    Toast.makeText(this,
+                        getString(R.string.ai_error, e.message ?: ""),
+                        Toast.LENGTH_LONG).show()
+                }
+                return@Thread
+            }
+            runOnUiThread {
+                progress.dismiss()
+                if (result.isEmpty()) {
+                    Toast.makeText(this, R.string.ai_empty, Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                // Aperçu tronqué dans la liste, texte complet une fois choisi
+                val labels = result.map { it.take(90).replace("\n", " ") }.toTypedArray()
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.ai_pick)
+                    .setItems(labels) { _, which ->
+                        findViewById<EditText>(R.id.emailBody).setText(result[which])
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }.start()
+    }
 
     private fun loadSettings() {
         val p = prefs()

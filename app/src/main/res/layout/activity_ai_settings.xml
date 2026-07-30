@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/NeonTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/ai_title"
+            android:textSize="18sp"
+            android:paddingBottom="10dp" />
+
+        <TextView
+            android:id="@+id/txtHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp"
+            android:paddingBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnGetKey"
+            style="@style/ActionBtn"
+            android:layout_width="match_parent"
+            android:text="@string/ai_get_key" />
+
+        <EditText
+            android:id="@+id/editKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="?attr/panelBg"
+            android:padding="12dp"
+            android:inputType="textPassword"
+            android:hint="@string/ai_key" />
+
+        <EditText
+            android:id="@+id/editModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/panelBg"
+            android:padding="12dp"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/panelBg"
+            android:padding="12dp"
+            android:inputType="text"
+            android:hint="@string/ai_tone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/btnSave" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/save_contact" />
+            <Button android:id="@+id/btnTest" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/ai_test" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:textColor="?attr/cNeon"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="18dp"
+            android:textColor="@color/text_dim"
+            android:textSize="11sp"
+            android:text="@string/ai_privacy" />
+    </LinearLayout>
+</ScrollView>

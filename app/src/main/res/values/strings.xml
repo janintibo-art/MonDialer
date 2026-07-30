@@ -180,4 +180,25 @@
     <string name="list_from_contacts">👤 AJOUTER DEPUIS LES CONTACTS</string>
     <string name="list_allow_desc">Ces numéros passent toujours, quels que soient les autres filtres. Appui long pour retirer.</string>
     <string name="list_block_desc">Ces numéros sont bloqués tant que la liste est active. Appui long pour retirer.</string>
+    <string name="menu_ai">✨ Assistant de réponse (IA)</string>
+    <string name="ai_title">ASSISTANT DE RÉPONSE</string>
+    <string name="ai_button">✨</string>
+    <string name="ai_button_long">✨ SUGGÉRER</string>
+    <string name="ai_key">Clé API (collez-la ici)</string>
+    <string name="ai_tone">Ton des réponses (ex : amical et naturel)</string>
+    <string name="ai_key_hint">L’assistant utilise Google Gemini, dont l’usage est gratuit. Créez votre clé sur %1$s, collez-la ci-dessous, puis testez. Le champ modèle peut rester vide (%2$s par défaut).</string>
+    <string name="ai_get_key">🔑 OBTENIR UNE CLÉ GRATUITE</string>
+    <string name="ai_test">TESTER</string>
+    <string name="ai_testing">Test en cours…</string>
+    <string name="ai_test_ok">✔ Connexion réussie — « %s »</string>
+    <string name="ai_test_fail">✕ Échec : %s</string>
+    <string name="ai_no_key">L’assistant n’est pas encore configuré. Voulez-vous entrer votre clé maintenant ?</string>
+    <string name="ai_configure">Configurer</string>
+    <string name="ai_thinking">Rédaction des propositions…</string>
+    <string name="ai_pick">Choisissez une réponse</string>
+    <string name="ai_empty">Aucune proposition obtenue</string>
+    <string name="ai_error">Assistant indisponible : %s</string>
+    <string name="ai_no_context">Aucun message dans cette conversation</string>
+    <string name="ai_no_context_mail">Renseignez d’abord un objet ou quelques notes à développer</string>
+    <string name="ai_privacy">Confidentialité : le contenu concerné est transmis à Google Gemini uniquement lorsque vous appuyez sur ✨. Rien n’est envoyé automatiquement, et votre clé reste sur cet appareil.</string>
 </resources>

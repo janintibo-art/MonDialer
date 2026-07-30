@@ -2,6 +2,7 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -129,6 +130,70 @@ class ThreadActivity : Activity() {
             startActivityForResult(i, 60)
         }
         findViewById<TextView>(R.id.txtAttach).setOnClickListener { clearAttachment() }
+
+        findViewById<Button>(R.id.btnAi).setOnClickListener { suggestReply() }
+    }
+
+    /**
+     * Demande trois réponses possibles à partir des derniers messages du fil.
+     * Rien n'est envoyé : la suggestion choisie atterrit dans la zone de saisie.
+     */
+    private fun suggestReply() {
+        if (BlockRulesStore.aiKey.isBlank()) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.ai_no_key)
+                .setPositiveButton(R.string.ai_configure) { _, _ ->
+                    startActivity(Intent(this, AiSettingsActivity::class.java))
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            return
+        }
+        if (msgs.isEmpty()) {
+            Toast.makeText(this, R.string.ai_no_context, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Contexte : les derniers échanges, en indiquant qui parle
+        val recent = msgs.takeLast(10).joinToString("\n") {
+            (if (it.outgoing) "Moi : " else "Correspondant : ") + (it.body ?: "[pièce jointe]")
+        }
+        val draft = findViewById<EditText>(R.id.editBody).text.toString().trim()
+        val context = if (draft.isEmpty()) recent
+                      else recent + "\n\nIntention de réponse à développer : " + draft
+
+        val progress = AlertDialog.Builder(this)
+            .setMessage(R.string.ai_thinking)
+            .setCancelable(true)
+            .show()
+
+        Thread {
+            val result = try {
+                AiClient.suggestReplies(context, "sms")
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progress.dismiss()
+                    Toast.makeText(this,
+                        getString(R.string.ai_error, e.message ?: ""),
+                        Toast.LENGTH_LONG).show()
+                }
+                return@Thread
+            }
+            runOnUiThread {
+                progress.dismiss()
+                if (result.isEmpty()) {
+                    Toast.makeText(this, R.string.ai_empty, Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.ai_pick)
+                    .setItems(result.toTypedArray()) { _, which ->
+                        findViewById<EditText>(R.id.editBody).setText(result[which])
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }.start()
     }
 
     private fun splitEmojis(s: String): List<String> {

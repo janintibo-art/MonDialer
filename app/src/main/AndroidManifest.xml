@@ -49,6 +49,7 @@
         <activity android:name=".FiltersActivity" android:exported="false" />
         <activity android:name=".CustomThemeActivity" android:exported="false" />
         <activity android:name=".ListsActivity" android:exported="false" />
+        <activity android:name=".AiSettingsActivity" android:exported="false" />
         <activity android:name=".ListDetailActivity" android:exported="false" />
         <activity android:name=".ContactsActivity" android:exported="false" />
         <activity android:name=".EditContactActivity" android:exported="false" />

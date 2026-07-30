@@ -137,6 +137,21 @@ object BlockRulesStore {
         }
     }
 
+    // ---- Assistant IA ----
+    var aiKey: String
+        get() = prefs(appCtx).getString("ai_key", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("ai_key", v).apply() }
+
+    var aiModel: String
+        get() = prefs(appCtx).getString("ai_model", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("ai_model", v).apply() }
+
+    /** Ton demandé aux suggestions : amical, neutre, professionnel... */
+    var aiTone: String
+        get() = prefs(appCtx).getString("ai_tone", "amical et naturel")
+            ?: "amical et naturel"
+        set(v) { prefs(appCtx).edit().putString("ai_tone", v).apply() }
+
     // ---- Thème personnalisé ----
     /** Couleur d'accent choisie par l'utilisateur. */
     var customAccent: Int

@@ -68,6 +68,9 @@
             <Button android:id="@+id/btnEmailAttach" style="@style/ActionBtn"
                 android:layout_width="0dp" android:layout_weight="1"
                 android:text="@string/email_attach" />
+            <Button android:id="@+id/btnEmailAi" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/ai_button_long" />
             <Button android:id="@+id/btnEmailSettings" style="@style/ActionBtn"
                 android:layout_width="0dp" android:layout_weight="1"
                 android:text="@string/email_settings" />
