@@ -226,4 +226,30 @@
     <string name="egg_red">Mode insurrection activé</string>
     <string name="egg_reset">Retour au calme</string>
     <string name="egg_tap">Touchez la citation pour en changer</string>
+    <string name="report_menu">📢 Signaler au 33700</string>
+    <string name="report_call_menu">📢 Signaler cet appel au 33700</string>
+    <string name="report_title">Signalement au 33700</string>
+    <string name="report_sms_confirm">Le contenu du message va être transféré à la plateforme nationale 33700 (gratuit, tous opérateurs) :\n\n« %s »</string>
+    <string name="report_call_confirm">Ce message va être envoyé au 33700 (gratuit) :\n\n« %s »</string>
+    <string name="report_send">Envoyer</string>
+    <string name="report_step2_title">Deuxième étape</string>
+    <string name="report_step2">Le 33700 va vous répondre en demandant le numéro de l’expéditeur. Voulez-vous l’envoyer maintenant ?\n\n%s</string>
+    <string name="report_send_number">Envoyer le numéro</string>
+    <string name="report_later">Plus tard</string>
+    <string name="report_done">Signalement transmis. Merci, chaque signalement compte.</string>
+    <string name="report_fail">Envoi impossible</string>
+    <string name="scan_menu">🔍 Analyser ce message</string>
+
+    <string name="widget_blocked">bloqués</string>
+    <string name="widget_sms">✉</string>
+
+    <string name="list_schedule">🕐 Horaire d’activation</string>
+    <string name="sched_start">Heure de début</string>
+    <string name="sched_end">Heure de fin</string>
+    <string name="sched_days">Jours concernés</string>
+    <string name="sched_everyday">Tous les jours</string>
+    <string name="sched_current">Horaire actuel : de %1$s à %2$s</string>
+    <string name="sched_change">Modifier</string>
+    <string name="sched_remove">Retirer l’horaire</string>
+    <string name="sched_saved">Liste active de %1$s à %2$s</string>
 </resources>

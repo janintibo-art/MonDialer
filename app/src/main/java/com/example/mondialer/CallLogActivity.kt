@@ -67,7 +67,8 @@ class CallLogActivity : Activity() {
             val options = arrayOf(
                 getString(R.string.action_dial_pad),
                 getString(R.string.action_block_number, num),
-                getString(R.string.action_block_prefix, prefix)
+                getString(R.string.action_block_prefix, prefix),
+                getString(R.string.report_call_menu)
             )
             AlertDialog.Builder(this)
                 .setTitle(num)
@@ -85,6 +86,7 @@ class CallLogActivity : Activity() {
                             BlockRulesStore.addPrefix(prefix)
                             Toast.makeText(this, R.string.prefix_blocked, Toast.LENGTH_SHORT).show()
                         }
+                        3 -> Report33700.reportCall(this, num)
                     }
                 }
                 .show()

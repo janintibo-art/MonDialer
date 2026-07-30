@@ -85,6 +85,31 @@ class ThreadActivity : Activity() {
         adapter = MsgAdapter()
         listView.adapter = adapter
 
+        // Appui long sur un message reçu : signaler, analyser ou bloquer
+        listView.setOnItemLongClickListener { _, _, pos, _ ->
+            val m = msgs.getOrNull(pos)
+            if (m == null || m.outgoing || m.body.isNullOrBlank()) {
+                return@setOnItemLongClickListener false
+            }
+            AlertDialog.Builder(this)
+                .setItems(arrayOf(
+                    getString(R.string.report_menu),
+                    getString(R.string.scan_menu),
+                    getString(R.string.action_block_number, address))) { _, which ->
+                    when (which) {
+                        0 -> Report33700.reportSms(this, m.body, address)
+                        1 -> analyzeScam()
+                        2 -> {
+                            BlockRulesStore.addNumber(address)
+                            Toast.makeText(this, R.string.number_blocked,
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .show()
+            true
+        }
+
         findViewById<Button>(R.id.btnSend).setOnClickListener {
             val to = editTo.text.toString().trim()
             val body = findViewById<EditText>(R.id.editBody).text.toString().trim()
@@ -234,6 +259,9 @@ class ThreadActivity : Activity() {
                     .setNeutralButton(R.string.scan_block) { _, _ ->
                         BlockRulesStore.addNumber(address)
                         Toast.makeText(this, R.string.number_blocked, Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton(R.string.report_menu) { _, _ ->
+                        Report33700.reportSms(this, incoming.body ?: "", address)
                     }
                     .show()
             }

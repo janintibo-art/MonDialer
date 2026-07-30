@@ -19,6 +19,7 @@ class SpamScreeningService : CallScreeningService() {
         val response = CallResponse.Builder()
         if (reason != null) {
             BlockRulesStore.logBlocked(number ?: "(masqué)", reason)
+            AnarchieWidget.refresh(applicationContext)
             if (BlockRulesStore.silentMode) {
                 // Mode discret : sonnerie coupée, l'appel file en messagerie
                 response.setSilenceCall(true)

@@ -62,6 +62,42 @@ object BlockRulesStore {
         get() = prefs(appCtx).getBoolean("silent", false)
         set(v) { prefs(appCtx).edit().putBoolean("silent", v).apply() }
 
+    /** Plage horaire du mode strict (-1 = permanent). */
+    var strictStart: Int
+        get() = prefs(appCtx).getInt("strict_start", -1)
+        set(v) { prefs(appCtx).edit().putInt("strict_start", v).apply() }
+
+    var strictEnd: Int
+        get() = prefs(appCtx).getInt("strict_end", -1)
+        set(v) { prefs(appCtx).edit().putInt("strict_end", v).apply() }
+
+    /**
+     * L'instant présent tombe-t-il dans la plage ? Une plage qui franchit
+     * minuit (22h → 7h) est gérée correctement.
+     */
+    fun withinSchedule(start: Int, end: Int, days: Set<Int>): Boolean {
+        if (start < 0 || end < 0) return true          // aucun horaire : toujours actif
+        val c = java.util.Calendar.getInstance()
+        val minute = c.get(java.util.Calendar.HOUR_OF_DAY) * 60 +
+                     c.get(java.util.Calendar.MINUTE)
+        val day = c.get(java.util.Calendar.DAY_OF_WEEK)
+        val inRange = if (start <= end) minute in start until end
+                      else minute >= start || minute < end   // franchit minuit
+        if (!inRange) return false
+        if (days.isEmpty()) return true
+        // Pour une plage nocturne, le jour de référence est celui du début
+        val refDay = if (start > end && minute < end)
+            (if (day == 1) 7 else day - 1) else day
+        return refDay in days
+    }
+
+    /** Une liste agit-elle en ce moment ? */
+    fun isListActiveNow(l: NamedList): Boolean =
+        l.enabled && withinSchedule(l.schedStart, l.schedEnd, l.schedDays)
+
+    fun strictActiveNow(): Boolean =
+        allowOnlyMode && withinSchedule(strictStart, strictEnd, emptySet())
+
     /** Bloque tout numéro absent du carnet d'adresses. */
     var blockUnknown: Boolean
         get() = prefs(appCtx).getBoolean("block_unknown", false)
@@ -84,7 +120,10 @@ object BlockRulesStore {
         var name: String,
         var type: String,               // "allow" ou "block"
         var enabled: Boolean,
-        val numbers: MutableSet<String>
+        val numbers: MutableSet<String>,
+        var schedStart: Int = -1,       // minute de début (-1 = sans horaire)
+        var schedEnd: Int = -1,         // minute de fin
+        var schedDays: MutableSet<Int> = HashSet()  // 1=dimanche … 7=samedi
     )
 
     fun namedLists(): MutableList<NamedList> {
@@ -96,9 +135,13 @@ object BlockRulesStore {
                 val nums = HashSet<String>()
                 val na = o.optJSONArray("numbers") ?: JSONArray()
                 for (j in 0 until na.length()) nums.add(na.getString(j))
+                val days = HashSet<Int>()
+                val da = o.optJSONArray("days") ?: JSONArray()
+                for (j in 0 until da.length()) days.add(da.getInt(j))
                 out.add(NamedList(
                     o.optString("id"), o.optString("name"),
-                    o.optString("type", "block"), o.optBoolean("enabled", true), nums))
+                    o.optString("type", "block"), o.optBoolean("enabled", true), nums,
+                    o.optInt("start", -1), o.optInt("end", -1), days))
             }
         } catch (_: Exception) {}
         return out
@@ -112,7 +155,10 @@ object BlockRulesStore {
                 .put("name", l.name)
                 .put("type", l.type)
                 .put("enabled", l.enabled)
-                .put("numbers", JSONArray(l.numbers.toList())))
+                .put("numbers", JSONArray(l.numbers.toList()))
+                .put("start", l.schedStart)
+                .put("end", l.schedEnd)
+                .put("days", JSONArray(l.schedDays.toList())))
         }
         prefs(appCtx).edit().putString("named_lists", arr.toString()).apply()
     }
@@ -245,7 +291,7 @@ object BlockRulesStore {
 
         if (n.isEmpty()) return if (blockHidden) "Numéro masqué" else null
 
-        val lists = namedLists().filter { it.enabled }
+        val lists = namedLists().filter { isListActiveNow(it) }
 
         // 1. Une liste d'autorisation active laisse toujours passer l'appel
         for (l in lists) {
@@ -255,7 +301,7 @@ object BlockRulesStore {
         val known = isInContacts(rawNumber)
 
         // 2. Mode strict : tout est refusé sauf autorisations explicites
-        if (allowOnlyMode) {
+        if (strictActiveNow()) {
             if (allowContacts && known) return null
             return "Hors liste autorisée"
         }

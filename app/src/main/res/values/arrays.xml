@@ -6,4 +6,13 @@
         <item>Dans 1 minute</item>
         <item>Dans 5 minutes</item>
     </string-array>
+    <string-array name="week_days">
+        <item>Lundi</item>
+        <item>Mardi</item>
+        <item>Mercredi</item>
+        <item>Jeudi</item>
+        <item>Vendredi</item>
+        <item>Samedi</item>
+        <item>Dimanche</item>
+    </string-array>
 </resources>
