@@ -13,10 +13,6 @@ import android.telecom.TelecomManager
 import android.telecom.VideoProfile
 import android.text.Editable
 import android.text.TextWatcher
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.style.RelativeSizeSpan
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.Button
@@ -218,22 +214,12 @@ class MainActivity : Activity() {
     }
 
 
-    /** Lettres associées à chaque touche, comme sur un clavier téléphonique. */
-    private val keyLetters = mapOf(
-        R.id.btn1 to "", R.id.btn2 to "ABC", R.id.btn3 to "DEF",
-        R.id.btn4 to "GHI", R.id.btn5 to "JKL", R.id.btn6 to "MNO",
-        R.id.btn7 to "PQRS", R.id.btn8 to "TUV", R.id.btn9 to "WXYZ",
-        R.id.btnStar to "", R.id.btn0 to "+", R.id.btnHash to ""
-    )
-
     /**
-     * Habille le clavier : fond résolu avec le thème courant (le cache de
-     * drawables d'Android peut garder l'ancienne palette) et chiffre surmontant
-     * ses lettres en plus petit.
+     * Habille le clavier : fond résolu avec le thème courant, car le cache de
+     * drawables d'Android peut garder les couleurs de l'ancienne palette.
      */
     private fun refreshDialpadTheme(ids: Collection<Int>) {
         val neon = resolveNeon()
-        val dim = ThemeRes.color(this, R.attr.cTextDim)
         val bgRes = ThemeRes.res(this, R.attr.dialBg)
         for (id in ids) {
             val b = findViewById<Button>(id) ?: continue
@@ -243,24 +229,6 @@ class MainActivity : Activity() {
             }
             b.setShadowLayer(14f, 0f, 0f, neon)
 
-            // Le libellé courant sert de source pour le chiffre/symbole
-            val label = b.text.toString().lineSequence().first().trim()
-            if (label.isEmpty()) continue
-            // Ligne de lettres, ou espace insécable pour garder la même
-            // hauteur sur les touches 1, * et # (chiffres alignés entre eux)
-            val letters = keyLetters[id]?.takeIf { it.isNotEmpty() } ?: "\u00A0"
-            val full = "$label\n$letters"
-            val sp = SpannableString(full)
-            val from = label.length + 1
-            sp.setSpan(RelativeSizeSpan(0.40f), from, full.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sp.setSpan(ForegroundColorSpan(dim), from, full.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            b.isSingleLine = false
-            b.maxLines = 2
-            b.setLineSpacing(0f, 0.88f)
-            b.includeFontPadding = false
-            b.text = sp
         }
     }
 
