@@ -2,6 +2,7 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.role.RoleManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -66,16 +67,13 @@ class MainActivity : Activity() {
 
         findViewById<Button>(R.id.btnCall).setOnClickListener { placeCall() }
 
-        findViewById<Button>(R.id.btnFilters).setOnClickListener {
-            startActivity(Intent(this, FiltersActivity::class.java))
-        }
+        findViewById<Button>(R.id.btnFilters).setOnClickListener { showMenu() }
         findViewById<Button>(R.id.btnContacts).setOnClickListener {
             startActivityForResult(Intent(this, ContactsActivity::class.java), 20)
         }
         findViewById<Button>(R.id.btnLog).setOnClickListener {
             startActivityForResult(Intent(this, CallLogActivity::class.java), 30)
         }
-        findViewById<Button>(R.id.btnDefault).setOnClickListener { requestDefaultDialer() }
         findViewById<Button>(R.id.btnSms).setOnClickListener {
             startActivity(Intent(this, ConversationsActivity::class.java))
         }
@@ -291,6 +289,39 @@ class MainActivity : Activity() {
         }
     }
 
+    /** Regroupe les réglages ponctuels, pour ne pas encombrer l'écran. */
+    private fun showMenu() {
+        val labels = arrayOf(
+            getString(R.string.menu_filters),
+            getString(R.string.menu_blocked),
+            getString(R.string.menu_theme),
+            getString(R.string.menu_default_dialer),
+            getString(R.string.menu_default_sms)
+        )
+        AlertDialog.Builder(this)
+            .setTitle(R.string.menu_title)
+            .setItems(labels) { _, which ->
+                when (which) {
+                    0 -> startActivity(Intent(this, FiltersActivity::class.java))
+                    1 -> startActivity(Intent(this, BlockedLogActivity::class.java))
+                    2 -> startActivity(Intent(this, CustomThemeActivity::class.java))
+                    3 -> requestDefaultDialer()
+                    4 -> requestDefaultSms()
+                }
+            }
+            .show()
+    }
+
+    /** Propose l'application comme application SMS par défaut. */
+    private fun requestDefaultSms() {
+        val rm = getSystemService(RoleManager::class.java)
+        if (rm.isRoleAvailable(RoleManager.ROLE_SMS) && !rm.isRoleHeld(RoleManager.ROLE_SMS)) {
+            startActivityForResult(rm.createRequestRoleIntent(RoleManager.ROLE_SMS), 11)
+        } else if (rm.isRoleHeld(RoleManager.ROLE_SMS)) {
+            Toast.makeText(this, R.string.already_sms_default, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun requestDefaultDialer() {
         val rm = getSystemService(RoleManager::class.java)
         if (rm.isRoleAvailable(RoleManager.ROLE_DIALER) && !rm.isRoleHeld(RoleManager.ROLE_DIALER)) {
@@ -305,6 +336,8 @@ class MainActivity : Activity() {
         when (requestCode) {
             10 -> if (resultCode == RESULT_OK)
                 Toast.makeText(this, R.string.now_default, Toast.LENGTH_SHORT).show()
+            11 -> if (resultCode == RESULT_OK)
+                Toast.makeText(this, R.string.now_sms_default, Toast.LENGTH_SHORT).show()
             20, 30 -> if (resultCode == RESULT_OK) {
                 val n = data?.getStringExtra("number") ?: return
                 display.setText(n)

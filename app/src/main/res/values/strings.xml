@@ -147,4 +147,12 @@
     <string name="lbl_blue">Bleu : %d</string>
     <string name="lbl_dim">Assombrissement : %d %% — 0 %% = image en pleine lumière</string>
     <string name="theme_custom">Sur mesure</string>
+    <string name="menu">MENU</string>
+    <string name="menu_title">Réglages</string>
+    <string name="menu_filters">🛡 Filtres anti-spam</string>
+    <string name="menu_blocked">⛔ Journal des appels bloqués</string>
+    <string name="menu_theme">🎨 Thème et apparence</string>
+    <string name="menu_default_dialer">📞 Application Téléphone par défaut</string>
+    <string name="menu_default_sms">✉ Application SMS par défaut</string>
+    <string name="now_sms_default">Anarchie Phone est maintenant l’app SMS par défaut</string>
 </resources>
