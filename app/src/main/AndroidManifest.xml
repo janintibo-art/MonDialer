@@ -46,6 +46,7 @@
         </activity>
 
         <activity android:name=".FiltersActivity" android:exported="false" />
+        <activity android:name=".CustomThemeActivity" android:exported="false" />
         <activity android:name=".ContactsActivity" android:exported="false" />
         <activity android:name=".EditContactActivity" android:exported="false" />
         <activity android:name=".EmailActivity" android:exported="true">

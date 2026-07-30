@@ -335,4 +335,30 @@
         <item name="bubbleOutBg">@drawable/bubble_out_angular</item>
         <item name="android:windowBackground">@drawable/bg_beam</item>
     </style>
+
+    <!-- Thème personnalisé : palette de base neutre (cyan), recolorée à
+         l'exécution selon le choix de l'utilisateur. Trois variantes de forme. -->
+    <style name="AppTheme.Custom" />
+
+    <style name="AppTheme.CustomTuile">
+        <item name="dialBg">@drawable/dial_squircle</item>
+        <item name="actionBg">@drawable/action_soft</item>
+        <item name="panelBg">@drawable/panel_squircle</item>
+        <item name="callBg">@drawable/call_soft</item>
+        <item name="dangerBg">@drawable/danger_soft</item>
+        <item name="bubbleInBg">@drawable/bubble_in_squircle</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_squircle</item>
+        <item name="android:windowBackground">@drawable/bg_vignette</item>
+    </style>
+
+    <style name="AppTheme.CustomHud">
+        <item name="dialBg">@drawable/dial_angular</item>
+        <item name="actionBg">@drawable/action_cut</item>
+        <item name="panelBg">@drawable/panel_angular</item>
+        <item name="callBg">@drawable/call_cut</item>
+        <item name="dangerBg">@drawable/danger_cut</item>
+        <item name="bubbleInBg">@drawable/bubble_in_angular</item>
+        <item name="bubbleOutBg">@drawable/bubble_out_angular</item>
+        <item name="android:windowBackground">@drawable/bg_beam</item>
+    </style>
 </resources>

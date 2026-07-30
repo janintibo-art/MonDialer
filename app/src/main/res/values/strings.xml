@@ -129,4 +129,22 @@
     <string name="theme_ardoise_nuit">ARDOISE NUIT</string>
     <string name="cancel">ANNULER</string>
     <string name="ok">OK</string>
+    <string name="custom_theme_btn">✎ THÈME PERSONNALISÉ</string>
+    <string name="custom_title">THÈME PERSONNALISÉ</string>
+    <string name="custom_palette">COULEUR RAPIDE</string>
+    <string name="custom_sliders">RÉGLAGE PRÉCIS</string>
+    <string name="custom_shape">FORME DES BOUTONS</string>
+    <string name="custom_image">IMAGE DE FOND</string>
+    <string name="custom_pick_image">📷 CHOISIR</string>
+    <string name="custom_clear_image">✕ RETIRER</string>
+    <string name="custom_apply">APPLIQUER CE THÈME</string>
+    <string name="custom_applied">Thème personnalisé appliqué</string>
+    <string name="shape_orb">● Rond</string>
+    <string name="shape_tuile">▢ Tuile</string>
+    <string name="shape_hud">◤ HUD</string>
+    <string name="lbl_red">Rouge : %d</string>
+    <string name="lbl_green">Vert : %d</string>
+    <string name="lbl_blue">Bleu : %d</string>
+    <string name="lbl_dim">Assombrissement de l’image : %d %%</string>
+    <string name="theme_custom">Sur mesure</string>
 </resources>

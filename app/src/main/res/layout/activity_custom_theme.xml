@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/NeonTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/custom_title"
+            android:textSize="18sp"
+            android:paddingBottom="12dp" />
+
+        <!-- Aperçu de la couleur -->
+        <TextView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:shadowColor="#B3000000"
+            android:shadowRadius="6"
+            android:shadowDx="0" android:shadowDy="1" />
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:textStyle="bold"
+            android:textColor="?attr/cNeon" android:text="@string/custom_palette" />
+
+        <LinearLayout
+            android:id="@+id/swatchRow1"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="6dp" />
+
+        <LinearLayout
+            android:id="@+id/swatchRow2"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="4dp" />
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:textStyle="bold"
+            android:textColor="?attr/cNeon" android:text="@string/custom_sliders" />
+
+        <TextView android:id="@+id/lblR" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textColor="#FF6B6B" />
+        <SeekBar android:id="@+id/seekR" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:max="255" />
+
+        <TextView android:id="@+id/lblG" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textColor="#6BFF9C" />
+        <SeekBar android:id="@+id/seekG" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:max="255" />
+
+        <TextView android:id="@+id/lblB" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textColor="#6BB5FF" />
+        <SeekBar android:id="@+id/seekB" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:max="255" />
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:textStyle="bold"
+            android:textColor="?attr/cNeon" android:text="@string/custom_shape" />
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="6dp">
+
+            <Button android:id="@+id/shapeOrb" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_orb" />
+            <Button android:id="@+id/shapeTuile" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_tuile" />
+            <Button android:id="@+id/shapeHud" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/shape_hud" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:textStyle="bold"
+            android:textColor="?attr/cNeon" android:text="@string/custom_image" />
+
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="6dp"
+            android:background="?attr/panelBg"
+            android:padding="4dp"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="6dp">
+
+            <Button android:id="@+id/btnPickImage" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/custom_pick_image" />
+            <Button android:id="@+id/btnClearImage" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/custom_clear_image" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/lblDim" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:textColor="@color/text_dim" />
+        <SeekBar android:id="@+id/seekDim" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:max="100" />
+
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="18dp"
+            android:background="?attr/callBg"
+            android:stateListAnimator="@animator/press"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:text="@string/custom_apply" />
+    </LinearLayout>
+</ScrollView>

@@ -54,7 +54,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:rowCount="5">
+            android:rowCount="5"
+            android:useDefaultMargins="false">
 
             <TextView
                 android:id="@+id/themeCyan"
@@ -109,6 +110,12 @@
                 style="@style/ThemeCard"
                 android:background="@drawable/theme_preview_ardoise"
                 android:text="@string/theme_ardoise_nuit" />
+            <TextView
+                android:id="@+id/themeCustom"
+                style="@style/ThemeCard"
+                android:background="@drawable/theme_preview_custom"
+                android:text="@string/theme_custom" />
+
         </GridLayout>
 
         <Switch android:id="@+id/swSilent"

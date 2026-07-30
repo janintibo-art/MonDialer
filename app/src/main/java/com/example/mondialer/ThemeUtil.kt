@@ -1,11 +1,28 @@
 package com.example.mondialer
 
 import android.app.Activity
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
+import android.net.Uri
+import android.view.View
 
 object ThemeUtil {
 
-    /** Thème réellement appliqué à chaque activité vivante. */
+    /** Couleur d'accent des drawables de base, servant de référence à la recoloration. */
+    private const val BASE_ACCENT = 0xFF45E9FF.toInt()
+
     private val applied = HashMap<Int, String>()
+
+    /** Image de fond décodée, gardée en mémoire pour éviter de la relire. */
+    private var cachedImage: Drawable? = null
+    private var cachedImageKey: String = ""
 
     fun apply(a: Activity) {
         BlockRulesStore.appCtx = a.applicationContext
@@ -19,29 +36,141 @@ object ThemeUtil {
             "or" -> R.style.AppTheme_Or
             "graphite" -> R.style.AppTheme_Graphite
             "ardoise" -> R.style.AppTheme_Ardoise
+            "custom" -> when (BlockRulesStore.customShape) {
+                "tuile" -> R.style.AppTheme_CustomTuile
+                "hud" -> R.style.AppTheme_CustomHud
+                else -> R.style.AppTheme_Custom
+            }
             else -> R.style.AppTheme
         }
         a.setTheme(style)
-        applied[System.identityHashCode(a)] = name
+        applied[System.identityHashCode(a)] = signature()
+    }
+
+    /** Signature de l'apparence : change dès qu'un réglage visuel est modifié. */
+    private fun signature(): String {
+        val t = BlockRulesStore.theme
+        return if (t != "custom") t
+        else "custom|${BlockRulesStore.customAccent}|${BlockRulesStore.customShape}" +
+             "|${BlockRulesStore.customImage}|${BlockRulesStore.customDim}"
     }
 
     /**
-     * À appeler dans onResume : si le thème a changé pendant que cette activité
-     * était en arrière-plan (elle est reprise depuis la pile sans repasser par
-     * onCreate), on la recrée pour qu'elle adopte la nouvelle palette.
+     * À appeler dans onResume : recrée l'écran si l'apparence a changé pendant
+     * qu'il était en arrière-plan, puis applique la personnalisation.
      */
     fun refreshIfNeeded(a: Activity) {
         val key = System.identityHashCode(a)
-        val was = applied[key] ?: return
-        if (was != BlockRulesStore.theme) {
+        val was = applied[key]
+        if (was != null && was != signature()) {
             applied.remove(key)
             a.recreate()
             a.overridePendingTransition(
                 android.R.anim.fade_in, android.R.anim.fade_out)
+            return
         }
+        decorate(a)
     }
 
     fun forget(a: Activity) {
         applied.remove(System.identityHashCode(a))
+    }
+
+    /** Applique la couleur choisie et l'image de fond du thème personnalisé. */
+    fun decorate(a: Activity) {
+        val content = a.findViewById<View>(android.R.id.content) ?: return
+
+        if (BlockRulesStore.theme != "custom") {
+            content.setLayerType(View.LAYER_TYPE_NONE, null)
+            return
+        }
+
+        // --- Image de fond : posée derrière le contenu, donc non recolorée ---
+        val uri = BlockRulesStore.customImage
+        if (uri.isNotBlank()) {
+            val key = "$uri|${BlockRulesStore.customDim}"
+            if (cachedImageKey != key) {
+                cachedImage = loadImage(a, uri, BlockRulesStore.customDim)
+                cachedImageKey = key
+            }
+            cachedImage?.let { a.window.setBackgroundDrawable(it) }
+        }
+
+        // --- Recoloration : l'écran est teinté vers la couleur choisie ---
+        val accent = BlockRulesStore.customAccent
+        if (accent == BASE_ACCENT) {
+            content.setLayerType(View.LAYER_TYPE_NONE, null)
+            return
+        }
+        val paint = Paint()
+        paint.colorFilter = ColorMatrixColorFilter(recolorMatrix(accent))
+        content.setLayerType(View.LAYER_TYPE_HARDWARE, paint)
+    }
+
+    /** Charge l'image, la met à l'échelle de l'écran et applique l'assombrissement. */
+    private fun loadImage(a: Activity, uriStr: String, dim: Int): Drawable? {
+        return try {
+            val uri = Uri.parse(uriStr)
+            val dm = a.resources.displayMetrics
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            a.contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it, null, bounds)
+            }
+            var sample = 1
+            while (bounds.outWidth / sample > dm.widthPixels * 1.5 ||
+                   bounds.outHeight / sample > dm.heightPixels * 1.5) sample *= 2
+            val opts = BitmapFactory.Options().apply { inSampleSize = sample }
+            val bmp = a.contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it, null, opts)
+            } ?: return null
+
+            val image = BitmapDrawable(a.resources, bmp)
+            image.gravity = android.view.Gravity.FILL
+            val scrim = ColorDrawable(Color.argb(
+                (dim.coerceIn(0, 100) * 255 / 100), 0, 0, 0))
+            LayerDrawable(arrayOf(image, scrim))
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Matrice qui déplace la teinte de l'interface depuis la couleur de base
+     * vers celle choisie, en ajustant aussi la saturation.
+     */
+    private fun recolorMatrix(target: Int): ColorMatrix {
+        val hsvBase = FloatArray(3)
+        val hsvTarget = FloatArray(3)
+        Color.colorToHSV(BASE_ACCENT, hsvBase)
+        Color.colorToHSV(target, hsvTarget)
+
+        val deg = hsvTarget[0] - hsvBase[0]
+        val rad = Math.toRadians(deg.toDouble())
+        val cos = Math.cos(rad).toFloat()
+        val sin = Math.sin(rad).toFloat()
+        val lr = 0.213f; val lg = 0.715f; val lb = 0.072f
+
+        val hue = ColorMatrix(floatArrayOf(
+            lr + cos * (1 - lr) + sin * (-lr),
+            lg + cos * (-lg) + sin * (-lg),
+            lb + cos * (-lb) + sin * (1 - lb), 0f, 0f,
+
+            lr + cos * (-lr) + sin * 0.143f,
+            lg + cos * (1 - lg) + sin * 0.140f,
+            lb + cos * (-lb) + sin * (-0.283f), 0f, 0f,
+
+            lr + cos * (-lr) + sin * (-(1 - lr)),
+            lg + cos * (-lg) + sin * lg,
+            lb + cos * (1 - lb) + sin * lb, 0f, 0f,
+
+            0f, 0f, 0f, 1f, 0f
+        ))
+
+        // Ajustement de saturation : une couleur pâle donne un rendu plus doux
+        val ratio = if (hsvBase[1] > 0.01f) hsvTarget[1] / hsvBase[1] else 1f
+        val sat = ColorMatrix()
+        sat.setSaturation(ratio.coerceIn(0.35f, 1.6f))
+        hue.postConcat(sat)
+        return hue
     }
 }

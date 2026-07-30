@@ -62,6 +62,27 @@ object BlockRulesStore {
         get() = prefs(appCtx).getBoolean("silent", false)
         set(v) { prefs(appCtx).edit().putBoolean("silent", v).apply() }
 
+    // ---- Thème personnalisé ----
+    /** Couleur d'accent choisie par l'utilisateur. */
+    var customAccent: Int
+        get() = prefs(appCtx).getInt("custom_accent", 0xFF45E9FF.toInt())
+        set(v) { prefs(appCtx).edit().putInt("custom_accent", v).apply() }
+
+    /** Famille de formes du thème personnalisé : orb, tuile ou hud. */
+    var customShape: String
+        get() = prefs(appCtx).getString("custom_shape", "orb") ?: "orb"
+        set(v) { prefs(appCtx).edit().putString("custom_shape", v).apply() }
+
+    /** Image de fond choisie dans la galerie (URI persistée), ou vide. */
+    var customImage: String
+        get() = prefs(appCtx).getString("custom_image", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("custom_image", v).apply() }
+
+    /** Assombrissement de l'image de fond, de 0 à 100. */
+    var customDim: Int
+        get() = prefs(appCtx).getInt("custom_dim", 55)
+        set(v) { prefs(appCtx).edit().putInt("custom_dim", v).apply() }
+
     var theme: String
         get() = prefs(appCtx).getString("theme", "cyan") ?: "cyan"
         set(v) { prefs(appCtx).edit().putString("theme", v).apply() }

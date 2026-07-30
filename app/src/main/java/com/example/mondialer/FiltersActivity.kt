@@ -72,6 +72,20 @@ class FiltersActivity : Activity() {
             }
         }
 
+        // Carte « Sur mesure » : ouvre l'atelier de personnalisation
+        findViewById<TextView>(R.id.themeCustom).let { card ->
+            val active = BlockRulesStore.theme == "custom"
+            card.text = if (active) "✓ ✎ ${getString(R.string.theme_custom)}"
+                        else "✎ ${getString(R.string.theme_custom)}"
+            card.alpha = if (active) 1f else 0.72f
+            card.scaleX = if (active) 1.02f else 0.97f
+            card.scaleY = if (active) 1.02f else 0.97f
+            card.elevation = (if (active) 14f else 5f) * density
+            card.setOnClickListener {
+                startActivity(Intent(this, CustomThemeActivity::class.java))
+            }
+        }
+
         // Options simples
         val swHidden = findViewById<Switch>(R.id.swHidden)
         val swNeighbors = findViewById<Switch>(R.id.swNeighbors)
