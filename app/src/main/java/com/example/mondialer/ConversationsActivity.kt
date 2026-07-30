@@ -94,6 +94,36 @@ class ConversationsActivity : Activity() {
             }
         } catch (_: Exception) {}
 
+        // Fils MMS absents de la liste SMS
+        try {
+            contentResolver.query(
+                Uri.parse("content://mms"),
+                arrayOf("_id", "thread_id", "date"),
+                null, null, "date DESC"
+            )?.use { c ->
+                while (c.moveToNext() && items.size < 120) {
+                    val tid = c.getString(1) ?: continue
+                    if (tid in seen) continue
+                    seen.add(tid)
+                    val mid = c.getString(0)
+                    val date = fmt.format(Date(c.getLong(2) * 1000))
+                    var addr = ""
+                    contentResolver.query(
+                        Uri.parse("content://mms/" + mid + "/addr"),
+                        arrayOf("address"), "type=137", null, null
+                    )?.use { a -> if (a.moveToFirst()) addr = a.getString(0) ?: "" }
+                    if (addr.isBlank()) continue
+                    val name = lookupName(addr)
+                    items.add(mapOf(
+                        "title" to (name ?: addr),
+                        "sub" to "📷 MMS  •  " + date,
+                        "address" to addr,
+                        "tid" to tid
+                    ))
+                }
+            }
+        } catch (_: Exception) {}
+
         list.adapter = SimpleAdapter(
             this, items, R.layout.item_two_lines,
             arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)

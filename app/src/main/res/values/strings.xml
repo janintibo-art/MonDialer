@@ -76,4 +76,11 @@
     <string name="playing_vm">Lecture…</string>
     <string name="vm_play_fail">Impossible de lire ce message</string>
     <string name="enter_number_first">Composez d\u0027abord un numéro</string>
+    <string name="gif_btn">🖼 GIF</string>
+    <string name="attach_too_big">Attention : fichier &gt; 1 Mo, votre opérateur peut le refuser</string>
+    <string name="attach_fail">Impossible de lire ce fichier</string>
+    <string name="mms_sending">MMS en cours d\u0027envoi…</string>
+    <string name="mms_dl_fail">Téléchargement impossible : consultez votre ancienne app Messages</string>
+    <string name="tap_to_save">appuyez pour enregistrer</string>
+    <string name="saved_downloads">%s enregistré dans Téléchargements</string>
 </resources>

@@ -25,11 +25,37 @@
         android:stackFromBottom="true"
         android:transcriptMode="normal" />
 
+    <TextView
+        android:id="@+id/txtAttach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/panel_round"
+        android:padding="10dp"
+        android:layout_marginTop="6dp"
+        android:textColor="?attr/cNeon"
+        android:visibility="gone" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnEmoji"
+            style="@style/ActionBtn"
+            android:layout_width="46dp"
+            android:paddingStart="0dp" android:paddingEnd="0dp"
+            android:textSize="16sp"
+            android:text="😊" />
+
+        <Button
+            android:id="@+id/btnAttach"
+            style="@style/ActionBtn"
+            android:layout_width="46dp"
+            android:paddingStart="0dp" android:paddingEnd="0dp"
+            android:textSize="16sp"
+            android:text="📎" />
 
         <EditText
             android:id="@+id/editBody"
@@ -46,9 +72,39 @@
             android:id="@+id/btnSend"
             style="@style/ActionBtn"
             android:layout_width="wrap_content"
-            android:paddingStart="22dp"
-            android:paddingEnd="22dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
             android:textSize="16sp"
             android:text="@string/send" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/emojiPanel"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:orientation="vertical"
+        android:background="@drawable/panel_round"
+        android:layout_marginTop="6dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnGif"
+                style="@style/ActionBtn"
+                android:layout_width="wrap_content"
+                android:paddingStart="18dp" android:paddingEnd="18dp"
+                android:text="@string/gif_btn" />
+        </LinearLayout>
+
+        <GridView
+            android:id="@+id/emojiGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="8" />
     </LinearLayout>
 </LinearLayout>

@@ -16,7 +16,18 @@
         android:maxWidth="280dp"
         android:padding="12dp"
         android:textColor="@color/text_main"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/msgImage"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxHeight="320dp"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/msgTime"

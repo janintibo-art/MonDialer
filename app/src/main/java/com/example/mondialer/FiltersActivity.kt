@@ -41,7 +41,10 @@ class FiltersActivity : Activity() {
             R.id.themeCyan to "cyan",
             R.id.themeViolet to "violet",
             R.id.themeGreen to "green",
-            R.id.themeOrange to "orange"
+            R.id.themeOrange to "orange",
+            R.id.themeRose to "rose",
+            R.id.themeRouge to "rouge",
+            R.id.themeOr to "or"
         )
         themeMap.forEach { (id, name) ->
             findViewById<View>(id).setOnClickListener {

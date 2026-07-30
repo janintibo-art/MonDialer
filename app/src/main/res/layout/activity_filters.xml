@@ -57,6 +57,15 @@
             <View android:id="@+id/themeOrange" android:layout_width="34dp"
                 android:layout_height="34dp" android:layout_margin="5dp"
                 android:background="@drawable/dot_orange" />
+            <View android:id="@+id/themeRose" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_rose" />
+            <View android:id="@+id/themeRouge" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_rouge" />
+            <View android:id="@+id/themeOr" android:layout_width="34dp"
+                android:layout_height="34dp" android:layout_margin="5dp"
+                android:background="@drawable/dot_or" />
         </LinearLayout>
 
         <Switch android:id="@+id/swSilent"

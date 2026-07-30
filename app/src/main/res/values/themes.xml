@@ -37,4 +37,24 @@
         <item name="cHalo">#33FF9E00</item>
         <item name="cHaloStrong">#80FF9E00</item>
     </style>
+    <style name="AppTheme.Rose">
+        <item name="cNeon">#FF4FD8</item>
+        <item name="cNeonDim">#D633B0</item>
+        <item name="cHalo">#33FF4FD8</item>
+        <item name="cHaloStrong">#80FF4FD8</item>
+    </style>
+
+    <style name="AppTheme.Rouge">
+        <item name="cNeon">#FF3355</item>
+        <item name="cNeonDim">#D91F42</item>
+        <item name="cHalo">#33FF3355</item>
+        <item name="cHaloStrong">#80FF3355</item>
+    </style>
+
+    <style name="AppTheme.Or">
+        <item name="cNeon">#FFD24A</item>
+        <item name="cNeonDim">#E0B02E</item>
+        <item name="cHalo">#33FFD24A</item>
+        <item name="cHaloStrong">#80FFD24A</item>
+    </style>
 </resources>
