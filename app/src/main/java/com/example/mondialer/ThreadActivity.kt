@@ -79,6 +79,23 @@ class ThreadActivity : Activity() {
             findViewById<RichEditText>(R.id.editBody).setText(it)
         }
 
+        // Contenu envoyé depuis une autre application (Spotify, galerie, navigateur…)
+        if (intent.action == Intent.ACTION_SEND) {
+            val shared = intent.getStringExtra(Intent.EXTRA_TEXT)
+            val subject = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            if (!shared.isNullOrBlank()) {
+                val text = if (!subject.isNullOrBlank() && !shared.contains(subject))
+                    "$subject\n$shared" else shared
+                findViewById<RichEditText>(R.id.editBody).setText(text)
+            }
+            val stream = if (android.os.Build.VERSION.SDK_INT >= 33)
+                intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            else @Suppress("DEPRECATION") intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            if (stream != null) {
+                attachFromUri(stream, intent.type, "partage")
+            }
+        }
+
         val editTo = findViewById<EditText>(R.id.editTo)
         if (address.isNotBlank()) {
             editTo.setText(address)
