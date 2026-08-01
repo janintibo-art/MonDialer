@@ -2,6 +2,7 @@ package com.example.mondialer
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -69,12 +70,10 @@ class ContactsActivity : Activity() {
                     .putExtra("contact_id", c.contactId)
                     .putExtra("name", c.name)
                     .putExtra("number", c.number))
+                finish()
             } else {
-                setResult(RESULT_OK, Intent()
-                    .putExtra("number", c.number)
-                    .putExtra("call", true))
+                showContactActions(c)
             }
-            finish()
         }
         list.setOnItemLongClickListener { _, _, pos, _ ->
             val c = shown[pos]
@@ -82,6 +81,85 @@ class ContactsActivity : Activity() {
             finish()
             true
         }
+    }
+
+    /**
+     * Propose les moyens de contact réellement renseignés : chaque numéro
+     * peut être appelé ou recevoir un SMS, chaque adresse un email.
+     */
+    private fun showContactActions(c: Contact) {
+        Thread {
+            val labels = mutableListOf<String>()
+            val actions = mutableListOf<Pair<String, String>>()   // type, valeur
+
+            val numbers = LinkedHashSet<String>()
+            val emails = LinkedHashSet<String>()
+            try {
+                contentResolver.query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
+                    arrayOf(c.contactId), null
+                )?.use { cur ->
+                    while (cur.moveToNext()) cur.getString(0)?.let { numbers.add(it) }
+                }
+                contentResolver.query(
+                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    arrayOf(ContactsContract.CommonDataKinds.Email.DATA1),
+                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + "=?",
+                    arrayOf(c.contactId), null
+                )?.use { cur ->
+                    while (cur.moveToNext()) cur.getString(0)?.let { emails.add(it) }
+                }
+            } catch (_: Exception) {}
+
+            if (numbers.isEmpty() && c.number.isNotBlank()) numbers.add(c.number)
+
+            for (n in numbers) {
+                labels.add(getString(R.string.act_call, n))
+                actions.add(Pair("call", n))
+            }
+            for (n in numbers) {
+                labels.add(getString(R.string.act_sms, n))
+                actions.add(Pair("sms", n))
+            }
+            for (e in emails) {
+                labels.add(getString(R.string.act_mail, e))
+                actions.add(Pair("mail", e))
+            }
+            labels.add(getString(R.string.act_edit))
+            actions.add(Pair("edit", c.contactId))
+
+            runOnUiThread {
+                if (actions.size == 1) {          // seulement « modifier »
+                    Toast.makeText(this, R.string.act_nothing, Toast.LENGTH_SHORT).show()
+                }
+                AlertDialog.Builder(this)
+                    .setTitle(c.name)
+                    .setItems(labels.toTypedArray()) { _, which ->
+                        val (type, value) = actions[which]
+                        when (type) {
+                            "call" -> {
+                                setResult(RESULT_OK, Intent()
+                                    .putExtra("number", value)
+                                    .putExtra("call", true))
+                                finish()
+                            }
+                            "sms" -> startActivity(
+                                Intent(this, ThreadActivity::class.java)
+                                    .putExtra("address", value))
+                            "mail" -> startActivity(
+                                Intent(this, EmailActivity::class.java)
+                                    .putExtra("to", value))
+                            "edit" -> startActivity(
+                                Intent(this, EditContactActivity::class.java)
+                                    .putExtra("contact_id", value))
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }.start()
     }
 
     override fun onResume() {

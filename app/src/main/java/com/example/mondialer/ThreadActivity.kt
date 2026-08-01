@@ -722,6 +722,16 @@ class ThreadActivity : Activity() {
 
             bubble.visibility = View.GONE
             img.visibility = View.GONE
+
+            // Le menu s'ouvre par appui long, posé sur chaque vue : un
+            // écouteur de clic sur un enfant priverait la liste de l'événement.
+            val longPress = View.OnLongClickListener {
+                showMessageMenu(m)
+                true
+            }
+            v.setOnLongClickListener(longPress)
+            bubble.setOnLongClickListener(longPress)
+            img.setOnLongClickListener(longPress)
             bubble.setOnClickListener(null)
             img.setOnClickListener(null)
 
@@ -736,19 +746,13 @@ class ThreadActivity : Activity() {
                         img.setImageResource(android.R.drawable.ic_menu_gallery)
                         decodeAsync(m.imageUri)
                     }
-                    img.setOnClickListener {
-                        saveToDownloads(m.imageUri, "mms_${m.date}.jpg", "image/jpeg")
-                    }
+                    img.setOnClickListener { showMessageMenu(m) }
                 }
                 m.fileName != null -> {
                     bubble.visibility = View.VISIBLE
                     bubble.setBackgroundResource(bg)
                     bubble.text = "📎 ${m.fileName}\n(${getString(R.string.tap_to_save)})"
-                    bubble.setOnClickListener {
-                        if (m.fileUri != null)
-                            saveToDownloads(m.fileUri, m.fileName,
-                                m.fileMime ?: "application/octet-stream")
-                    }
+                    bubble.setOnClickListener { showMessageMenu(m) }
                 }
                 else -> {
                     bubble.visibility = View.VISIBLE

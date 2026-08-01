@@ -275,4 +275,10 @@
     <string name="msg_share">📤 Partager</string>
     <string name="msg_copied">Copié dans le presse-papiers</string>
     <string name="msg_copy_fail">Copie impossible</string>
+    <string name="search_messages">🔎 Rechercher un contact ou un message…</string>
+    <string name="act_call">📞 Appeler %s</string>
+    <string name="act_sms">💬 Envoyer un SMS à %s</string>
+    <string name="act_mail">✉ Envoyer un email à %s</string>
+    <string name="act_edit">✎ Modifier la fiche</string>
+    <string name="act_nothing">Ce contact n’a ni numéro ni adresse email</string>
 </resources>

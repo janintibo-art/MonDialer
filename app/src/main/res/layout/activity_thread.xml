@@ -23,7 +23,9 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:stackFromBottom="true"
-        android:transcriptMode="normal" />
+        android:transcriptMode="normal"
+        android:choiceMode="none"
+        android:longClickable="false" />
 
     <TextView
         android:id="@+id/txtAttach"

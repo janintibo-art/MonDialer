@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.app.AlertDialog
 import android.provider.ContactsContract
 import android.widget.Button
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.Toast
@@ -20,6 +23,7 @@ import java.util.Locale
 class ConversationsActivity : Activity() {
 
     private lateinit var list: ListView
+    private var allItems = listOf<Map<String, String>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
@@ -35,6 +39,14 @@ class ConversationsActivity : Activity() {
         findViewById<Button>(R.id.btnMail).setOnClickListener {
             startActivity(Intent(this, EmailActivity::class.java))
         }
+
+        // Recherche par nom, numéro ou contenu du message
+        findViewById<EditText>(R.id.editSearch).addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+                override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+                override fun afterTextChanged(s: Editable?) = filter(s?.toString() ?: "")
+            })
 
         val perms = mutableListOf(
             Manifest.permission.READ_SMS,
@@ -134,20 +146,89 @@ class ConversationsActivity : Activity() {
             } catch (_: Exception) {}
 
             runOnUiThread {
-                list.adapter = SimpleAdapter(
-                    this, items, R.layout.item_two_lines,
-                    arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-                )
-                list.setOnItemClickListener { _, _, pos, _ ->
-                    @Suppress("UNCHECKED_CAST")
-                    val item = list.adapter.getItem(pos) as Map<String, String>
-                    startActivity(Intent(this, ThreadActivity::class.java)
-                        .putExtra("address", item["address"])
-                        .putExtra("thread_id", item["tid"]))
-                }
+                allItems = items
+                show(items)
                 loading = false
+                val q = findViewById<EditText>(R.id.editSearch).text.toString()
+                if (q.isNotBlank()) filter(q)
             }
         }.start()
+    }
+
+    private fun show(items: List<Map<String, String>>) {
+        list.adapter = SimpleAdapter(
+            this, items, R.layout.item_two_lines,
+            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2))
+        list.setOnItemClickListener { _, _, pos, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = list.adapter.getItem(pos) as Map<String, String>
+            startActivity(Intent(this, ThreadActivity::class.java)
+                .putExtra("address", item["address"])
+                .putExtra("thread_id", item["tid"])
+                .putExtra("search", item["match"]))
+        }
+    }
+
+    /**
+     * Filtre sur le nom, le numéro et l'aperçu ; puis, si peu de résultats,
+     * cherche aussi dans le corps de tous les messages.
+     */
+    private fun filter(query: String) {
+        val q = query.trim().lowercase()
+        if (q.isEmpty()) { show(allItems); return }
+
+        val direct = allItems.filter {
+            (it["title"] ?: "").lowercase().contains(q) ||
+            (it["address"] ?: "").contains(q) ||
+            (it["sub"] ?: "").lowercase().contains(q)
+        }
+        show(direct)
+
+        // Recherche approfondie dans le contenu des messages
+        if (q.length >= 3) {
+            Thread {
+                val found = deepSearch(q, direct.mapNotNull { it["tid"] }.toSet())
+                if (found.isNotEmpty()) {
+                    runOnUiThread {
+                        val current = findViewById<EditText>(R.id.editSearch)
+                            .text.toString().trim().lowercase()
+                        if (current == q) show(direct + found)
+                    }
+                }
+            }.start()
+        }
+    }
+
+    /** Parcourt le corps des SMS pour retrouver une conversation par son contenu. */
+    private fun deepSearch(q: String, exclude: Set<String>): List<Map<String, String>> {
+        val out = mutableListOf<Map<String, String>>()
+        val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
+        val seen = HashSet<String>()
+        try {
+            contentResolver.query(
+                Uri.parse("content://sms"),
+                arrayOf("thread_id", "address", "body", "date"),
+                "body LIKE ?", arrayOf("%" + q + "%"), "date DESC LIMIT 60"
+            )?.use { c ->
+                while (c.moveToNext() && out.size < 30) {
+                    val tid = c.getString(0) ?: continue
+                    if (tid in exclude || tid in seen) continue
+                    seen.add(tid)
+                    val address = c.getString(1) ?: ""
+                    val body = c.getString(2) ?: ""
+                    val date = fmt.format(Date(c.getLong(3)))
+                    val name = lookupName(address)
+                    out.add(mapOf(
+                        "title" to "🔎 " + (name ?: address),
+                        "sub" to body.take(70) + "  •  " + date,
+                        "address" to address,
+                        "tid" to tid,
+                        "match" to q
+                    ))
+                }
+            }
+        } catch (_: Exception) {}
+        return out
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
