@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 import java.text.SimpleDateFormat
@@ -48,13 +47,8 @@ class BlockedLogActivity : Activity() {
             )
         }
         val list = findViewById<ListView>(R.id.list)
-        if (items.isEmpty()) {
-            Toast.makeText(this, R.string.no_blocked_calls, Toast.LENGTH_SHORT).show()
-        }
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-        )
+        EmptyState.show(this, items.isEmpty(), "⛔", getString(R.string.no_blocked_calls))
+        list.adapter = CardAdapter(this, items)
     }
 
     override fun onResume() {

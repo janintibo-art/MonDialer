@@ -13,7 +13,6 @@ import android.provider.VoicemailContract
 import android.telephony.TelephonyManager
 import android.widget.Button
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.Toast
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -114,10 +113,7 @@ class VoicemailActivity : Activity() {
             Toast.makeText(this, R.string.no_visual_vm, Toast.LENGTH_LONG).show()
             return
         }
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-        )
+        list.adapter = CardAdapter(this, items)
         list.setOnItemClickListener { _, _, pos, _ ->
             playVoicemail(ids[pos])
         }

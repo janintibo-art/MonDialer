@@ -12,6 +12,7 @@
 
         <TextView
             style="@style/NeonTitle"
+        android:background="@drawable/header_band"
             android:id="@+id/txtEditTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

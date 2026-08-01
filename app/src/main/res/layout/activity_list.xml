@@ -7,6 +7,7 @@
 
     <TextView
         style="@style/NeonTitle"
+        android:background="@drawable/header_band"
         android:id="@+id/txtTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +24,10 @@
         android:inputType="text"
         android:textSize="16sp" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
@@ -30,4 +35,7 @@
         android:layout_marginTop="8dp"
         android:divider="?attr/cNeonDim"
         android:dividerHeight="0.5dp" />
+
+        <include layout="@layout/empty_state" />
+    </FrameLayout>
 </LinearLayout>

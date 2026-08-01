@@ -14,7 +14,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.Toast
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -151,6 +150,8 @@ class ConversationsActivity : Activity() {
             runOnUiThread {
                 allItems = items
                 show(items)
+                EmptyState.show(this, items.isEmpty(), "💬",
+                    getString(R.string.empty_messages))
                 loading = false
                 val q = findViewById<EditText>(R.id.editSearch).text.toString()
                 if (q.isNotBlank()) filter(q)
@@ -159,9 +160,7 @@ class ConversationsActivity : Activity() {
     }
 
     private fun show(items: List<Map<String, String>>) {
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2))
+        list.adapter = CardAdapter(this, items)
         list.setOnItemClickListener { _, _, pos, _ ->
             @Suppress("UNCHECKED_CAST")
             val item = list.adapter.getItem(pos) as Map<String, String>

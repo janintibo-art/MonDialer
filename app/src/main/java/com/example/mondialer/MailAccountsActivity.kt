@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 
@@ -54,12 +53,11 @@ class MailAccountsActivity : Activity() {
                 "sub" to it.user + "  •  " + it.host
             )
         }
-        listView.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2))
+        listView.adapter = CardAdapter(this, items)
         findViewById<TextView>(R.id.txtHint).text =
-            if (items.isEmpty()) getString(R.string.mail_accounts_empty)
-            else getString(R.string.mail_accounts_hint)
+            if (items.isEmpty()) "" else getString(R.string.mail_accounts_hint)
+        EmptyState.show(this, items.isEmpty(), "✉",
+            getString(R.string.mail_accounts_empty))
     }
 
     /** Formulaire d'ajout ou de modification, avec détection du fournisseur. */

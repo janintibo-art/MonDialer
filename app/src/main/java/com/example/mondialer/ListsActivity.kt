@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 
@@ -59,12 +58,10 @@ class ListsActivity : Activity() {
                          getString(R.string.list_numbers) + sched
             )
         }
-        listView.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2))
+        listView.adapter = CardAdapter(this, items)
         findViewById<TextView>(R.id.txtHint).text =
-            if (items.isEmpty()) getString(R.string.lists_empty)
-            else getString(R.string.lists_hint)
+            if (items.isEmpty()) "" else getString(R.string.lists_hint)
+        EmptyState.show(this, items.isEmpty(), "📋", getString(R.string.lists_empty))
     }
 
     private fun createList() {

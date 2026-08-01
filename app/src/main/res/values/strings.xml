@@ -316,4 +316,6 @@
     <string name="state_hold">En attente</string>
     <string name="notify_blocked">Me prévenir discrètement des appels bloqués</string>
     <string name="notif_blocked_title">Appel bloqué : %s</string>
+    <string name="empty_messages">Aucune conversation pour l’instant.\nAppuyez sur ✎ NOUVEAU pour écrire à quelqu’un.</string>
+    <string name="empty_contacts">Aucun contact trouvé.\nAppuyez sur + pour en créer un.</string>
 </resources>

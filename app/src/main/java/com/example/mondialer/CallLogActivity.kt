@@ -11,7 +11,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 import java.text.SimpleDateFormat
@@ -136,10 +135,7 @@ class CallLogActivity : Activity() {
     }
 
     private fun show(items: List<Map<String, String>>) {
-        list.adapter = SimpleAdapter(
-            this, items, R.layout.item_two_lines,
-            arrayOf("title", "sub"), intArrayOf(R.id.text1, R.id.text2)
-        )
+        list.adapter = CardAdapter(this, items)
     }
 
     private fun filter(q: String) {

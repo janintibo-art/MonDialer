@@ -1,39 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="10dp">
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:background="@drawable/card_row"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="10dp">
 
-        <TextView
-            android:id="@+id/text1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="?attr/cText"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+        <View
+            android:layout_width="3dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/card_row_edge" />
 
-        <TextView
-            android:id="@+id/text2"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="?attr/cNeonDim"
-            android:textSize="14sp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/cText"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/cTextDim"
+                android:textSize="13sp"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnEdit"
+            style="@style/ActionBtn"
+            android:layout_width="44dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:textSize="15sp"
+            android:text="✎" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnEdit"
-        style="@style/ActionBtn"
-        android:layout_width="46dp"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        android:textSize="15sp"
-        android:text="✎" />
-</LinearLayout>
+</FrameLayout>

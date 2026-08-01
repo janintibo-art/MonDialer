@@ -17,6 +17,7 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -205,6 +206,8 @@ class ContactsActivity : Activity() {
 
     private fun show(items: List<Contact>) {
         shown = items
+        lastAnimated = -1
+        EmptyState.show(this, items.isEmpty(), "👤", getString(R.string.empty_contacts))
         letterPos.clear()
         for ((i, c) in items.withIndex()) {
             val l = initialOf(c.name)
@@ -272,6 +275,42 @@ class ContactsActivity : Activity() {
         return tv.data
     }
 
+    private val photoCache = HashMap<String, android.graphics.Bitmap?>()
+    private val photoTried = HashSet<String>()
+    private var lastAnimated = -1
+
+    /** Masque circulaire appliqué aux photos de contact. */
+    private fun roundMask(): android.graphics.drawable.Drawable {
+        val d = android.graphics.drawable.GradientDrawable()
+        d.shape = android.graphics.drawable.GradientDrawable.OVAL
+        d.setColor(android.graphics.Color.TRANSPARENT)
+        d.setStroke((1.5f * resources.displayMetrics.density).toInt(),
+            ThemeRes.color(this, R.attr.cNeonDim))
+        return d
+    }
+
+    /** Charge la photo en arrière-plan, une seule tentative par contact. */
+    private fun loadPhoto(contactId: String) {
+        photoTried.add(contactId)
+        Thread {
+            var bmp: android.graphics.Bitmap? = null
+            try {
+                val uri = android.content.ContentUris.withAppendedId(
+                    ContactsContract.Contacts.CONTENT_URI, contactId.toLong())
+                ContactsContract.Contacts.openContactPhotoInputStream(
+                    contentResolver, uri, true)?.use {
+                    bmp = android.graphics.BitmapFactory.decodeStream(it)
+                }
+            } catch (_: Exception) {}
+            if (bmp != null) {
+                runOnUiThread {
+                    photoCache[contactId] = bmp
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }.start()
+    }
+
     inner class ContactAdapter : BaseAdapter() {
         override fun getCount() = shown.size
         override fun getItem(position: Int) = shown[position]
@@ -282,6 +321,29 @@ class ContactsActivity : Activity() {
             val c = shown[position]
             v.findViewById<TextView>(R.id.text1).text = c.name
             v.findViewById<TextView>(R.id.text2).text = c.number
+
+            // Photo du carnet si elle existe, sinon pastille d'initiales
+            val img = v.findViewById<ImageView>(R.id.avatar)
+            val cached = photoCache[c.contactId]
+            if (cached != null) {
+                img.setImageBitmap(cached)
+                img.background = roundMask()
+                img.clipToOutline = true
+            } else {
+                img.background = null
+                img.setImageDrawable(AvatarDrawable(c.name,
+                    ThemeRes.color(this@ContactsActivity, R.attr.cNeon)))
+                if (c.contactId !in photoTried) loadPhoto(c.contactId)
+            }
+
+            // Apparition décalée, comme dans les autres listes
+            if (position > lastAnimated) {
+                lastAnimated = position
+                v.alpha = 0f
+                v.translationY = 26f * resources.displayMetrics.density
+                v.animate().alpha(1f).translationY(0f)
+                    .setStartDelay((position % 8) * 28L).setDuration(260).start()
+            }
             v.findViewById<Button>(R.id.btnEdit).setOnClickListener {
                 startActivity(Intent(this@ContactsActivity, EditContactActivity::class.java)
                     .putExtra("contact_id", c.contactId))
