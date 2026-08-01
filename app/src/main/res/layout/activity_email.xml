@@ -18,6 +18,17 @@
             android:textSize="18sp"
             android:paddingBottom="10dp" />
 
+        <!-- Compte expéditeur : un appui permet d'en changer -->
+        <TextView
+            android:id="@+id/txtFrom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/panelBg"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="?attr/cNeon"
+            android:textSize="14sp" />
+
         <EditText
             android:id="@+id/emailTo"
             android:layout_width="match_parent"
@@ -44,7 +55,7 @@
             android:layout_marginTop="8dp"
             android:background="?attr/panelBg"
             android:padding="12dp"
-            android:inputType="textCapSentences|textMultiLine"
+            android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
             android:minLines="6"
             android:gravity="top"
             android:hint="@string/email_body" />
@@ -73,101 +84,18 @@
                 android:text="@string/ai_button_long" />
             <Button android:id="@+id/btnEmailSettings" style="@style/ActionBtn"
                 android:layout_width="0dp" android:layout_weight="1"
-                android:text="@string/email_settings" />
+                android:text="@string/mail_accounts_btn" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnEmailSend"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="10dp"
+            android:layout_height="58dp"
+            android:layout_marginTop="12dp"
             android:background="?attr/callBg"
             android:stateListAnimator="@animator/press"
-            android:textColor="?attr/cOnAccent"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:text="@string/email_send" />
-
-        <!-- Réglages SMTP -->
-        <LinearLayout
-            android:id="@+id/settingsPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="?attr/panelBg"
-            android:padding="12dp"
-            android:layout_marginTop="14dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="?attr/cNeon"
-                android:text="@string/smtp_config" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="6dp">
-
-                <Button android:id="@+id/presetGmail" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="Gmail" />
-                <Button android:id="@+id/presetOrange" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="Orange" />
-                <Button android:id="@+id/presetSfr" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="SFR" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button android:id="@+id/presetFree" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="Free" />
-                <Button android:id="@+id/presetOutlook" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="Outlook" />
-                <Button android:id="@+id/presetLaposte" style="@style/ActionBtn"
-                    android:layout_width="0dp" android:layout_weight="1" android:text="Laposte" />
-            </LinearLayout>
-
-            <EditText android:id="@+id/smtpHost"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="?attr/panelBg"
-                android:padding="10dp" android:inputType="textUri"
-                android:hint="@string/smtp_host" />
-
-            <EditText android:id="@+id/smtpPort"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="?attr/panelBg"
-                android:padding="10dp" android:inputType="number"
-                android:hint="@string/smtp_port" />
-
-            <EditText android:id="@+id/smtpUser"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="?attr/panelBg"
-                android:padding="10dp" android:inputType="textEmailAddress"
-                android:hint="@string/smtp_user" />
-
-            <EditText android:id="@+id/smtpPass"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:background="?attr/panelBg"
-                android:padding="10dp" android:inputType="textPassword"
-                android:hint="@string/smtp_pass" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="6dp"
-                android:textColor="?attr/cTextDim"
-                android:textSize="12sp"
-                android:text="@string/gmail_hint" />
-
-            <Button android:id="@+id/btnSaveSmtp" style="@style/ActionBtn"
-                android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:text="@string/save" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -281,4 +281,27 @@
     <string name="act_mail">✉ Envoyer un email à %s</string>
     <string name="act_edit">✎ Modifier la fiche</string>
     <string name="act_nothing">Ce contact n’a ni numéro ni adresse email</string>
+    <string name="mail_accounts_btn">👤 COMPTES</string>
+    <string name="mail_accounts_title">MES COMPTES EMAIL</string>
+    <string name="mail_accounts_hint">Appui : modifier — Appui long : définir par défaut ou supprimer</string>
+    <string name="mail_accounts_empty">Aucun compte. Ajoutez-en un pour envoyer des emails.</string>
+    <string name="mail_account_new">＋ AJOUTER UN COMPTE</string>
+    <string name="mail_account_edit">Modifier le compte</string>
+    <string name="mail_account_delete">Supprimer ce compte</string>
+    <string name="mail_account_default">★ Utiliser par défaut</string>
+    <string name="mail_account_test">Tester</string>
+    <string name="mail_account_testing">Vérification de la connexion…</string>
+    <string name="mail_account_ok">✔ Connexion réussie</string>
+    <string name="mail_account_ko">✕ Échec : %s</string>
+    <string name="mail_account_incomplete">Adresse et serveur sont nécessaires</string>
+    <string name="mail_field_address">Adresse email complète</string>
+    <string name="mail_field_password">Mot de passe (ou mot de passe d’application)</string>
+    <string name="mail_field_label">Nom du compte (ex : Perso, Boulot)</string>
+    <string name="mail_field_host">Serveur SMTP</string>
+    <string name="mail_field_port">Port (465 ou 587)</string>
+    <string name="mail_from">De : %s</string>
+    <string name="mail_no_account">Aucun compte configuré — appuyez ici</string>
+    <string name="mail_no_account_msg">Ajoutez d’abord un compte d’envoi.</string>
+    <string name="mail_pick_account">Envoyer depuis</string>
+    <string name="mail_manage">Gérer les comptes</string>
 </resources>

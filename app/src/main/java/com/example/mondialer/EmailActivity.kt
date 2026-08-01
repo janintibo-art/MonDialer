@@ -2,7 +2,6 @@ package com.example.mondialer
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -10,17 +9,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import java.util.Properties
-import javax.mail.Authenticator
-import javax.mail.Message
-import javax.mail.PasswordAuthentication
-import javax.mail.Session
-import javax.mail.Transport
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
-import javax.mail.util.ByteArrayDataSource
 
 class EmailActivity : Activity() {
 
@@ -28,7 +16,6 @@ class EmailActivity : Activity() {
     private var attachName: String? = null
     private var attachMime: String? = null
 
-    private fun prefs() = getSharedPreferences("email_cfg", Context.MODE_PRIVATE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
@@ -45,42 +32,11 @@ class EmailActivity : Activity() {
             }
         }
 
-        // Réglages SMTP
-        val panel = findViewById<View>(R.id.settingsPanel)
+        setupAccountPicker()
+
+        // Gestion des comptes d'envoi
         findViewById<Button>(R.id.btnEmailSettings).setOnClickListener {
-            panel.visibility =
-                if (panel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-        }
-        loadSettings()
-        if (prefs().getString("host", "").isNullOrBlank()) {
-            panel.visibility = View.VISIBLE
-            Toast.makeText(this, R.string.email_cfg_missing, Toast.LENGTH_LONG).show()
-        }
-
-        val presets = mapOf(
-            R.id.presetGmail to Pair("smtp.gmail.com", "465"),
-            R.id.presetOrange to Pair("smtp.orange.fr", "465"),
-            R.id.presetSfr to Pair("smtp.sfr.fr", "465"),
-            R.id.presetFree to Pair("smtp.free.fr", "465"),
-            R.id.presetOutlook to Pair("smtp.office365.com", "587"),
-            R.id.presetLaposte to Pair("smtp.laposte.net", "465")
-        )
-        presets.forEach { (id, hp) ->
-            findViewById<Button>(id).setOnClickListener {
-                findViewById<EditText>(R.id.smtpHost).setText(hp.first)
-                findViewById<EditText>(R.id.smtpPort).setText(hp.second)
-            }
-        }
-
-        findViewById<Button>(R.id.btnSaveSmtp).setOnClickListener {
-            prefs().edit()
-                .putString("host", text(R.id.smtpHost))
-                .putString("port", text(R.id.smtpPort))
-                .putString("user", text(R.id.smtpUser))
-                .putString("pass", text(R.id.smtpPass))
-                .apply()
-            Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
-            panel.visibility = View.GONE
+            startActivity(Intent(this, MailAccountsActivity::class.java))
         }
 
         // Pièce jointe
@@ -97,6 +53,43 @@ class EmailActivity : Activity() {
 
         findViewById<Button>(R.id.btnEmailAi).setOnClickListener { suggestBody() }
         findViewById<Button>(R.id.btnEmailSend).setOnClickListener { send() }
+    }
+
+    private var accounts = mutableListOf<BlockRulesStore.MailAccount>()
+    private var current: BlockRulesStore.MailAccount? = null
+
+    /** Bandeau « De : » permettant de choisir l'adresse d'expédition. */
+    private fun setupAccountPicker() {
+        accounts = BlockRulesStore.mailAccounts()
+        current = accounts.firstOrNull { it.id == BlockRulesStore.defaultMailAccount }
+            ?: accounts.firstOrNull()
+        updateAccountLabel()
+
+        findViewById<TextView>(R.id.txtFrom).setOnClickListener {
+            accounts = BlockRulesStore.mailAccounts()
+            if (accounts.isEmpty()) {
+                startActivity(Intent(this, MailAccountsActivity::class.java))
+                return@setOnClickListener
+            }
+            val labels = accounts.map { it.label + "  —  " + it.user }.toTypedArray()
+            AlertDialog.Builder(this)
+                .setTitle(R.string.mail_pick_account)
+                .setItems(labels) { _, which ->
+                    current = accounts[which]
+                    updateAccountLabel()
+                }
+                .setNeutralButton(R.string.mail_manage) { _, _ ->
+                    startActivity(Intent(this, MailAccountsActivity::class.java))
+                }
+                .show()
+        }
+    }
+
+    private fun updateAccountLabel() {
+        val c = current
+        findViewById<TextView>(R.id.txtFrom).text =
+            if (c == null) getString(R.string.mail_no_account)
+            else getString(R.string.mail_from, c.user)
     }
 
     private fun text(id: Int) = findViewById<EditText>(id).text.toString().trim()
@@ -160,13 +153,6 @@ class EmailActivity : Activity() {
         }.start()
     }
 
-    private fun loadSettings() {
-        val p = prefs()
-        findViewById<EditText>(R.id.smtpHost).setText(p.getString("host", ""))
-        findViewById<EditText>(R.id.smtpPort).setText(p.getString("port", "465"))
-        findViewById<EditText>(R.id.smtpUser).setText(p.getString("user", ""))
-        findViewById<EditText>(R.id.smtpPass).setText(p.getString("pass", ""))
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -199,24 +185,28 @@ class EmailActivity : Activity() {
     }
 
     private fun send() {
-        val p = prefs()
-        val host = p.getString("host", "") ?: ""
-        val port = p.getString("port", "465") ?: "465"
-        val user = p.getString("user", "") ?: ""
-        val pass = p.getString("pass", "") ?: ""
-        val to = text(R.id.emailTo)
-        val subject = text(R.id.emailSubject)
-        val body = findViewById<EditText>(R.id.emailBody).text.toString()
-
-        if (host.isBlank() || user.isBlank() || pass.isBlank()) {
-            findViewById<View>(R.id.settingsPanel).visibility = View.VISIBLE
-            Toast.makeText(this, R.string.email_cfg_missing, Toast.LENGTH_LONG).show()
+        accounts = BlockRulesStore.mailAccounts()
+        if (current == null) current = accounts.firstOrNull {
+            it.id == BlockRulesStore.defaultMailAccount } ?: accounts.firstOrNull()
+        val account = current
+        if (account == null) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.mail_no_account_msg)
+                .setPositiveButton(R.string.mail_manage) { _, _ ->
+                    startActivity(Intent(this, MailAccountsActivity::class.java))
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
             return
         }
+
+        val to = text(R.id.emailTo)
         if (to.isBlank()) {
             Toast.makeText(this, R.string.email_to_missing, Toast.LENGTH_SHORT).show()
             return
         }
+        val subject = text(R.id.emailSubject)
+        val body = findViewById<EditText>(R.id.emailBody).text.toString()
 
         val btn = findViewById<Button>(R.id.btnEmailSend)
         btn.isEnabled = false
@@ -228,42 +218,7 @@ class EmailActivity : Activity() {
 
         Thread {
             try {
-                val props = Properties()
-                props["mail.smtp.host"] = host
-                props["mail.smtp.port"] = port
-                props["mail.smtp.auth"] = "true"
-                if (port == "587") {
-                    props["mail.smtp.starttls.enable"] = "true"
-                } else {
-                    props["mail.smtp.ssl.enable"] = "true"
-                }
-                val session = Session.getInstance(props, object : Authenticator() {
-                    override fun getPasswordAuthentication() =
-                        PasswordAuthentication(user, pass)
-                })
-
-                val msg = MimeMessage(session)
-                msg.setFrom(InternetAddress(user))
-                msg.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(to))
-                msg.subject = subject
-
-                if (aData != null) {
-                    val multipart = MimeMultipart()
-                    val textPart = MimeBodyPart()
-                    textPart.setText(body)
-                    multipart.addBodyPart(textPart)
-                    val filePart = MimeBodyPart()
-                    filePart.dataHandler = javax.activation.DataHandler(
-                        ByteArrayDataSource(aData, aMime ?: "application/octet-stream"))
-                    filePart.fileName = aName ?: "fichier"
-                    multipart.addBodyPart(filePart)
-                    msg.setContent(multipart)
-                } else {
-                    msg.setText(body)
-                }
-
-                Transport.send(msg)
+                MailSender.send(account, to, subject, body, aData, aName, aMime)
                 runOnUiThread {
                     Toast.makeText(this, R.string.email_sent, Toast.LENGTH_LONG).show()
                     finish()
@@ -277,6 +232,95 @@ class EmailActivity : Activity() {
                 }
             }
         }.start()
+    }
+
+    private fun suggestBody() {
+        if (BlockRulesStore.aiKey.isBlank()) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.ai_no_key)
+                .setPositiveButton(R.string.ai_configure) { _, _ ->
+                    startActivity(Intent(this, AiSettingsActivity::class.java))
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            return
+        }
+        val subject = text(R.id.emailSubject)
+        val body = findViewById<EditText>(R.id.emailBody).text.toString().trim()
+        if (subject.isEmpty() && body.isEmpty()) {
+            Toast.makeText(this, R.string.ai_no_context_mail, Toast.LENGTH_LONG).show()
+            return
+        }
+        val context = buildString {
+            if (subject.isNotEmpty()) append("Objet : ").append(subject).append("\n")
+            if (body.isNotEmpty()) append("Notes ou message reçu :\n").append(body)
+        }
+
+        val progress = AlertDialog.Builder(this)
+            .setMessage(R.string.ai_thinking)
+            .setCancelable(true)
+            .show()
+
+        Thread {
+            val result = try {
+                AiClient.suggestReplies(context, "mail")
+            } catch (e: Exception) {
+                runOnUiThread {
+                    progress.dismiss()
+                    Toast.makeText(this,
+                        getString(R.string.ai_error, e.message ?: ""),
+                        Toast.LENGTH_LONG).show()
+                }
+                return@Thread
+            }
+            runOnUiThread {
+                progress.dismiss()
+                if (result.isEmpty()) {
+                    Toast.makeText(this, R.string.ai_empty, Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                // Aperçu tronqué dans la liste, texte complet une fois choisi
+                val labels = result.map { it.take(90).replace("\n", " ") }.toTypedArray()
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.ai_pick)
+                    .setItems(labels) { _, which ->
+                        findViewById<EditText>(R.id.emailBody).setText(result[which])
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }.start()
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 80 && resultCode == RESULT_OK) {
+            val uri = data?.data ?: return
+            Thread {
+                try {
+                    val bytes = contentResolver.openInputStream(uri)?.readBytes()
+                        ?: return@Thread
+                    val mime = contentResolver.getType(uri) ?: "application/octet-stream"
+                    var name = "fichier"
+                    contentResolver.query(uri, null, null, null, null)?.use { c ->
+                        val idx = c.getColumnIndex(
+                            android.provider.OpenableColumns.DISPLAY_NAME)
+                        if (c.moveToFirst() && idx >= 0) name = c.getString(idx) ?: name
+                    }
+                    runOnUiThread {
+                        attachData = bytes; attachMime = mime; attachName = name
+                        val chip = findViewById<TextView>(R.id.emailAttachChip)
+                        chip.text = "📎 $name (${bytes.size / 1024} Ko) ✕"
+                        chip.visibility = View.VISIBLE
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this, R.string.attach_fail, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }.start()
+        }
     }
 
     override fun onResume() {

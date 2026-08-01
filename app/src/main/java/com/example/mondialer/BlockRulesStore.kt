@@ -183,6 +183,64 @@ object BlockRulesStore {
         }
     }
 
+    // ---- Comptes email ----
+    /** Un compte d'envoi : nom affiché, serveur, identifiants. */
+    data class MailAccount(
+        val id: String,
+        var label: String,
+        var host: String,
+        var port: String,
+        var user: String,
+        var pass: String,
+        var fromName: String = ""
+    )
+
+    fun mailAccounts(): MutableList<MailAccount> {
+        val out = mutableListOf<MailAccount>()
+        try {
+            val arr = JSONArray(prefs(appCtx).getString("mail_accounts", "[]"))
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                out.add(MailAccount(
+                    o.optString("id"), o.optString("label"), o.optString("host"),
+                    o.optString("port", "465"), o.optString("user"),
+                    o.optString("pass"), o.optString("from_name")))
+            }
+        } catch (_: Exception) {}
+
+        // Reprise de l'ancien réglage unique, pour ne rien perdre
+        if (out.isEmpty()) {
+            val old = appCtx.getSharedPreferences("email_cfg", Context.MODE_PRIVATE)
+            val h = old.getString("host", "") ?: ""
+            val u = old.getString("user", "") ?: ""
+            if (h.isNotBlank() && u.isNotBlank()) {
+                out.add(MailAccount(newAccountId(), u.substringAfter("@"), h,
+                    old.getString("port", "465") ?: "465", u,
+                    old.getString("pass", "") ?: ""))
+                saveMailAccounts(out)
+            }
+        }
+        return out
+    }
+
+    fun saveMailAccounts(list: List<MailAccount>) {
+        val arr = JSONArray()
+        for (a in list) {
+            arr.put(JSONObject()
+                .put("id", a.id).put("label", a.label).put("host", a.host)
+                .put("port", a.port).put("user", a.user).put("pass", a.pass)
+                .put("from_name", a.fromName))
+        }
+        prefs(appCtx).edit().putString("mail_accounts", arr.toString()).apply()
+    }
+
+    fun newAccountId(): String = "M" + System.currentTimeMillis()
+
+    /** Compte utilisé par défaut à l'ouverture du composeur. */
+    var defaultMailAccount: String
+        get() = prefs(appCtx).getString("mail_default", "") ?: ""
+        set(v) { prefs(appCtx).edit().putString("mail_default", v).apply() }
+
     // ---- Style du clavier ----
     /** Forme des touches : auto (suit le thème), orb, tuile ou hud. */
     var keypadShape: String
