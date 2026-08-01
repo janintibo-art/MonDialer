@@ -127,6 +127,10 @@ class FiltersActivity : Activity() {
         swInternational.setOnCheckedChangeListener { _, v -> BlockRulesStore.blockInternational = v }
         swSilent.setOnCheckedChangeListener { _, v -> BlockRulesStore.silentMode = v }
 
+        val swNotify = findViewById<Switch>(R.id.swNotifyBlocked)
+        swNotify.isChecked = BlockRulesStore.notifyBlocked
+        swNotify.setOnCheckedChangeListener { _, v -> BlockRulesStore.notifyBlocked = v }
+
         // Listes prédéfinies
         val container = findViewById<LinearLayout>(R.id.listsContainer)
         for (list in BlockRulesStore.PREDEFINED_LISTS) {
@@ -196,7 +200,10 @@ class FiltersActivity : Activity() {
     private fun exportRules() {
         try {
             val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, "mondialer-regles.json")
+                val stamp = java.text.SimpleDateFormat("yyyy-MM-dd-HHmm",
+                    java.util.Locale.FRANCE).format(java.util.Date())
+                put(MediaStore.Downloads.DISPLAY_NAME,
+                    "anarchie-phone-sauvegarde-$stamp.json")
                 put(MediaStore.Downloads.MIME_TYPE, "application/json")
             }
             val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)

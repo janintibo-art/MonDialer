@@ -183,6 +183,23 @@ object BlockRulesStore {
         }
     }
 
+    /** Prévenir discrètement lorsqu'un appel est bloqué. */
+    var notifyBlocked: Boolean
+        get() = prefs(appCtx).getBoolean("notify_blocked", true)
+        set(v) { prefs(appCtx).edit().putBoolean("notify_blocked", v).apply() }
+
+    // ---- Brouillons ----
+    /** Texte en cours de rédaction, conservé par conversation. */
+    fun draft(address: String): String =
+        prefs(appCtx).getString("draft_" + normalize(address), "") ?: ""
+
+    fun setDraft(address: String, text: String) {
+        val key = "draft_" + normalize(address)
+        val e = prefs(appCtx).edit()
+        if (text.isBlank()) e.remove(key) else e.putString(key, text)
+        e.apply()
+    }
+
     // ---- Comptes email ----
     /** Un compte d'envoi : nom affiché, serveur, identifiants. */
     data class MailAccount(
@@ -453,9 +470,18 @@ object BlockRulesStore {
         prefs(appCtx).edit().putString("blocked_log", "[]").apply()
     }
 
-    // ---- Export / import des règles ----
+    // ---- Sauvegarde complète ----
+    /**
+     * Exporte l'intégralité de la configuration : filtres, listes nommées,
+     * comptes email, apparence et assistant. Le fichier obtenu suffit à
+     * retrouver son installation à l'identique.
+     */
     fun exportJson(): String {
         val o = JSONObject()
+        o.put("version", 2)
+        o.put("exported_at", System.currentTimeMillis())
+
+        // Filtres
         o.put("numbers", JSONArray(numbers().toList()))
         o.put("prefixes", JSONArray(prefixes().toList()))
         o.put("enabled_lists", JSONArray(enabledLists().toList()))
@@ -464,32 +490,104 @@ object BlockRulesStore {
         o.put("neighbors", blockNeighbors)
         o.put("silent", silentMode)
         o.put("my_number", myNumber)
+        o.put("block_unknown", blockUnknown)
+        o.put("allow_only", allowOnlyMode)
+        o.put("allow_contacts", allowContacts)
+        o.put("strict_start", strictStart)
+        o.put("strict_end", strictEnd)
+
+        // Listes nommées, horaires compris
+        val lists = JSONArray()
+        for (l in namedLists()) {
+            lists.put(JSONObject()
+                .put("id", l.id).put("name", l.name).put("type", l.type)
+                .put("enabled", l.enabled)
+                .put("numbers", JSONArray(l.numbers.toList()))
+                .put("start", l.schedStart).put("end", l.schedEnd)
+                .put("days", JSONArray(l.schedDays.toList())))
+        }
+        o.put("named_lists", lists)
+
+        // Comptes email
+        val mails = JSONArray()
+        for (a in mailAccounts()) {
+            mails.put(JSONObject()
+                .put("id", a.id).put("label", a.label).put("host", a.host)
+                .put("port", a.port).put("user", a.user).put("pass", a.pass)
+                .put("from_name", a.fromName))
+        }
+        o.put("mail_accounts", mails)
+        o.put("mail_default", defaultMailAccount)
+
+        // Apparence
         o.put("theme", theme)
+        o.put("custom_accent", customAccent)
+        o.put("custom_shape", customShape)
+        o.put("custom_image", customImage)
+        o.put("custom_dim", customDim)
+        o.put("keypad_shape", keypadShape)
+        o.put("keypad_glow", keypadGlow)
+        o.put("keypad_digit_accent", keypadDigitAccent)
+
+        // Assistant et divers
+        o.put("ai_key", aiKey)
+        o.put("ai_model", aiModel)
+        o.put("ai_tone", aiTone)
+        o.put("fake_name", fakeCallName)
+        o.put("fake_number", fakeCallNumber)
+
         return o.toString(2)
     }
 
+    /** Restaure une sauvegarde. Les champs absents gardent leur valeur actuelle. */
     fun importJson(json: String): Boolean {
         return try {
             val o = JSONObject(json)
             val e = prefs(appCtx).edit()
-            val nums = HashSet<String>()
-            val na = o.optJSONArray("numbers") ?: JSONArray()
-            for (i in 0 until na.length()) nums.add(na.getString(i))
-            e.putStringSet("numbers", nums)
-            val pres = HashSet<String>()
-            val pa = o.optJSONArray("prefixes") ?: JSONArray()
-            for (i in 0 until pa.length()) pres.add(pa.getString(i))
-            e.putStringSet("prefixes", pres)
-            val lists = HashSet<String>()
-            val la = o.optJSONArray("enabled_lists") ?: JSONArray()
-            for (i in 0 until la.length()) lists.add(la.getString(i))
-            e.putStringSet("enabled_lists", lists)
-            e.putBoolean("hidden", o.optBoolean("hidden", false))
-            e.putBoolean("international", o.optBoolean("international", false))
-            e.putBoolean("neighbors", o.optBoolean("neighbors", false))
-            e.putBoolean("silent", o.optBoolean("silent", false))
-            e.putString("my_number", o.optString("my_number", ""))
-            e.putString("theme", o.optString("theme", "cyan"))
+
+            fun strSet(key: String, pref: String) {
+                val a = o.optJSONArray(key) ?: return
+                val set = HashSet<String>()
+                for (i in 0 until a.length()) set.add(a.getString(i))
+                e.putStringSet(pref, set)
+            }
+            strSet("numbers", "numbers")
+            strSet("prefixes", "prefixes")
+            strSet("enabled_lists", "enabled_lists")
+
+            e.putBoolean("hidden", o.optBoolean("hidden", blockHidden))
+            e.putBoolean("international", o.optBoolean("international", blockInternational))
+            e.putBoolean("neighbors", o.optBoolean("neighbors", blockNeighbors))
+            e.putBoolean("silent", o.optBoolean("silent", silentMode))
+            e.putString("my_number", o.optString("my_number", myNumber))
+            e.putBoolean("block_unknown", o.optBoolean("block_unknown", blockUnknown))
+            e.putBoolean("allow_only", o.optBoolean("allow_only", allowOnlyMode))
+            e.putBoolean("allow_contacts", o.optBoolean("allow_contacts", allowContacts))
+            e.putInt("strict_start", o.optInt("strict_start", strictStart))
+            e.putInt("strict_end", o.optInt("strict_end", strictEnd))
+
+            if (o.has("named_lists")) e.putString("named_lists",
+                o.getJSONArray("named_lists").toString())
+            if (o.has("mail_accounts")) e.putString("mail_accounts",
+                o.getJSONArray("mail_accounts").toString())
+            e.putString("mail_default", o.optString("mail_default", defaultMailAccount))
+
+            e.putString("theme", o.optString("theme", theme))
+            e.putInt("custom_accent", o.optInt("custom_accent", customAccent))
+            e.putString("custom_shape", o.optString("custom_shape", customShape))
+            e.putString("custom_image", o.optString("custom_image", customImage))
+            e.putInt("custom_dim", o.optInt("custom_dim", customDim))
+            e.putString("keypad_shape", o.optString("keypad_shape", keypadShape))
+            e.putInt("keypad_glow", o.optInt("keypad_glow", keypadGlow))
+            e.putBoolean("keypad_digit_accent",
+                o.optBoolean("keypad_digit_accent", keypadDigitAccent))
+
+            e.putString("ai_key", o.optString("ai_key", aiKey))
+            e.putString("ai_model", o.optString("ai_model", aiModel))
+            e.putString("ai_tone", o.optString("ai_tone", aiTone))
+            e.putString("fake_name", o.optString("fake_name", fakeCallName))
+            e.putString("fake_number", o.optString("fake_number", fakeCallNumber))
+
             e.apply()
             true
         } catch (ex: Exception) { false }

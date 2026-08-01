@@ -12,5 +12,10 @@ class App : Application() {
         nm.createNotificationChannel(
             NotificationChannel("sms", "Messages", NotificationManager.IMPORTANCE_HIGH)
         )
+        // Canal discret : informe sans déranger
+        nm.createNotificationChannel(
+            NotificationChannel("blocked", "Appels bloqués",
+                NotificationManager.IMPORTANCE_LOW)
+        )
     }
 }

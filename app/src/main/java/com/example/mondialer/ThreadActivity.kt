@@ -102,6 +102,16 @@ class ThreadActivity : Activity() {
             editTo.isEnabled = false
         }
 
+        // Reprise du texte laissé en plan dans cette conversation
+        if (address.isNotBlank()) {
+            val draft = BlockRulesStore.draft(address)
+            val field = findViewById<RichEditText>(R.id.editBody)
+            if (draft.isNotBlank() && field.text.isBlank()) {
+                field.setText(draft)
+                field.setSelection(field.text.length)
+            }
+        }
+
         listView = findViewById(R.id.listMsgs)
         adapter = MsgAdapter()
         listView.adapter = adapter
@@ -276,10 +286,52 @@ class ThreadActivity : Activity() {
             }
         }
 
+        // Suppression du message, toujours proposée en dernier
+        labels.add(getString(R.string.msg_delete))
+        actions.add { confirmDeleteMessage(m) }
+
         if (labels.isEmpty()) return
         AlertDialog.Builder(this)
             .setItems(labels.toTypedArray()) { _, which -> actions[which]() }
             .show()
+    }
+
+    private fun confirmDeleteMessage(m: Msg) {
+        AlertDialog.Builder(this)
+            .setMessage(R.string.msg_delete_confirm)
+            .setPositiveButton(R.string.contact_delete_yes) { _, _ -> deleteMessage(m) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /** Retire un message du fournisseur système, puis rafraîchit le fil. */
+    private fun deleteMessage(m: Msg) {
+        Thread {
+            var removed = 0
+            try {
+                if (m.body != null) {
+                    removed = contentResolver.delete(
+                        Uri.parse("content://sms"),
+                        "address=? AND body=? AND date=?",
+                        arrayOf(address, m.body, m.date.toString()))
+                }
+                if (removed == 0) {
+                    // Pièce jointe ou message MMS : on cible la date, en secondes
+                    removed = contentResolver.delete(
+                        Uri.parse("content://mms"),
+                        "date=?", arrayOf((m.date / 1000).toString()))
+                }
+            } catch (_: Exception) {}
+            runOnUiThread {
+                if (removed > 0) {
+                    Toast.makeText(this, R.string.msg_deleted, Toast.LENGTH_SHORT).show()
+                    loadAsync()
+                } else {
+                    Toast.makeText(this, R.string.thread_delete_fail,
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
     }
 
     /** Copie dans le presse-papiers du système. */
@@ -421,6 +473,15 @@ class ThreadActivity : Activity() {
             if (chunk.isNotBlank()) out.add(chunk)
         }
         return out
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Le texte non envoyé est conservé pour la prochaine ouverture
+        if (address.isNotBlank()) {
+            BlockRulesStore.setDraft(address,
+                findViewById<RichEditText>(R.id.editBody).text.toString())
+        }
     }
 
     override fun onResume() {
@@ -626,6 +687,7 @@ class ThreadActivity : Activity() {
             }.start()
             findViewById<RichEditText>(R.id.editBody).setText("")
             if (address.isBlank()) address = to
+            BlockRulesStore.setDraft(to, "")
             msgs.add(Msg(body, System.currentTimeMillis(), true))
             adapter.notifyDataSetChanged()
             listView.setSelection(msgs.size - 1)

@@ -118,6 +118,10 @@
 
         </GridLayout>
 
+        <Switch android:id="@+id/swNotifyBlocked"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="8dp" android:text="@string/notify_blocked" />
+
         <Switch android:id="@+id/swSilent"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:padding="8dp" android:text="@string/silent_mode" />

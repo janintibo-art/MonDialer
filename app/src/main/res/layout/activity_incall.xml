@@ -62,6 +62,9 @@
             <Button android:id="@+id/btnMute" style="@style/ActionBtn"
                 android:layout_width="0dp" android:layout_weight="1"
                 android:text="@string/mute" />
+            <Button android:id="@+id/btnHold" style="@style/ActionBtn"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:text="@string/hold" />
             <Button android:id="@+id/btnKeypad" style="@style/ActionBtn"
                 android:layout_width="0dp" android:layout_weight="1"
                 android:text="@string/keypad" />

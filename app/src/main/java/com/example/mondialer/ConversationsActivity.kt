@@ -105,9 +105,12 @@ class ConversationsActivity : Activity() {
                         val body = c.getString(2) ?: ""
                         val date = fmt.format(Date(c.getLong(3)))
                         val name = lookupName(address)
+                        val draft = BlockRulesStore.draft(address)
+                        val preview = if (draft.isNotBlank())
+                            "✎ " + draft.take(50) else body.take(60)
                         items.add(mapOf(
                             "title" to (name ?: address),
-                            "sub" to "${body.take(60)}  •  $date",
+                            "sub" to "$preview  •  $date",
                             "address" to address,
                             "tid" to tid
                         ))
@@ -167,6 +170,94 @@ class ConversationsActivity : Activity() {
                 .putExtra("thread_id", item["tid"])
                 .putExtra("search", item["match"]))
         }
+        list.setOnItemLongClickListener { _, _, pos, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = list.adapter.getItem(pos) as Map<String, String>
+            showThreadActions(item)
+            true
+        }
+    }
+
+    /** Actions sur une conversation entière. */
+    private fun showThreadActions(item: Map<String, String>) {
+        val address = item["address"] ?: return
+        val tid = item["tid"]
+        AlertDialog.Builder(this)
+            .setTitle(item["title"])
+            .setItems(arrayOf(
+                getString(R.string.thread_delete),
+                getString(R.string.thread_mark_read),
+                getString(R.string.action_block_number, address))) { _, which ->
+                when (which) {
+                    0 -> confirmDeleteThread(address, tid)
+                    1 -> markRead(address, tid)
+                    2 -> {
+                        BlockRulesStore.addNumber(address)
+                        Toast.makeText(this, R.string.number_blocked,
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun confirmDeleteThread(address: String, tid: String?) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.thread_delete)
+            .setMessage(getString(R.string.thread_delete_confirm, address))
+            .setPositiveButton(R.string.contact_delete_yes) { _, _ ->
+                deleteThread(address, tid)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * Supprime la conversation. La suppression n'est possible que si
+     * l'application est celle par défaut pour les SMS : Android l'exige.
+     */
+    private fun deleteThread(address: String, tid: String?) {
+        Thread {
+            var removed = 0
+            try {
+                if (tid != null) {
+                    removed += contentResolver.delete(
+                        Uri.parse("content://sms"), "thread_id=?", arrayOf(tid))
+                    removed += contentResolver.delete(
+                        Uri.parse("content://mms"), "thread_id=?", arrayOf(tid))
+                } else {
+                    removed += contentResolver.delete(
+                        Uri.parse("content://sms"), "address=?", arrayOf(address))
+                }
+                BlockRulesStore.setDraft(address, "")
+            } catch (_: Exception) {}
+            runOnUiThread {
+                if (removed > 0) {
+                    Toast.makeText(this, R.string.thread_deleted, Toast.LENGTH_SHORT).show()
+                    load()
+                } else {
+                    Toast.makeText(this, R.string.thread_delete_fail,
+                        Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
+    }
+
+    private fun markRead(address: String, tid: String?) {
+        Thread {
+            try {
+                val v = android.content.ContentValues().apply {
+                    put("read", 1); put("seen", 1)
+                }
+                if (tid != null)
+                    contentResolver.update(Uri.parse("content://sms"), v,
+                        "thread_id=?", arrayOf(tid))
+                else
+                    contentResolver.update(Uri.parse("content://sms"), v,
+                        "address=?", arrayOf(address))
+            } catch (_: Exception) {}
+            runOnUiThread { load() }
+        }.start()
     }
 
     /**

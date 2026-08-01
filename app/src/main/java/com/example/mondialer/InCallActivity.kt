@@ -20,6 +20,21 @@ class InCallActivity : Activity() {
     private var call: Call? = null
     private var speakerOn = false
     private var muted = false
+    private var onHold = false
+    private var connectedAt = 0L
+    private val ticker = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** Rafraîchit la durée de communication chaque seconde. */
+    private val tick = object : Runnable {
+        override fun run() {
+            if (connectedAt > 0L) {
+                val sec = ((System.currentTimeMillis() - connectedAt) / 1000).toInt()
+                findViewById<TextView>(R.id.txtState).text = String.format(
+                    java.util.Locale.FRANCE, "%02d:%02d", sec / 60, sec % 60)
+            }
+            ticker.postDelayed(this, 1000)
+        }
+    }
 
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
@@ -75,6 +90,16 @@ class InCallActivity : Activity() {
             btnMute.alpha = if (muted) 1f else 0.5f
         }
         btnMute.alpha = 0.5f
+
+        // Mise en attente
+        val btnHold = findViewById<Button>(R.id.btnHold)
+        btnHold.setOnClickListener {
+            val c2 = call ?: return@setOnClickListener
+            onHold = !onHold
+            if (onHold) c2.hold() else c2.unhold()
+            btnHold.alpha = if (onHold) 1f else 0.5f
+        }
+        btnHold.alpha = 0.5f
 
         // Clavier DTMF (serveurs vocaux « tapez 1 »)
         val dtmfGrid = findViewById<GridLayout>(R.id.dtmfGrid)
@@ -154,11 +179,22 @@ class InCallActivity : Activity() {
                 controls.visibility = View.VISIBLE
             }
             Call.STATE_ACTIVE -> {
-                txt.text = getString(R.string.state_active)
+                if (connectedAt == 0L) {
+                    connectedAt = System.currentTimeMillis()
+                    ticker.post(tick)
+                }
                 answer.visibility = View.GONE
                 controls.visibility = View.VISIBLE
             }
-            Call.STATE_DISCONNECTED -> txt.text = getString(R.string.state_ended)
+            Call.STATE_HOLDING -> {
+                txt.text = getString(R.string.state_hold)
+                answer.visibility = View.GONE
+                controls.visibility = View.VISIBLE
+            }
+            Call.STATE_DISCONNECTED -> {
+                ticker.removeCallbacks(tick)
+                txt.text = getString(R.string.state_ended)
+            }
             else -> txt.text = ""
         }
     }

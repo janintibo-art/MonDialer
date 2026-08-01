@@ -304,4 +304,16 @@
     <string name="mail_no_account_msg">Ajoutez d’abord un compte d’envoi.</string>
     <string name="mail_pick_account">Envoyer depuis</string>
     <string name="mail_manage">Gérer les comptes</string>
+    <string name="thread_delete">🗑 Supprimer la conversation</string>
+    <string name="thread_delete_confirm">Supprimer tous les messages échangés avec %s ? Cette action est irréversible.</string>
+    <string name="thread_deleted">Conversation supprimée</string>
+    <string name="thread_delete_fail">Suppression impossible : activez Anarchie Phone comme application SMS par défaut (Menu → Application SMS par défaut).</string>
+    <string name="thread_mark_read">✓ Marquer comme lu</string>
+    <string name="msg_delete">🗑 Supprimer ce message</string>
+    <string name="msg_delete_confirm">Supprimer définitivement ce message ?</string>
+    <string name="msg_deleted">Message supprimé</string>
+    <string name="hold">⏸ ATTENTE</string>
+    <string name="state_hold">En attente</string>
+    <string name="notify_blocked">Me prévenir discrètement des appels bloqués</string>
+    <string name="notif_blocked_title">Appel bloqué : %s</string>
 </resources>
