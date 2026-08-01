@@ -27,7 +27,13 @@ class CardAdapter(
         v.findViewById<ImageView>(R.id.avatar)?.let { img ->
             @Suppress("UNCHECKED_CAST")
             val item = getItem(position) as? Map<String, String>
-            val label = item?.get("title")?.trimStart('★', '●', '○', '✓', '🔎', ' ') ?: ""
+            // Les préfixes décoratifs sont retirés avant de calculer les initiales.
+            // (Un emoji ne tient pas dans un littéral de caractère : on filtre par chaîne.)
+            var label = item?.get("title") ?: ""
+            for (mark in listOf("★", "●", "○", "✓", "🔎", "✎", "📷")) {
+                label = label.removePrefix(mark).trimStart()
+            }
+            label = label.trim()
             val accent = ThemeRes.color(activity, R.attr.cNeon)
             img.setImageDrawable(AvatarDrawable(label, accent))
         }
