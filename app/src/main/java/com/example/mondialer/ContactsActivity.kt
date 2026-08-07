@@ -116,11 +116,11 @@ class ContactsActivity : Activity() {
 
             if (numbers.isEmpty() && c.number.isNotBlank()) numbers.add(c.number)
 
+            // Chaque numéro est proposé avec ses deux usages, à la suite :
+            // plus lisible qu'une liste d'appels puis une liste de SMS.
             for (n in numbers) {
                 labels.add(getString(R.string.act_call, n))
                 actions.add(Pair("call", n))
-            }
-            for (n in numbers) {
                 labels.add(getString(R.string.act_sms, n))
                 actions.add(Pair("sms", n))
             }
