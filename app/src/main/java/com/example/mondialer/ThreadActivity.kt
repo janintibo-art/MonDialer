@@ -211,11 +211,13 @@ class ThreadActivity : Activity() {
 
         when {
             m.imageUri != null -> {
-                val name = "image_${m.date}.jpg"
+                val ext = if (m.fileMime == "image/gif") "gif" else "jpg"
+                val name = "image_${m.date}.$ext"
+                val mime = m.fileMime ?: "image/jpeg"
                 labels.add(getString(R.string.msg_save_image))
-                actions.add { saveToDownloads(m.imageUri, name, "image/jpeg") }
+                actions.add { saveToDownloads(m.imageUri, name, mime) }
                 labels.add(getString(R.string.msg_share))
-                actions.add { shareAttachment(m.imageUri, name, "image/jpeg") }
+                actions.add { shareAttachment(m.imageUri, name, mime) }
             }
             m.fileUri != null -> {
                 val name = m.fileName ?: "fichier"
@@ -508,9 +510,12 @@ class ThreadActivity : Activity() {
         loading = true
         Thread {
             val result = mutableListOf<Msg>()
-            // Sans identifiant de fil, on le déduit du numéro : la recherche
-            // par adresse exacte manquerait les formats internationaux.
-            if (threadId == null) threadId = findThreadId()
+            // L'identifiant est retenu dès la première résolution : le
+            // recalculer à chaque rafraîchissement ralentissait l'affichage.
+            if (threadId == null) {
+                threadId = findThreadId()
+                runOnUiThread { /* mémorisé pour les chargements suivants */ }
+            }
             try {
                 val (sel, args) = if (threadId != null)
                     Pair("thread_id=?", arrayOf(threadId!!))
@@ -561,10 +566,18 @@ class ThreadActivity : Activity() {
             } catch (_: Exception) {}
 
             runOnUiThread {
-                msgs.clear()
-                msgs.addAll(result)
-                adapter.notifyDataSetChanged()
-                if (msgs.isNotEmpty()) listView.setSelection(msgs.size - 1)
+                // On ne remplace la liste que si le chargement a produit
+                // quelque chose : sinon l'écran clignoterait à vide.
+                if (result.isNotEmpty() || msgs.isEmpty()) {
+                    val wasAtBottom = msgs.isEmpty() ||
+                        listView.lastVisiblePosition >= msgs.size - 2
+                    msgs.clear()
+                    msgs.addAll(result)
+                    adapter.notifyDataSetChanged()
+                    if (wasAtBottom && msgs.isNotEmpty()) {
+                        listView.setSelection(msgs.size - 1)
+                    }
+                }
                 loading = false
             }
         }.start()
@@ -581,15 +594,25 @@ class ThreadActivity : Activity() {
         val tail = mine.takeLast(9)
         var found: String? = null
         try {
+            // Requête ciblée : la base filtre elle-même sur la fin du numéro,
+            // bien plus rapide que de parcourir tout l'historique.
             contentResolver.query(
                 Uri.parse("content://sms"),
-                arrayOf("thread_id", "address"),
-                null, null, "date DESC LIMIT 500"
-            )?.use { c ->
-                while (c.moveToNext() && found == null) {
-                    val a = BlockRulesStore.normalize(c.getString(1))
-                    if (a.isNotEmpty() && (a.endsWith(tail) || tail.endsWith(a.takeLast(9)))) {
-                        found = c.getString(0)
+                arrayOf("thread_id"),
+                "replace(replace(replace(address,' ',''),'-',''),'.','') LIKE ?",
+                arrayOf("%$tail"), "date DESC LIMIT 1"
+            )?.use { c -> if (c.moveToFirst()) found = c.getString(0) }
+
+            // Repli : certaines bases n'acceptent pas replace() dans la clause
+            if (found == null) {
+                contentResolver.query(
+                    Uri.parse("content://sms"),
+                    arrayOf("thread_id", "address"),
+                    "address LIKE ?", arrayOf("%$tail"), "date DESC LIMIT 20"
+                )?.use { c ->
+                    while (c.moveToNext() && found == null) {
+                        val a = BlockRulesStore.normalize(c.getString(1))
+                        if (a.isNotEmpty() && a.endsWith(tail)) found = c.getString(0)
                     }
                 }
             }
@@ -613,7 +636,10 @@ class ThreadActivity : Activity() {
                     when {
                         ct == "text/plain" -> text = c.getString(2) ?: ""
                         ct.startsWith("image/") ->
-                            extra.add(Msg(null, date, outgoing, imageUri = partUri))
+                            // Le type est conservé : un GIF doit être animé,
+                            // pas décodé comme une image fixe.
+                            extra.add(Msg(null, date, outgoing,
+                                imageUri = partUri, fileMime = ct))
                         ct == "application/smil" -> {}
                         else -> {
                             val name = c.getString(3) ?: c.getString(4) ?: "fichier"
@@ -765,12 +791,16 @@ class ThreadActivity : Activity() {
                 m.imageUri != null -> {
                     img.visibility = View.VISIBLE
                     img.setBackgroundResource(bg)
-                    val cached = bmpCache[m.imageUri]
-                    if (cached != null) {
-                        img.setImageBitmap(cached)
+                    if (m.fileMime == "image/gif") {
+                        showAnimated(img, m.imageUri)
                     } else {
-                        img.setImageResource(android.R.drawable.ic_menu_gallery)
-                        decodeAsync(m.imageUri)
+                        val cached = bmpCache[m.imageUri]
+                        if (cached != null) {
+                            img.setImageBitmap(cached)
+                        } else {
+                            img.setImageResource(android.R.drawable.ic_menu_gallery)
+                            decodeAsync(m.imageUri)
+                        }
                     }
                     img.setOnClickListener { showMessageMenu(m) }
                 }
@@ -787,6 +817,27 @@ class ThreadActivity : Activity() {
                 }
             }
             return v
+        }
+
+        /**
+         * Affiche un GIF animé. Le décodeur d'images d'Android sait produire
+         * un dessin animé, ce que le décodage bitmap classique ignore.
+         */
+        private fun showAnimated(img: ImageView, uri: Uri) {
+            try {
+                val src = android.graphics.ImageDecoder.createSource(contentResolver, uri)
+                val d = android.graphics.ImageDecoder.decodeDrawable(src)
+                img.setImageDrawable(d)
+                if (d is android.graphics.drawable.AnimatedImageDrawable) d.start()
+                return
+            } catch (_: Exception) {}
+            // Repli : première image du GIF, mieux que rien
+            val cached = bmpCache[uri]
+            if (cached != null) img.setImageBitmap(cached)
+            else {
+                img.setImageResource(android.R.drawable.ic_menu_gallery)
+                decodeAsync(uri)
+            }
         }
 
         /** Décode l'image en arrière-plan puis rafraîchit la liste. */
