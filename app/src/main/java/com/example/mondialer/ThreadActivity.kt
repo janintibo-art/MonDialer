@@ -18,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.GridView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
@@ -56,11 +55,6 @@ class ThreadActivity : Activity() {
     private var attachName: String? = null
     private var attachMime: String? = null
 
-    private val emojis = ("😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙😚🙂🤗🤩🤔🤨😐😑😶🙄😏😣" +
-        "😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🙃🤑😲☹️🙁😖😞😟😤😢😭😦😧😨😩🤯😬" +
-        "😰😱🥵🥶😳🤪😵😡😠🤬😷🤒🤕🤢🤮🤧🥳🥺🤠🤡🤥🤫🤭🧐🤓😈👿👍👎👊✊🤛🤜🤞" +
-        "✌️🤟🤘👌🤏👈👉👆👇☝️✋🤚🖐🖖👋🤙💪🙏❤️🧡💛💚💙💜🖤🤍💔❣️💕💞💓💗💖" +
-        "💘💝🔥✨⭐🌟💫🎉🎊🎁🌹🌸💐🍀☀️🌙⚡❄️🍕🍔🍟🌭🍿🧁🎂🍾🥂☕🚀✈️🚗⚽🏀🎮🎵🎶")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeUtil.apply(this)
@@ -131,43 +125,11 @@ class ThreadActivity : Activity() {
             else if (body.isNotBlank()) sendSms(to, body)
         }
 
-        val emojiPanel = findViewById<View>(R.id.emojiPanel)
-        findViewById<Button>(R.id.btnEmoji).setOnClickListener {
-            emojiPanel.visibility =
-                if (emojiPanel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-        }
-        val grid = findViewById<GridView>(R.id.emojiGrid)
-        val list = splitEmojis(emojis)
-        grid.adapter = object : BaseAdapter() {
-            override fun getCount() = list.size
-            override fun getItem(p: Int) = list[p]
-            override fun getItemId(p: Int) = p.toLong()
-            override fun getView(p: Int, cv: View?, parent: ViewGroup?): View {
-                val tv = (cv as? TextView) ?: TextView(this@ThreadActivity)
-                tv.text = list[p]
-                tv.textSize = 26f
-                tv.gravity = Gravity.CENTER
-                tv.setPadding(0, 14, 0, 14)
-                return tv
-            }
-        }
-        grid.setOnItemClickListener { _, _, pos, _ ->
-            findViewById<RichEditText>(R.id.editBody).append(list[pos])
-        }
-
         // Le clavier (Gboard et consorts) transmet directement le GIF choisi
         findViewById<RichEditText>(R.id.editBody).onRichContent = { uri, mime ->
             attachFromUri(uri, mime, "gif")
         }
 
-        // Le bouton ouvre le clavier et rappelle où trouver la recherche de GIF
-        findViewById<Button>(R.id.btnGif).setOnClickListener {
-            val e = findViewById<RichEditText>(R.id.editBody)
-            e.requestFocus()
-            val imm = getSystemService(android.view.inputmethod.InputMethodManager::class.java)
-            imm?.showSoftInput(e, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-            Toast.makeText(this, R.string.gif_hint, Toast.LENGTH_LONG).show()
-        }
         findViewById<Button>(R.id.btnAttach).setOnClickListener {
             val i = Intent(Intent.ACTION_OPEN_DOCUMENT)
             i.addCategory(Intent.CATEGORY_OPENABLE)
@@ -454,26 +416,6 @@ class ThreadActivity : Activity() {
         }.start()
     }
 
-    private fun splitEmojis(s: String): List<String> {
-        val out = mutableListOf<String>()
-        var i = 0
-        while (i < s.length) {
-            val cp = s.codePointAt(i)
-            val len = Character.charCount(cp)
-            var chunk = s.substring(i, i + len)
-            i += len
-            while (i < s.length) {
-                val c2 = s.codePointAt(i)
-                if (c2 == 0xFE0F || c2 in 0x1F3FB..0x1F3FF || c2 == 0x200D) {
-                    val l2 = Character.charCount(c2)
-                    chunk += s.substring(i, i + l2)
-                    i += l2
-                } else break
-            }
-            if (chunk.isNotBlank()) out.add(chunk)
-        }
-        return out
-    }
 
     override fun onPause() {
         super.onPause()
@@ -566,6 +508,9 @@ class ThreadActivity : Activity() {
         loading = true
         Thread {
             val result = mutableListOf<Msg>()
+            // Sans identifiant de fil, on le déduit du numéro : la recherche
+            // par adresse exacte manquerait les formats internationaux.
+            if (threadId == null) threadId = findThreadId()
             try {
                 val (sel, args) = if (threadId != null)
                     Pair("thread_id=?", arrayOf(threadId!!))
@@ -606,9 +551,10 @@ class ThreadActivity : Activity() {
             // Marquer comme lus (en arrière-plan)
             try {
                 val v = ContentValues().apply { put("read", 1); put("seen", 1) }
-                if (threadId != null)
+                val tid2 = threadId
+                if (tid2 != null)
                     contentResolver.update(Uri.parse("content://sms"), v,
-                        "thread_id=?", arrayOf(threadId))
+                        "thread_id=?", arrayOf(tid2))
                 else
                     contentResolver.update(Uri.parse("content://sms"), v,
                         "address=?", arrayOf(address))
@@ -624,14 +570,32 @@ class ThreadActivity : Activity() {
         }.start()
     }
 
-    private fun findThreadId(): String? = try {
-        var tid: String? = null
-        contentResolver.query(
-            Uri.parse("content://sms"),
-            arrayOf("thread_id"), "address=?", arrayOf(address), null
-        )?.use { c -> if (c.moveToFirst()) tid = c.getString(0) }
-        tid
-    } catch (_: Exception) { null }
+    /**
+     * Retrouve le fil correspondant au numéro. La comparaison exacte échoue
+     * dès que le format diffère (+33645511828 contre 0645511828) : on compare
+     * donc les derniers chiffres, seuls réellement discriminants.
+     */
+    private fun findThreadId(): String? {
+        val mine = BlockRulesStore.normalize(address)
+        if (mine.isEmpty()) return null
+        val tail = mine.takeLast(9)
+        var found: String? = null
+        try {
+            contentResolver.query(
+                Uri.parse("content://sms"),
+                arrayOf("thread_id", "address"),
+                null, null, "date DESC LIMIT 500"
+            )?.use { c ->
+                while (c.moveToNext() && found == null) {
+                    val a = BlockRulesStore.normalize(c.getString(1))
+                    if (a.isNotEmpty() && (a.endsWith(tail) || tail.endsWith(a.takeLast(9)))) {
+                        found = c.getString(0)
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+        return found
+    }
 
     private fun loadMmsParts(result: MutableList<Msg>, mid: String, date: Long, outgoing: Boolean) {
         try {

@@ -11,8 +11,8 @@ android {
         applicationId "com.example.mondialer"
         minSdk 29
         targetSdk 34
-        versionCode 45
-        versionName "9.1.3"
+        versionCode 46
+        versionName "9.2"
     }
 
     buildTypes {

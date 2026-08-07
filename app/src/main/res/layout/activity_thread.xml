@@ -45,26 +45,6 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnEmoji"
-            style="@style/ActionBtn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:paddingStart="0dp" android:paddingEnd="0dp"
-            android:paddingTop="8dp" android:paddingBottom="8dp"
-            android:textSize="15sp"
-            android:text="😊" />
-
-        <Button
-            android:id="@+id/btnGif"
-            style="@style/ActionBtn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:paddingStart="0dp" android:paddingEnd="0dp"
-            android:paddingTop="8dp" android:paddingBottom="8dp"
-            android:textSize="12sp"
-            android:text="@string/gif_btn" />
-
-        <Button
             android:id="@+id/btnAi"
             style="@style/ActionBtn"
             android:layout_width="0dp"
@@ -125,21 +105,5 @@
             android:paddingEnd="20dp"
             android:textSize="17sp"
             android:text="@string/send" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/emojiPanel"
-        android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:orientation="vertical"
-        android:background="?attr/panelBg"
-        android:layout_marginTop="6dp"
-        android:visibility="gone">
-
-        <GridView
-            android:id="@+id/emojiGrid"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:numColumns="8" />
     </LinearLayout>
 </LinearLayout>
