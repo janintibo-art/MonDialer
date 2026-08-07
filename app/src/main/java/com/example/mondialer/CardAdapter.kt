@@ -38,7 +38,10 @@ class CardAdapter(
             img.setImageDrawable(AvatarDrawable(label, accent))
         }
 
-        // Apparition : montée légère en fondu, décalée selon la ligne
+        // Apparition : montée légère en fondu, décalée selon la ligne.
+        // La vue est systématiquement remise à l'état visible : une animation
+        // interrompue laisserait sinon la ligne transparente.
+        v.animate().cancel()
         if (position > lastAnimated) {
             lastAnimated = position
             v.alpha = 0f
@@ -47,7 +50,11 @@ class CardAdapter(
                 .alpha(1f).translationY(0f)
                 .setStartDelay((position % 8) * 28L)
                 .setDuration(260)
+                .withEndAction { v.alpha = 1f; v.translationY = 0f }
                 .start()
+        } else {
+            v.alpha = 1f
+            v.translationY = 0f
         }
         return v
     }

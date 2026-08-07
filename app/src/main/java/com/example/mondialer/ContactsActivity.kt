@@ -279,18 +279,13 @@ class ContactsActivity : Activity() {
     private val photoTried = HashSet<String>()
     private var lastAnimated = -1
 
-    /** Masque circulaire appliqué aux photos de contact. */
-    private fun roundMask(): android.graphics.drawable.Drawable {
-        val d = android.graphics.drawable.GradientDrawable()
-        d.shape = android.graphics.drawable.GradientDrawable.OVAL
-        d.setColor(android.graphics.Color.TRANSPARENT)
-        d.setStroke((1.5f * resources.displayMetrics.density).toInt(),
-            ThemeRes.color(this, R.attr.cNeonDim))
-        return d
-    }
 
-    /** Charge la photo en arrière-plan, une seule tentative par contact. */
-    private fun loadPhoto(contactId: String) {
+    /**
+     * Charge la photo en arrière-plan, une seule tentative par contact.
+     * La vue est mise à jour directement : rafraîchir toute la liste
+     * relancerait getView, donc de nouveaux chargements, sans fin.
+     */
+    private fun loadPhoto(contactId: String, target: ImageView) {
         photoTried.add(contactId)
         Thread {
             var bmp: android.graphics.Bitmap? = null
@@ -302,11 +297,11 @@ class ContactsActivity : Activity() {
                     bmp = android.graphics.BitmapFactory.decodeStream(it)
                 }
             } catch (_: Exception) {}
-            if (bmp != null) {
-                runOnUiThread {
-                    photoCache[contactId] = bmp
-                    adapter.notifyDataSetChanged()
-                }
+            val loaded = bmp ?: return@Thread
+            photoCache[contactId] = loaded
+            runOnUiThread {
+                // La vue a pu être recyclée entre-temps : on vérifie
+                if (target.tag == contactId) target.setImageBitmap(loaded)
             }
         }.start()
     }
@@ -324,25 +319,29 @@ class ContactsActivity : Activity() {
 
             // Photo du carnet si elle existe, sinon pastille d'initiales
             val img = v.findViewById<ImageView>(R.id.avatar)
+            img.tag = c.contactId
             val cached = photoCache[c.contactId]
             if (cached != null) {
                 img.setImageBitmap(cached)
-                img.background = roundMask()
-                img.clipToOutline = true
             } else {
-                img.background = null
                 img.setImageDrawable(AvatarDrawable(c.name,
                     ThemeRes.color(this@ContactsActivity, R.attr.cNeon)))
-                if (c.contactId !in photoTried) loadPhoto(c.contactId)
+                if (c.contactId !in photoTried) loadPhoto(c.contactId, img)
             }
 
-            // Apparition décalée, comme dans les autres listes
+            // Apparition décalée ; la vue finit toujours pleinement visible
+            v.animate().cancel()
             if (position > lastAnimated) {
                 lastAnimated = position
                 v.alpha = 0f
                 v.translationY = 26f * resources.displayMetrics.density
                 v.animate().alpha(1f).translationY(0f)
-                    .setStartDelay((position % 8) * 28L).setDuration(260).start()
+                    .setStartDelay((position % 8) * 28L).setDuration(260)
+                    .withEndAction { v.alpha = 1f; v.translationY = 0f }
+                    .start()
+            } else {
+                v.alpha = 1f
+                v.translationY = 0f
             }
             v.findViewById<Button>(R.id.btnEdit).setOnClickListener {
                 startActivity(Intent(this@ContactsActivity, EditContactActivity::class.java)

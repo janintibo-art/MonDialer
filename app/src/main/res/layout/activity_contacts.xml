@@ -11,10 +11,10 @@
 
         <TextView
             style="@style/NeonTitle"
-        android:background="@drawable/header_band"
             android:id="@+id/txtTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/header_band"
             android:gravity="center"
             android:textSize="18sp"
             android:paddingBottom="8dp" />
@@ -48,18 +48,21 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
+            <!-- La liste occupe l'espace restant ; le poids doit rester
+                 sur l'enfant direct du LinearLayout, pas sur la ListView. -->
             <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            <ListView
-                android:id="@+id/list"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginTop="8dp"
-                android:divider="?attr/cNeonDim"
-                android:dividerHeight="0.5dp" />
+                android:layout_marginTop="8dp">
+
+                <ListView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
+                    android:scrollbars="none" />
 
                 <include layout="@layout/empty_state" />
             </FrameLayout>
