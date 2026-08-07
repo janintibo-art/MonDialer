@@ -1,6 +1,7 @@
 package com.example.mondialer
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -35,6 +36,11 @@ class AiSettingsActivity : Activity() {
 
         findViewById<Button>(R.id.btnSave).setOnClickListener { save() }
         findViewById<Button>(R.id.btnTest).setOnClickListener { save(); test() }
+
+        // Appui long sur TESTER : liste les modèles ouverts à cette clé
+        findViewById<Button>(R.id.btnTest).setOnLongClickListener {
+            save(); chooseModel(); true
+        }
     }
 
     private fun save() {
@@ -45,6 +51,37 @@ class AiSettingsActivity : Activity() {
         Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
     }
 
+    /** Demande à Google la liste des modèles accessibles, et laisse choisir. */
+    private fun chooseModel() {
+        val status = findViewById<TextView>(R.id.txtStatus)
+        status.text = getString(R.string.ai_listing)
+        Thread {
+            try {
+                val models = AiClient.listModels()
+                runOnUiThread {
+                    status.text = ""
+                    if (models.isEmpty()) {
+                        Toast.makeText(this, R.string.ai_no_model, Toast.LENGTH_LONG).show()
+                        return@runOnUiThread
+                    }
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.ai_pick_model)
+                        .setItems(models.toTypedArray()) { _, which ->
+                            findViewById<EditText>(R.id.editModel).setText(models[which])
+                            BlockRulesStore.aiModel = models[which]
+                            test()
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    status.text = getString(R.string.ai_test_fail, e.message ?: "")
+                }
+            }
+        }.start()
+    }
+
     private fun test() {
         val status = findViewById<TextView>(R.id.txtStatus)
         status.text = getString(R.string.ai_testing)
@@ -53,6 +90,10 @@ class AiSettingsActivity : Activity() {
                 val r = AiClient.ask(
                     "Réponds en français, très brièvement.",
                     "Dis bonjour en une phrase.")
+                // Le repli automatique a pu changer de modèle : on l'affiche
+                runOnUiThread {
+                    findViewById<EditText>(R.id.editModel).setText(BlockRulesStore.aiModel)
+                }
                 getString(R.string.ai_test_ok, r.trim().take(60))
             } catch (e: Exception) {
                 getString(R.string.ai_test_fail, e.message ?: "")

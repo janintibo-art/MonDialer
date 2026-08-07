@@ -186,7 +186,7 @@
     <string name="ai_button_long">✨ SUGGÉRER</string>
     <string name="ai_key">Clé API (collez-la ici)</string>
     <string name="ai_tone">Ton des réponses (ex : amical et naturel)</string>
-    <string name="ai_key_hint">L’assistant utilise Google Gemini, dont l’usage est gratuit. Créez votre clé sur %1$s, collez-la ci-dessous, puis testez. Le champ modèle peut rester vide (%2$s par défaut).</string>
+    <string name="ai_key_hint">L’assistant utilise Google Gemini, dont l’usage est gratuit. Créez votre clé sur %1$s, collez-la ci-dessous, puis testez. Laissez le champ modèle vide : %2$s suit automatiquement le modèle courant. Appui long sur TESTER pour en choisir un autre.</string>
     <string name="ai_get_key">🔑 OBTENIR UNE CLÉ GRATUITE</string>
     <string name="ai_test">TESTER</string>
     <string name="ai_testing">Test en cours…</string>
@@ -318,4 +318,7 @@
     <string name="notif_blocked_title">Appel bloqué : %s</string>
     <string name="empty_messages">Aucune conversation pour l’instant.\nAppuyez sur ✎ NOUVEAU pour écrire à quelqu’un.</string>
     <string name="empty_contacts">Aucun contact trouvé.\nAppuyez sur + pour en créer un.</string>
+    <string name="ai_listing">Recherche des modèles disponibles…</string>
+    <string name="ai_pick_model">Modèles accessibles avec votre clé</string>
+    <string name="ai_no_model">Aucun modèle disponible pour cette clé</string>
 </resources>

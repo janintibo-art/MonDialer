@@ -289,7 +289,14 @@ object BlockRulesStore {
         set(v) { prefs(appCtx).edit().putString("ai_key", v).apply() }
 
     var aiModel: String
-        get() = prefs(appCtx).getString("ai_model", "") ?: ""
+        get() {
+            val m = prefs(appCtx).getString("ai_model", "") ?: ""
+            // Les identifiants figés finissent par être retirés par Google :
+            // on repart de l'alias courant plutôt que d'échouer.
+            val obsolete = listOf("gemini-2.5-flash", "gemini-2.0-flash",
+                "gemini-1.5-flash", "gemini-pro")
+            return if (m in obsolete) "" else m
+        }
         set(v) { prefs(appCtx).edit().putString("ai_model", v).apply() }
 
     /** Ton demandé aux suggestions : amical, neutre, professionnel... */
