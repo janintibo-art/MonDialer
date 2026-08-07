@@ -41,13 +41,20 @@ class SmsReceiver : BroadcastReceiver() {
             val pi = PendingIntent.getActivity(
                 context, address.hashCode(), open,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            val notif = Notification.Builder(context, "sms")
+            // Le nom du contact prime sur le numéro brut
+            val who = ContactLookup.displayName(context, address)
+            val builder = Notification.Builder(context, "sms")
                 .setSmallIcon(android.R.drawable.sym_action_chat)
-                .setContentTitle(address)
+                .setContentTitle(who)
                 .setContentText(body.take(120))
+                .setStyle(Notification.BigTextStyle().bigText(body))
                 .setContentIntent(pi)
                 .setAutoCancel(true)
-                .build()
+                .setCategory(Notification.CATEGORY_MESSAGE)
+            ContactLookup.photo(context, address)?.let {
+                builder.setLargeIcon(it)
+            }
+            val notif = builder.build()
             context.getSystemService(NotificationManager::class.java)
                 .notify(address.hashCode(), notif)
         } catch (_: Exception) {}

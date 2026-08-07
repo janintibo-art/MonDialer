@@ -33,13 +33,16 @@ class MmsDownloadedReceiver : BroadcastReceiver() {
             val pi = PendingIntent.getActivity(
                 context, from.hashCode(), open,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            val notif = Notification.Builder(context, "sms")
+            val who = ContactLookup.displayName(context, from)
+            val builder = Notification.Builder(context, "sms")
                 .setSmallIcon(android.R.drawable.sym_action_chat)
-                .setContentTitle(from)
+                .setContentTitle(who)
                 .setContentText(text)
                 .setContentIntent(pi)
                 .setAutoCancel(true)
-                .build()
+                .setCategory(Notification.CATEGORY_MESSAGE)
+            ContactLookup.photo(context, from)?.let { builder.setLargeIcon(it) }
+            val notif = builder.build()
             context.getSystemService(NotificationManager::class.java)
                 .notify(from.hashCode(), notif)
         } catch (_: Exception) {

@@ -157,6 +157,7 @@ class EditContactActivity : Activity() {
                     ContactsContract.RawContacts.CONTACT_ID + "=?", arrayOf(id))
             }
             if (deleted > 0) {
+                ContactLookup.clearCache()
                 Toast.makeText(this, R.string.contact_deleted, Toast.LENGTH_SHORT).show()
                 finish()
             } else {
@@ -250,6 +251,7 @@ class EditContactActivity : Activity() {
                 }
             }
 
+            ContactLookup.clearCache()
             Toast.makeText(this, R.string.contact_saved, Toast.LENGTH_SHORT).show()
             finish()
         } catch (e: Exception) {

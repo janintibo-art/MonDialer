@@ -40,7 +40,8 @@ class SpamScreeningService : CallScreeningService() {
      */
     private fun notifyBlocked(number: String?, reason: String) {
         try {
-            val shown = number ?: getString(R.string.hidden_number)
+            // Un correspondant connu bloqué par erreur doit être identifiable
+            val shown = ContactLookup.displayName(this, number)
             val open = android.content.Intent(this, BlockedLogActivity::class.java)
                 .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
             val pi = android.app.PendingIntent.getActivity(

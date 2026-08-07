@@ -60,6 +60,12 @@ class InCallActivity : Activity() {
         if (number != null &&
             checkSelfPermission(Manifest.permission.READ_CONTACTS)
             == PackageManager.PERMISSION_GRANTED) {
+            ContactLookup.name(this, number)?.let {
+                findViewById<TextView>(R.id.txtName).apply {
+                    text = it
+                    visibility = View.VISIBLE
+                }
+            }
             lookupContact(number)
         }
 
