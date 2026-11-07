@@ -24,6 +24,18 @@
         android:inputType="text"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/txtSpamStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:padding="10dp"
+        android:background="?attr/panelBg"
+        android:textColor="?attr/cText"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

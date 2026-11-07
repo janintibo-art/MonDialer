@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.text.Editable
 import android.text.TextWatcher
 import android.content.Intent
+import android.net.Uri
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -23,6 +24,7 @@ class BlockedLogActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
+        findViewById<TextView>(R.id.txtSpamStats).visibility = android.view.View.VISIBLE
         val title = findViewById<TextView>(R.id.txtTitle)
         title.text = getString(R.string.blocked_log_title)
         // Appui long sur le titre : vider le journal
@@ -46,6 +48,32 @@ class BlockedLogActivity : Activity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) = render(s?.toString().orEmpty())
             })
+        }
+        // Recherche en ligne exclusivement à la demande explicite de l'utilisateur.
+        // Appui long sur une ligne : l'application ne contacte aucun annuaire en arrière-plan.
+        findViewById<ListView>(R.id.list).setOnItemLongClickListener { parent, _, position, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = parent.getItemAtPosition(position) as Map<String, String>
+            val number = item["number"].orEmpty()
+            val normalized = BlockRulesStore.normalize(number)
+            if (normalized.length < 8) {
+                Toast.makeText(this, "Numéro indisponible pour la recherche", Toast.LENGTH_SHORT).show()
+            } else {
+                AlertDialog.Builder(this)
+                    .setTitle("Rechercher l'appelant ?")
+                    .setMessage("Cette action ouvrira le navigateur et transmettra le numéro à votre moteur de recherche. Les résultats ne constituent pas une preuve d'identité.")
+                    .setPositiveButton("Rechercher") { _, _ ->
+                        val query = Uri.encode("\"$normalized\" entreprise téléphone")
+                        val uri = Uri.parse("https://www.google.com/search?q=$query")
+                        try { startActivity(Intent(Intent.ACTION_VIEW, uri)) }
+                        catch (_: Exception) {
+                            Toast.makeText(this, "Aucun navigateur disponible", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+            true
         }
         findViewById<ListView>(R.id.list).setOnItemClickListener { parent, _, position, _ ->
             @Suppress("UNCHECKED_CAST")
@@ -96,7 +124,25 @@ class BlockedLogActivity : Activity() {
             )
         }
         displayed = items
+        updateStats(BlockRulesStore.blockedLog())
         render(findViewById<EditText>(R.id.editSearch).text.toString())
+    }
+
+    // Compteurs calculés uniquement à partir de l'historique local, limité
+    // aux 200 événements conservés par BlockRulesStore.
+    private fun updateStats(entries: List<BlockRulesStore.BlockedEntry>) {
+        val now = System.currentTimeMillis()
+        val week = 7L * 24 * 60 * 60 * 1000
+        val month = 30L * 24 * 60 * 60 * 1000
+        val last7 = entries.count { it.time in (now - week)..now }
+        val last30 = entries.count { it.time in (now - month)..now }
+        val unique = entries.map { BlockRulesStore.normalize(it.number) }
+            .filter { it.isNotBlank() }.distinct().size
+        val top = entries.groupingBy { it.reason }.eachCount()
+            .maxByOrNull { it.value }?.let { "\nMotif principal : ${it.key} (${it.value})" }.orEmpty()
+        findViewById<TextView>(R.id.txtSpamStats)?.text =
+            "⛨ Antispam  •  7 j : $last7  •  30 j : $last30  •  $unique numéros distincts$top" +
+            "\nHistorique local : ${entries.size}/200 dernières entrées"
     }
 
     private fun render(query: String) {
