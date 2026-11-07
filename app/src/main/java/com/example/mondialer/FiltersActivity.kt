@@ -208,76 +208,135 @@ class FiltersActivity : Activity() {
     private lateinit var communityInfo: TextView
 
     private fun setupCommunityLists() {
-        // Le layout du filtre est le premier ScrollView de la vue d'activité.
-        val scroll = findViewById<View>(R.id.btnBlockedLog).parent.parent as? android.widget.LinearLayout
-            ?: return
+        // Catalogue local : aucun lien CSV non verifie n'est impose.
+        val scroll = findViewById<View>(R.id.btnBlockedLog).parent.parent as?
+            android.widget.LinearLayout ?: return
         val box = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(12, 18, 12, 18)
+            setPadding(14, 18, 14, 18)
             setBackgroundResource(R.drawable.card_row)
         }
-        val heading = TextView(this).apply {
-            text = "LISTES COMMUNAUTAIRES · V9.19"
+        box.addView(TextView(this).apply {
+            text = "CATALOGUE ANTISPAM · V9.20"
             textSize = 17f
             setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cNeon))
-        }
-        box.addView(heading)
+        })
         communityInfo = TextView(this).apply {
             textSize = 13f
             setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cText))
-            setPadding(4, 9, 4, 9)
+            setPadding(4, 10, 4, 10)
         }
         box.addView(communityInfo)
-        val modeBtn = Button(this).apply { text = "Mode : avertissement / blocage" }
-        modeBtn.setOnClickListener {
-            val items = arrayOf("Avertissement seulement (recommandé)",
-                "Bloquer tous les numéros des listes actives")
-            AlertDialog.Builder(this).setTitle("Politique des listes communautaires")
-                .setSingleChoiceItems(items, if (CommunityLists.mode(this) == "block") 1 else 0) { dialog, which ->
-                    CommunityLists.setMode(this, if (which == 1) "block" else "warn")
-                    refreshCommunityInfo()
-                    dialog.dismiss()
-                }.setNegativeButton(android.R.string.cancel, null).show()
-        }
-        box.addView(modeBtn)
-        for ((id, label, request) in listOf(
-            Triple("saracroche", "Saracroche", 91), Triple("nocall", "NoCall", 92))) {
-            val sw = Switch(this).apply {
-                text = "Activer $label (après import)"
+        box.addView(Button(this).apply {
+            text = "Choisir : avertir / tout bloquer"
+            setOnClickListener {
+                val modes = arrayOf("Avertissement seulement (recommande)",
+                    "Bloquer les numeros des listes activees")
+                AlertDialog.Builder(this@FiltersActivity)
+                    .setTitle("Protection communautaire")
+                    .setSingleChoiceItems(modes,
+                        if (CommunityLists.mode(this@FiltersActivity) == "block") 1 else 0
+                    ) { dialog, choice ->
+                        CommunityLists.setMode(this@FiltersActivity,
+                            if (choice == 1) "block" else "warn")
+                        refreshCommunityInfo()
+                        dialog.dismiss()
+                    }.setNegativeButton(android.R.string.cancel, null).show()
+            }
+        })
+        box.addView(TextView(this).apply {
+            text = "ARCEP · Officiel et gratuit\nLes prefixes de demarchage sont deja " +
+                "integres dans les listes predefinies ci-dessous. " +
+                "Aucun telechargement communautaire requis."
+            textSize = 13f
+            setPadding(6, 12, 6, 12)
+        })
+        for ((id, name, request, site, description) in listOf(
+            listOf("saracroche", "Saracroche", "91", "https://saracroche.org/",
+                "Listes communautaires ; format CSV public direct non confirme."),
+            listOf("nocall", "NoCall", "92", "https://nocall.io/fr/numeros-indesirables",
+                "CSV CC BY 4.0 ; liste francaise actuellement vide. Attribution : NoCall (nocall.io).")
+        )) {
+            val section = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(6, 12, 6, 8)
+            }
+            section.addView(TextView(this).apply {
+                text = name + "\n" + description
+                textSize = 13f
+                setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cText))
+            })
+            section.addView(Switch(this).apply {
+                text = "Activer $name"
                 isChecked = CommunityLists.enabled(this@FiltersActivity, id)
-                setOnCheckedChangeListener { _, value ->
-                    CommunityLists.setEnabled(this@FiltersActivity, id, value)
+                setOnCheckedChangeListener { _, enabled ->
+                    CommunityLists.setEnabled(this@FiltersActivity, id, enabled)
                     refreshCommunityInfo()
                 }
-            }
-            box.addView(sw)
-            val btn = Button(this).apply { text = "Importer CSV $label" }
-            btn.setOnClickListener {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "*/*"
+            })
+            section.addView(Button(this).apply {
+                text = "Installer / actualiser $name"
+                setOnClickListener { updateSavedCommunity(id, name) }
+            })
+            section.addView(Button(this).apply {
+                text = "Configurer l'URL CSV $name"
+                setOnClickListener { askDownloadCommunity(id, name) }
+            })
+            section.addView(Button(this).apply {
+                text = "Importer un fichier CSV $name"
+                setOnClickListener {
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "*/*"
+                    }
+                    startActivityForResult(intent, request.toInt())
                 }
-                startActivityForResult(intent, request)
-            }
-            box.addView(btn)
-            val download = Button(this).apply {
-                text = "Télécharger / actualiser $label (CSV HTTPS)"
-                contentDescription = "Télécharger la liste $label depuis une URL CSV"
-            }
-            download.setOnClickListener { askDownloadCommunity(id, label) }
-            box.addView(download)
-            val website = Button(this).apply { text = "Voir la source $label" }
-            website.setOnClickListener {
-                val link = if (id == "nocall")
-                    "https://nocall.io/fr/numeros-indesirables"
-                else "https://saracroche.org/"
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-            }
-            box.addView(website)
+            })
+            section.addView(Button(this).apply {
+                text = "Voir la source / telecharger sur le site"
+                setOnClickListener {
+                    try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(site))) }
+                    catch (_: Exception) {
+                        Toast.makeText(this@FiltersActivity,
+                            "Navigateur indisponible", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+            box.addView(section)
         }
-        // Insérer après le bandeau et les actions hautes, avant les thèmes.
         scroll.addView(box, 2)
         refreshCommunityInfo()
+    }
+
+    /** Un clic apres configuration : pas de nouvelle saisie de l'URL. */
+    private fun updateSavedCommunity(id: String, name: String) {
+        val url = CommunityLists.sourceUrl(this, id)
+        if (url.isBlank()) {
+            AlertDialog.Builder(this)
+                .setTitle("Source non configuree")
+                .setMessage("Aucune adresse CSV directe verifiee pour $name. " +
+                    "Ouvrez sa page officielle et importez un CSV, ou " +
+                    "renseignez une URL HTTPS valide une seule fois.")
+                .setPositiveButton("Configurer") { _, _ -> askDownloadCommunity(id, name) }
+                .setNegativeButton(android.R.string.cancel, null).show()
+            return
+        }
+        Toast.makeText(this, "Actualisation de $name...", Toast.LENGTH_SHORT).show()
+        Thread {
+            val result = try {
+                val n = CommunityLists.downloadCsv(this, id, url)
+                "$name : $n numeros importes."
+            } catch (e: Exception) {
+                "$name : mise a jour impossible (${e.message ?: "erreur"}). " +
+                    "Ancienne liste conservee."
+            }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                refreshCommunityInfo()
+                AlertDialog.Builder(this).setMessage(result)
+                    .setPositiveButton(android.R.string.ok, null).show()
+            }
+        }.start()
     }
 
     private fun refreshCommunityInfo() {
