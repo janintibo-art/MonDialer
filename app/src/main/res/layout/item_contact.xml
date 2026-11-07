@@ -5,8 +5,8 @@
     android:descendantFocusability="blocksDescendants"
     android:paddingStart="6dp"
     android:paddingEnd="6dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:background="@drawable/card_row"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
         <View
             android:layout_width="3dp"
@@ -24,8 +24,8 @@
 
         <ImageView
             android:id="@+id/avatar"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:layout_marginEnd="12dp"
             android:contentDescription="@null" />
 
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="?attr/cText"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -59,10 +59,11 @@
             style="@style/ActionBtn"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:layout_width="44dp"
+            android:layout_width="48dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
             android:textSize="15sp"
-            android:text="✎" />
+            android:text="✎"
+            android:contentDescription="Modifier le contact" />
     </LinearLayout>
 </FrameLayout>

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -106,15 +113,21 @@
             android:textStyle="bold"
             android:text="@string/answer" />
 
+
+    </LinearLayout>
+    </ScrollView>
+
         <Button
             android:id="@+id/btnHangup"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:background="?attr/dangerBg"
             android:stateListAnimator="@animator/press"
             android:textColor="?attr/cText"
             android:textStyle="bold"
             android:text="@string/hangup" />
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

@@ -93,9 +93,9 @@ class Neon3DButton @JvmOverloads constructor(
 
         // ---------- 2. Halo néon, dégradé sur 6 anneaux ----------
         paint.style = Paint.Style.STROKE
-        for (i in 6 downTo 1) {
-            paint.strokeWidth = i * 2.2f * d
-            paint.color = a(neon, ((10 + (6 - i) * 9 + press * 60) * glow).toInt())
+        for (i in 4 downTo 1) {
+            paint.strokeWidth = i * 1.8f * d
+            paint.color = a(neon, ((8 + (4 - i) * 9 + press * 40) * glow).toInt())
             canvas.drawRoundRect(body, r, r, paint)
         }
 
@@ -130,8 +130,8 @@ class Neon3DButton @JvmOverloads constructor(
         paint.shader = LinearGradient(
             0f, tmp.top, 0f, tmp.bottom,
             intArrayOf(
-                a(Color.WHITE, (185 * lift + 16).toInt()),
-                a(Color.WHITE, (72 * lift + 8).toInt()),
+                a(Color.WHITE, (115 * lift + 12).toInt()),
+                a(Color.WHITE, (50 * lift + 7).toInt()),
                 Color.TRANSPARENT),
             floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP)
         canvas.drawRect(tmp, paint)
@@ -142,7 +142,7 @@ class Neon3DButton @JvmOverloads constructor(
             body.right - body.width() * 0.14f, body.top + body.height() * 0.26f)
         paint.shader = LinearGradient(
             0f, tmp.top, 0f, tmp.bottom,
-            a(Color.WHITE, (225 * lift + 10).toInt()), Color.TRANSPARENT,
+            a(Color.WHITE, (150 * lift + 10).toInt()), Color.TRANSPARENT,
             Shader.TileMode.CLAMP)
         canvas.drawRoundRect(tmp, tmp.height(), tmp.height(), paint)
 
@@ -186,8 +186,8 @@ class Neon3DButton @JvmOverloads constructor(
         // ---------- 11. Contour néon, net et complet ----------
         paint.shader = null
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f * d
-        paint.color = a(neon, 245)
+        paint.strokeWidth = 1.6f * d
+        paint.color = a(neon, 220)
         canvas.drawRoundRect(body, r, r, paint)
 
         body.offset(0f, -sink)

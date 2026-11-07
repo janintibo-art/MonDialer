@@ -33,14 +33,14 @@
         <item name="android:textColor">?attr/cText</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">0.08</item>
+        <item name="android:letterSpacing">0.04</item>
         <item name="android:background">?attr/actionBg</item>
         <item name="android:stateListAnimator">@animator/press</item>
         <item name="android:layout_margin">3dp</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:shadowColor">?attr/cNeon</item>
-        <item name="android:shadowRadius">8</item>
+        <item name="android:shadowRadius">5</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
     </style>

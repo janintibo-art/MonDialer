@@ -70,7 +70,7 @@
             <!-- Index alphabétique tactile -->
             <LinearLayout
                 android:id="@+id/indexBar"
-                android:layout_width="26dp"
+                android:layout_width="32dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center" />
