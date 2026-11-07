@@ -5,17 +5,17 @@
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:layout_rowWeight">1</item>
-        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_margin">3dp</item>
         <item name="android:padding">0dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">32sp</item>
+        <item name="android:textSize">26sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/cText</item>
         <item name="android:background">?attr/dialBg</item>
         <item name="android:stateListAnimator">@animator/press</item>
         <item name="android:hapticFeedbackEnabled">true</item>
         <item name="android:shadowColor">?attr/cNeon</item>
-        <item name="android:shadowRadius">14</item>
+        <item name="android:shadowRadius">6</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
     </style>
