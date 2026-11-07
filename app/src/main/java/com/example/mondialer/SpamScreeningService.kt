@@ -14,6 +14,9 @@ class SpamScreeningService : CallScreeningService() {
         }
 
         val number = details.handle?.schemeSpecificPart
+        // Android peut transmettre le nom présenté par le réseau/opérateur.
+        // Cette information est parfois absente et n'est pas une identité certifiée.
+        BlockRulesStore.rememberNetworkCallerName(number, details.callerDisplayName)
         val reason = BlockRulesStore.blockReason(number)
 
         val response = CallResponse.Builder()
@@ -41,7 +44,9 @@ class SpamScreeningService : CallScreeningService() {
     private fun notifyBlocked(number: String?, reason: String) {
         try {
             // Un correspondant connu bloqué par erreur doit être identifiable
-            val shown = ContactLookup.displayName(this, number)
+            val shown = BlockRulesStore.callerAlias(number)
+                ?: BlockRulesStore.networkCallerName(number)
+                ?: ContactLookup.displayName(this, number)
             val open = android.content.Intent(this, BlockedLogActivity::class.java)
                 .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
             val pi = android.app.PendingIntent.getActivity(

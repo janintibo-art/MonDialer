@@ -44,6 +44,23 @@ object BlockRulesStore {
         return n
     }
 
+    // Les noms récupérés dans les métadonnées réseau sont indicatifs :
+    // ils ne prouvent pas que le numéro présenté appartient à cette société.
+    // Ils restent sur le téléphone, sans synchronisation ni requête externe.
+    fun networkCallerName(number: String?): String? {
+        val key = normalize(number)
+        if (key.isBlank()) return null
+        return prefs(appCtx).getString("network_caller_" + key, null)
+            ?.takeIf { it.isNotBlank() }
+    }
+
+    fun rememberNetworkCallerName(number: String?, name: String?) {
+        val key = normalize(number)
+        val cleaned = name?.trim()?.replace(Regex("[\r\n\t]"), " ")?.take(100).orEmpty()
+        if (key.isBlank() || cleaned.isBlank() || cleaned == number) return
+        prefs(appCtx).edit().putString("network_caller_" + key, cleaned).apply()
+    }
+
     // Alias d'identification définis localement par l'utilisateur :
     // ce n'est pas une identification vérifiée d'entreprise.
     fun callerAlias(number: String?): String? {

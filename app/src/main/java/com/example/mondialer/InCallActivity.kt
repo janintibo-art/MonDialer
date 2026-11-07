@@ -60,6 +60,16 @@ class InCallActivity : Activity() {
         call = c
 
         val number = c.details?.handle?.schemeSpecificPart
+        // Le nom réseau s'affiche automatiquement s'il est fourni.
+        BlockRulesStore.rememberNetworkCallerName(number, c.details?.callerDisplayName)
+        val identified = BlockRulesStore.callerAlias(number)
+            ?: BlockRulesStore.networkCallerName(number)
+        if (!identified.isNullOrBlank()) {
+            findViewById<TextView>(R.id.txtName).apply {
+                text = identified + " (indicatif, non vérifié)"
+                visibility = View.VISIBLE
+            }
+        }
         findViewById<TextView>(R.id.txtNumber).text =
             number ?: getString(R.string.hidden_number)
 

@@ -69,6 +69,8 @@ class BlockedLogActivity : Activity() {
             mapOf(
                 "title" to (BlockRulesStore.callerAlias(it.number)?.let { alias ->
                     "$alias (étiquette personnelle) — ${it.number}"
+                } ?: BlockRulesStore.networkCallerName(it.number)?.let { name ->
+                    "$name (nom transmis par le réseau, non vérifié) — ${it.number}"
                 } ?: it.number),
                 "sub" to "⛔ ${it.reason}  •  ${fmt.format(Date(it.time))}",
                 "number" to it.number
