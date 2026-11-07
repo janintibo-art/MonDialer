@@ -62,12 +62,17 @@ class BlockedLogActivity : Activity() {
                 val choices = arrayOf(
                     "PagesJaunes / PagesBlanches (recherche manuelle)",
                     "Moteur de recherche Web",
-                    "Données officielles ARCEP (opérateur attributaire)"
+                    "Données officielles ARCEP (opérateur attributaire)",
+                    "Analyser avec Gemini (sur demande)"
                 )
                 AlertDialog.Builder(this)
                     .setTitle("Identifier un numéro")
                     .setMessage("Une recherche externe transmettra ce numéro au site choisi. L'opérateur ARCEP n'est pas nécessairement l'entreprise appelante. Aucun résultat n'est une preuve d'identité.")
                     .setItems(choices) { _, which ->
+                        if (which == 3) {
+                            NumberInsight.ask(this, number, item["sub"].orEmpty())
+                            return@setItems
+                        }
                         val uri = when (which) {
                             0 -> Uri.parse("https://www.pagesjaunes.fr/annuaireinverse")
                             1 -> Uri.parse("https://www.google.com/search?q=" +
