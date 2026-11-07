@@ -105,6 +105,15 @@ class CallLogActivity : Activity() {
         else -> "•"
     }
 
+    private fun statusOf(t: Int): String = when (t) {
+        CallLog.Calls.INCOMING_TYPE -> "incoming"
+        CallLog.Calls.OUTGOING_TYPE -> "outgoing"
+        CallLog.Calls.MISSED_TYPE -> "missed"
+        CallLog.Calls.REJECTED_TYPE -> "rejected"
+        CallLog.Calls.BLOCKED_TYPE -> "blocked"
+        else -> "unknown"
+    }
+
     private fun load() {
         val out = mutableListOf<Map<String, String>>()
         val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
@@ -125,10 +134,20 @@ class CallLogActivity : Activity() {
                 val name = c.getString(1)
                 val type = c.getInt(2)
                 val date = fmt.format(Date(c.getLong(3)))
+                // Les noms issus de l'operateur ne sont PAS des identites certifiees.
+                val alias = BlockRulesStore.callerAlias(number)
+                val network = BlockRulesStore.networkCallerName(number)
+                val shown = when {
+                    !name.isNullOrBlank() -> name
+                    !alias.isNullOrBlank() -> "$alias (etiquette personnelle)"
+                    !network.isNullOrBlank() -> "$network (nom reseau non verifie)"
+                    else -> number.ifBlank { getString(R.string.hidden_number) }
+                }
                 out.add(mapOf(
-                    "title" to (if (name.isNullOrBlank()) number.ifBlank { getString(R.string.hidden_number) } else name),
+                    "title" to shown,
                     "sub" to "${typeSymbol(type)}  •  $number  •  $date",
-                    "num" to number
+                    "num" to number,
+                    "status" to statusOf(type)
                 ))
                 count++
             }
@@ -161,6 +180,8 @@ class CallLogActivity : Activity() {
     override fun onResume() {
         super.onResume()
         ThemeUtil.refreshIfNeeded(this)
+        if (checkSelfPermission(Manifest.permission.READ_CALL_LOG)
+            == PackageManager.PERMISSION_GRANTED) load()
     }
 
     override fun onDestroy() {

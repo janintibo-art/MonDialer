@@ -1,6 +1,9 @@
 package com.example.mondialer
 
 import android.app.Activity
+import android.graphics.Color
+import android.content.res.ColorStateList
+import android.widget.TextView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -23,6 +26,23 @@ class CardAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val v = super.getView(position, convertView, parent)
 
+        @Suppress("UNCHECKED_CAST")
+        val status = (getItem(position) as? Map<String, String>)?.get("status")
+        // Couleurs lisibles, distinctes du theme sans modifier le filtrage.
+        val stateColor = when (status) {
+            "incoming" -> Color.rgb(59, 220, 166)
+            "outgoing" -> Color.rgb(84, 192, 255)
+            "missed" -> Color.rgb(255, 172, 75)
+            "rejected", "blocked" -> Color.rgb(255, 92, 117)
+            else -> ThemeRes.color(activity, R.attr.cNeon)
+        }
+        v.findViewById<View>(R.id.statusStrip)?.backgroundTintList =
+            ColorStateList.valueOf(stateColor)
+        v.findViewById<TextView>(R.id.text2)?.let { sub ->
+            sub.setTextColor(if (status == "blocked" || status == "missed")
+                stateColor else ThemeRes.color(activity, R.attr.cTextDim))
+        }
+
         // Pastille : photo si disponible, sinon initiales colorées
         v.findViewById<ImageView>(R.id.avatar)?.let { img ->
             @Suppress("UNCHECKED_CAST")
@@ -34,8 +54,7 @@ class CardAdapter(
                 label = label.removePrefix(mark).trimStart()
             }
             label = label.trim()
-            val accent = ThemeRes.color(activity, R.attr.cNeon)
-            img.setImageDrawable(AvatarDrawable(label, accent))
+            img.setImageDrawable(AvatarDrawable(label, stateColor))
         }
 
         // Apparition : montée légère en fondu, décalée selon la ligne.
