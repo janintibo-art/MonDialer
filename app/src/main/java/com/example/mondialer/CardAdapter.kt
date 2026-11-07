@@ -2,7 +2,7 @@ package com.example.mondialer
 
 import android.app.Activity
 import android.graphics.Color
-import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.widget.TextView
 import android.view.View
 import android.view.ViewGroup
@@ -36,12 +36,17 @@ class CardAdapter(
             "rejected", "blocked" -> Color.rgb(255, 92, 117)
             else -> ThemeRes.color(activity, R.attr.cNeon)
         }
-        v.findViewById<View>(R.id.statusStrip)?.backgroundTintList =
-            ColorStateList.valueOf(stateColor)
-        v.findViewById<TextView>(R.id.text2)?.let { sub ->
-            sub.setTextColor(if (status == "blocked" || status == "missed")
-                stateColor else ThemeRes.color(activity, R.attr.cTextDim))
+        // Une vraie pastille unie : le tint sur le dégradé du thème était trompeur.
+        v.findViewById<View>(R.id.statusStrip)?.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 4f * activity.resources.displayMetrics.density
+            setColor(stateColor)
         }
+        v.findViewById<TextView>(R.id.text2)?.let { sub ->
+            sub.setTextColor(if (status in listOf("blocked", "rejected", "missed"))
+                stateColor else Color.rgb(207, 221, 232))
+        }
+        v.findViewById<TextView>(R.id.text1)?.setTextColor(Color.WHITE)
 
         // Pastille : photo si disponible, sinon initiales colorées
         v.findViewById<ImageView>(R.id.avatar)?.let { img ->
@@ -54,7 +59,13 @@ class CardAdapter(
                 label = label.removePrefix(mark).trimStart()
             }
             label = label.trim()
-            img.setImageDrawable(AvatarDrawable(label, stateColor))
+            val number = item?.get("num") ?: item?.get("number").orEmpty()
+            val avatarLabel = when {
+                label.equals("Numéro masqué", ignoreCase = true) || number.isBlank() -> "?"
+                label.startsWith("+") || label.firstOrNull()?.isDigit() == true -> "☎"
+                else -> label
+            }
+            img.setImageDrawable(AvatarDrawable(avatarLabel, stateColor))
         }
 
         // Apparition : montée légère en fondu, décalée selon la ligne.

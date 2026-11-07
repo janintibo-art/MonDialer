@@ -145,7 +145,7 @@ class CallLogActivity : Activity() {
                 }
                 out.add(mapOf(
                     "title" to shown,
-                    "sub" to "${typeSymbol(type)}  •  $number  •  $date",
+                    "sub" to "${typeSymbol(type)}  •  $date\n${number.ifBlank { getString(R.string.hidden_number) }}",
                     "num" to number,
                     "status" to statusOf(type)
                 ))

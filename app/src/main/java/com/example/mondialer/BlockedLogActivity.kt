@@ -78,12 +78,19 @@ class BlockedLogActivity : Activity() {
         val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
         val items = BlockRulesStore.blockedLog().map {
             mapOf(
-                "title" to (BlockRulesStore.callerAlias(it.number)?.let { alias ->
-                    "$alias (étiquette personnelle) — ${it.number}"
-                } ?: BlockRulesStore.networkCallerName(it.number)?.let { name ->
-                    "$name (nom transmis par le réseau, non vérifié) — ${it.number}"
-                } ?: it.number),
-                "sub" to "⛔ ${it.reason}  •  ${fmt.format(Date(it.time))}",
+                "title" to (BlockRulesStore.callerAlias(it.number)
+                    ?: BlockRulesStore.networkCallerName(it.number)
+                    ?: it.number.ifBlank { "Numéro masqué" }),
+                "sub" to buildString {
+                    append("⛔ ").append(it.reason)
+                    append("  •  ").append(fmt.format(Date(it.time)))
+                    append("\n")
+                    append(it.number.ifBlank { "Numéro masqué" })
+                    if (BlockRulesStore.callerAlias(it.number) != null)
+                        append("  •  Étiquette personnelle (non vérifiée)")
+                    else if (BlockRulesStore.networkCallerName(it.number) != null)
+                        append("  •  Nom réseau (non vérifié)")
+                },
                 "number" to it.number,
                 "status" to "blocked"
             )
