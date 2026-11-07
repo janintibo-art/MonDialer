@@ -21,6 +21,15 @@
         android:layout_marginBottom="10dp"
         android:background="@drawable/divider_glow" />
 
+    <Button
+        android:id="@+id/btnResumeCall"
+        style="@style/ActionBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="8dp"
+        android:text="📞 REPRENDRE L’APPEL EN COURS"
+        android:visibility="gone" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

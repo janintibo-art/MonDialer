@@ -68,6 +68,16 @@ class MainActivity : Activity() {
             display.setText(""); true
         }
 
+        findViewById<Button>(R.id.btnResumeCall).setOnClickListener {
+            if (OngoingCall.call != null) {
+                startActivity(Intent(this, InCallActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
+            } else {
+                Toast.makeText(this, "Aucun appel en cours", Toast.LENGTH_SHORT).show()
+                refreshResumeCallButton()
+            }
+        }
+
         findViewById<Button>(R.id.btnCall).setOnClickListener { placeCall() }
         findViewById<Button>(R.id.btnSaveNumber).setOnClickListener {
             val number = display.text.toString().trim()
@@ -452,8 +462,14 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun refreshResumeCallButton() {
+        findViewById<Button>(R.id.btnResumeCall).visibility =
+            if (OngoingCall.call != null) View.VISIBLE else View.GONE
+    }
+
     override fun onResume() {
         super.onResume()
+        refreshResumeCallButton()
         ThemeUtil.refreshIfNeeded(this)
         if (checkSelfPermission(Manifest.permission.READ_CONTACTS)
             == PackageManager.PERMISSION_GRANTED) {

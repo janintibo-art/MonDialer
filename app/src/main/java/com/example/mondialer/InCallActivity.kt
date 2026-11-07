@@ -87,7 +87,7 @@ class InCallActivity : Activity() {
         }
 
         findViewById<Button>(R.id.btnAnswer).setOnClickListener {
-            c.answer(VideoProfile.STATE_AUDIO_ONLY)
+            (call ?: OngoingCall.call)?.answer(VideoProfile.STATE_AUDIO_ONLY)
         }
         findViewById<Button>(R.id.btnHangup).setOnClickListener {
             val current = call ?: OngoingCall.call
