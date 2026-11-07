@@ -37,6 +37,9 @@ class SpamScreeningService : CallScreeningService() {
         // En mode avertissement, l'appel passe normalement : notification seulement.
         if (reason == null && CommunityLists.mode(applicationContext) == "warn" &&
             !BlockRulesStore.isInContacts(number)) {
+            if (SaracrocheRanges.matches(applicationContext, number)) {
+                warnCommunity(number, CommunityLists.Hit("Saracroche (plage)", 0))
+            }
             CommunityLists.match(applicationContext, number)?.let { hit ->
                 warnCommunity(number, hit)
             }
@@ -51,7 +54,7 @@ class SpamScreeningService : CallScreeningService() {
                 "community_warn", "Avertissements communautaires",
                 android.app.NotificationManager.IMPORTANCE_DEFAULT))
             val title = "Numéro signalé (non vérifié)"
-            val body = "${number ?: "Numéro inconnu"} · ${hit.source} · ${hit.reports} signalements"
+            val body = if (hit.reports > 0) "${number ?: "Numéro inconnu"} · ${hit.source} · ${hit.reports} signalements" else "${number ?: "Numéro inconnu"} · ${hit.source} (plage communautaire)"
             val notification = android.app.Notification.Builder(this, "community_warn")
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentTitle(title).setContentText(body)

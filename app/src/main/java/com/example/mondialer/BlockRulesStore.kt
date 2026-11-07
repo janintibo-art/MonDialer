@@ -475,6 +475,10 @@ object BlockRulesStore {
             ) return "Numéro imitant le mien"
         }
 
+        // V9.21 : plages Saracroche telechargees, mode blocage choisi explicitement.
+        if (CommunityLists.mode(appCtx) == "block" && !known &&
+            SaracrocheRanges.matches(appCtx, n)) return "Plage Saracroche (signalement communautaire)"
+
         // V9.18 : listes communautaires seulement en mode blocage.
         // Les autorisations explicites et les contacts restent prioritaires.
         if (CommunityLists.mode(appCtx) == "block" && !known) {

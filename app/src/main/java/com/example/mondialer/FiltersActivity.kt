@@ -221,6 +221,57 @@ class FiltersActivity : Activity() {
             textSize = 17f
             setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cNeon))
         })
+        // V9.21 : source Saracroche a plages, independante des CSV existants.
+        val arcepInfo = TextView(this).apply {
+            text = "Saracroche : plages communautaires (source sous conditions de licence). " +
+                "L'attributaire n'est pas l'entreprise appelante."
+            textSize = 12f
+            setPadding(8, 8, 8, 8)
+        }
+        box.addView(arcepInfo)
+        val rangeSwitch = Switch(this).apply {
+            text = "Activer les plages Saracroche telechargees"
+            isChecked = SaracrocheRanges.enabled(this@FiltersActivity)
+            setOnCheckedChangeListener { _, v ->
+                SaracrocheRanges.setEnabled(this@FiltersActivity, v)
+                refreshCommunityInfo()
+            }
+        }
+        box.addView(rangeSwitch)
+        val rangeButton = Button(this).apply { text = "Installer / actualiser les plages Saracroche" }
+        rangeButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Telecharger Saracroche ?")
+                .setMessage("Cette source communautaire est distincte de l'ARCEP. " +
+                    "Seules des plages reconnues seront importees. Aucune donnee sur vos appels " +
+                    "n'est transmise. En cas d'erreur, la liste actuelle est conservee.")
+                .setPositiveButton("Telecharger") { _, _ ->
+                    Toast.makeText(this, "Actualisation en cours...", Toast.LENGTH_SHORT).show()
+                    Thread {
+                        val message = try {
+                            val count = SaracrocheRanges.update(applicationContext)
+                            "Plages telechargees : $count. Activez l'interrupteur pour les utiliser."
+                        } catch (e: Exception) {
+                            "Telechargement impossible : ${e.message}. Ancienne liste conservee."
+                        }
+                        runOnUiThread {
+                            refreshCommunityInfo()
+                            AlertDialog.Builder(this).setMessage(message)
+                                .setPositiveButton(android.R.string.ok, null).show()
+                        }
+                    }.start()
+                }.setNegativeButton(android.R.string.cancel, null).show()
+        }
+        box.addView(rangeButton)
+        val onlyContacts = Switch(this).apply {
+            text = "Mode strict : contacts uniquement (autres filtres conserves)"
+            isChecked = BlockRulesStore.blockUnknown
+            setOnCheckedChangeListener { _, checked ->
+                BlockRulesStore.blockUnknown = checked
+                if (checked) askContactsPermission()
+            }
+        }
+        box.addView(onlyContacts)
         communityInfo = TextView(this).apply {
             textSize = 13f
             setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cText))
@@ -350,7 +401,9 @@ class FiltersActivity : Activity() {
                 DateFormat.SHORT, DateFormat.SHORT).format(Date(updated)) else "jamais"
             "$id : $count numéros · $enabled · MAJ : $date"
         }
-        communityInfo.text = "Mode : $mode\n" + lines.joinToString("\n") +
+        communityInfo.text = "Mode : $mode\nSaracroche plages : ${SaracrocheRanges.count(this)} · " +
+            (if (SaracrocheRanges.enabled(this)) "actives" else "inactives") +
+            "\n" + lines.joinToString("\n") +
             "\nImport CSV manuel ou téléchargement HTTPS à la demande. " +
             "Les signalements ne prouvent pas une fraude."
     }
