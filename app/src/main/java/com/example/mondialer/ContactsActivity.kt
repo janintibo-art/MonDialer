@@ -200,8 +200,10 @@ class ContactsActivity : Activity() {
                 }
             }
         } catch (_: Exception) {}
-        all = out
-        show(out)
+        all = out.sortedWith(compareBy<Contact>({ initialOf(it.name) },
+            { Normalizer.normalize(it.name, Normalizer.Form.NFD)
+                .replace(Regex("\\p{M}"), "").lowercase() }))
+        show(all)
     }
 
     private fun show(items: List<Contact>) {
@@ -242,7 +244,7 @@ class ContactsActivity : Activity() {
         bar.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                    val idx = ((event.y / v.height) * indexChars.length)
+                    val idx = ((event.y.coerceIn(0f, v.height.toFloat()) / v.height.coerceAtLeast(1)) * indexChars.length)
                         .toInt().coerceIn(0, indexChars.length - 1)
                     val ch = indexChars[idx]
                     overlay.text = ch.toString()
@@ -265,6 +267,9 @@ class ContactsActivity : Activity() {
         // Lettre absente : aller à la suivante disponible
         val start = indexChars.indexOf(ch)
         for (i in start until indexChars.length) {
+            letterPos[indexChars[i]]?.let { list.setSelection(it); return }
+        }
+        for (i in start - 1 downTo 0) {
             letterPos[indexChars[i]]?.let { list.setSelection(it); return }
         }
     }

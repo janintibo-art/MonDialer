@@ -31,6 +31,9 @@ class EditContactActivity : Activity() {
         setContentView(R.layout.activity_edit_contact)
 
         contactId = intent.getStringExtra("contact_id")
+        intent.getStringExtra("new_phone")?.let {
+            findViewById<EditText>(R.id.editPhone).setText(it)
+        }
         findViewById<TextView>(R.id.txtEditTitle).text =
             if (contactId == null) getString(R.string.new_contact)
             else getString(R.string.edit_contact)

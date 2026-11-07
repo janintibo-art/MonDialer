@@ -39,7 +39,14 @@ class InCallActivity : Activity() {
     private val callback = object : Call.Callback() {
         override fun onStateChanged(call: Call, state: Int) {
             updateUi(state)
-            if (state == Call.STATE_DISCONNECTED) finish()
+            if (state == Call.STATE_DISCONNECTED) {
+                ticker.removeCallbacks(tick)
+                // La prochaine communication peut encore être active.
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    if (!isFinishing && OngoingCall.call != null) bindCurrentCall()
+                    else finish()
+                }, 250)
+            }
         }
     }
 
@@ -48,9 +55,9 @@ class InCallActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_incall)
 
-        call = OngoingCall.call
-        val c = call
+        val c = OngoingCall.call
         if (c == null) { finish(); return }
+        call = c
 
         val number = c.details?.handle?.schemeSpecificPart
         findViewById<TextView>(R.id.txtNumber).text =
@@ -73,7 +80,17 @@ class InCallActivity : Activity() {
             c.answer(VideoProfile.STATE_AUDIO_ONLY)
         }
         findViewById<Button>(R.id.btnHangup).setOnClickListener {
-            if (c.state == Call.STATE_RINGING) c.reject(false, null) else c.disconnect()
+            val current = call ?: OngoingCall.call
+            if (current == null) {
+                android.widget.Toast.makeText(this, "Appel introuvable", android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                try {
+                    if (current.state == Call.STATE_RINGING) current.reject(false, null)
+                    else current.disconnect()
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(this, "Raccrochage impossible : vérifier l'application téléphone par défaut", android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
         // Haut-parleur
@@ -211,8 +228,29 @@ class InCallActivity : Activity() {
         super.onDestroy()
     }
 
+    private fun bindCurrentCall() {
+        val next = OngoingCall.call ?: return
+        if (next !== call) {
+            call?.unregisterCallback(callback)
+            ticker.removeCallbacks(tick)
+            connectedAt = 0L
+            call = next
+            next.registerCallback(callback)
+            findViewById<TextView>(R.id.txtNumber).text =
+                next.details?.handle?.schemeSpecificPart ?: getString(R.string.hidden_number)
+            findViewById<TextView>(R.id.txtName).visibility = View.GONE
+        }
+        updateUi(next.state)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent?) {
+        super.onNewIntent(intent)
+        bindCurrentCall()
+    }
+
     override fun onResume() {
         super.onResume()
+        bindCurrentCall()
         ThemeUtil.refreshIfNeeded(this)
     }
 }

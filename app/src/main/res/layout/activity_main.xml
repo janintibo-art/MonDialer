@@ -106,6 +106,14 @@
         android:gravity="center"
         android:hint="•••" />
 
+    <Button
+        android:id="@+id/btnSaveNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        style="@style/ActionBtn"
+        android:text="+ Enregistrer ce numéro dans les contacts" />
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

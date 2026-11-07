@@ -69,6 +69,15 @@ class MainActivity : Activity() {
         }
 
         findViewById<Button>(R.id.btnCall).setOnClickListener { placeCall() }
+        findViewById<Button>(R.id.btnSaveNumber).setOnClickListener {
+            val number = display.text.toString().trim()
+            if (number.isBlank()) {
+                Toast.makeText(this, "Saisissez un numéro", Toast.LENGTH_SHORT).show()
+            } else {
+                startActivity(Intent(this, EditContactActivity::class.java)
+                    .putExtra("new_phone", number))
+            }
+        }
 
         findViewById<Button>(R.id.btnFilters).setOnClickListener { showMenu() }
         findViewById<Button>(R.id.btnContacts).setOnClickListener {
