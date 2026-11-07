@@ -4,6 +4,9 @@ import android.content.Context
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.io.ByteArrayInputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
 
 /** Listes locales importees volontairement, jamais de telechargement implicite. */
@@ -26,6 +29,57 @@ object CommunityLists {
         require(id in ids)
         prefs(ctx).edit().putBoolean("enabled_" + id, value).apply()
     }
+    // Une adresse CSV HTTPS configurée volontairement par liste.
+    fun sourceUrl(ctx: Context, id: String): String =
+        if (id in ids) prefs(ctx).getString("source_" + id, "").orEmpty() else ""
+
+    fun setSourceUrl(ctx: Context, id: String, url: String) {
+        require(id in ids && (url.isBlank() || (URL(url).protocol == "https" &&
+            URL(url).host.isNotBlank()))) { "Une adresse HTTPS est obligatoire" }
+        prefs(ctx).edit().putString("source_" + id, url.trim()).apply()
+    }
+
+    /** Téléchargement volontaire, hors du service de filtrage des appels.
+     * Aucun numéro de l'utilisateur n'est envoyé à la source.
+     * L'ancienne liste est conservée en cas de réponse vide ou invalide.
+     */
+    fun downloadCsv(ctx: Context, id: String, url: String): Int {
+        require(id in ids)
+        val address = URL(url.trim())
+        require(address.protocol == "https" && address.host.isNotBlank() &&
+                address.userInfo == null) { "Adresse HTTPS invalide" }
+        val connection = address.openConnection() as HttpURLConnection
+        try {
+            connection.instanceFollowRedirects = false
+            connection.connectTimeout = 10000
+            connection.readTimeout = 18000
+            connection.setRequestProperty("Accept", "text/csv,text/plain,application/octet-stream")
+            connection.setRequestProperty("User-Agent", "AnarchiePhone/9.19")
+            require(connection.responseCode == 200) {
+                "Serveur indisponible : HTTP ${connection.responseCode}"
+            }
+            val type = connection.contentType.orEmpty().lowercase()
+            require(!type.contains("text/html") && !type.contains("application/json")) {
+                "Le serveur n'a pas renvoyé un CSV"
+            }
+            val bytes = connection.inputStream.use { stream ->
+                val output = java.io.ByteArrayOutputStream()
+                val buffer = ByteArray(8192)
+                while (true) {
+                    val len = stream.read(buffer)
+                    if (len < 0) break
+                    require(output.size() + len <= 10_000_000) { "CSV trop volumineux" }
+                    output.write(buffer, 0, len)
+                }
+                output.toByteArray()
+            }
+            require(bytes.isNotEmpty()) { "Liste vide : conservation des données précédentes" }
+            val count = importCsv(ctx, id, ByteArrayInputStream(bytes))
+            setSourceUrl(ctx, id, url)
+            return count
+        } finally { connection.disconnect() }
+    }
+
     fun count(ctx: Context, id: String): Int = read(ctx, id).size
     fun lastImport(ctx: Context, id: String): Long = prefs(ctx).getLong("updated_" + id, 0L)
 
@@ -80,11 +134,16 @@ object CommunityLists {
                 if (!headerChecked) {
                     delimiter = listOf(';', ',', '\t').maxByOrNull { sep -> line.count { it == sep } } ?: ';'
                     val first = line.split(delimiter).map { it.trim().trim('"').lowercase() }
-                    val indexes = listOf("number", "numero", "numéro", "phone", "telephone", "téléphone", "e164")
+                    val indexes = listOf("number", "numero", "numéro", "phone", "phone_number", "telephone", "téléphone", "e164")
                     val column = first.indexOfFirst { it in indexes }
                     val reports = listOf("reports", "report_count", "signalements", "count", "votes")
                     countIndex = first.indexOfFirst { it in reports }
                     if (column >= 0) { numIndex = column; headerChecked = true; continue }
+                    // La présence de lettres dans la 1ère ligne indique un
+                    // format non reconnu, plutôt que des données sans en-tête.
+                    require(!line.any { it.isLetter() || it == '<' || it == '>' }) {
+                        "En-tête CSV non reconnu (colonne phone_number attendue)"
+                    }
                     headerChecked = true
                 }
                 val cols = line.split(delimiter)

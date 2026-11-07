@@ -14,6 +14,7 @@ import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import android.app.AlertDialog
+import android.net.Uri
 import android.view.View
 import java.text.DateFormat
 import java.util.Date
@@ -216,7 +217,7 @@ class FiltersActivity : Activity() {
             setBackgroundResource(R.drawable.card_row)
         }
         val heading = TextView(this).apply {
-            text = "LISTES COMMUNAUTAIRES · V9.18"
+            text = "LISTES COMMUNAUTAIRES · V9.19"
             textSize = 17f
             setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cNeon))
         }
@@ -259,6 +260,20 @@ class FiltersActivity : Activity() {
                 startActivityForResult(intent, request)
             }
             box.addView(btn)
+            val download = Button(this).apply {
+                text = "Télécharger / actualiser $label (CSV HTTPS)"
+                contentDescription = "Télécharger la liste $label depuis une URL CSV"
+            }
+            download.setOnClickListener { askDownloadCommunity(id, label) }
+            box.addView(download)
+            val website = Button(this).apply { text = "Voir la source $label" }
+            website.setOnClickListener {
+                val link = if (id == "nocall")
+                    "https://nocall.io/fr/numeros-indesirables"
+                else "https://saracroche.org/"
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
+            }
+            box.addView(website)
         }
         // Insérer après le bandeau et les actions hautes, avant les thèmes.
         scroll.addView(box, 2)
@@ -271,10 +286,64 @@ class FiltersActivity : Activity() {
         val lines = listOf("saracroche", "nocall").map { id ->
             val count = CommunityLists.count(this, id)
             val enabled = if (CommunityLists.enabled(this, id)) "active" else "inactive"
-            "$id : $count numéros · $enabled"
+            val updated = CommunityLists.lastImport(this, id)
+            val date = if (updated > 0L) DateFormat.getDateTimeInstance(
+                DateFormat.SHORT, DateFormat.SHORT).format(Date(updated)) else "jamais"
+            "$id : $count numéros · $enabled · MAJ : $date"
         }
         communityInfo.text = "Mode : $mode\n" + lines.joinToString("\n") +
-            "\nFichiers CSV choisis manuellement. Les signalements ne prouvent pas une fraude."
+            "\nImport CSV manuel ou téléchargement HTTPS à la demande. " +
+            "Les signalements ne prouvent pas une fraude."
+    }
+
+    private fun askDownloadCommunity(id: String, label: String) {
+        val entry = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_VARIATION_URI
+            setSingleLine(true)
+            hint = "https://.../liste.csv"
+            setText(CommunityLists.sourceUrl(this@FiltersActivity, id))
+            selectAll()
+        }
+        val wrap = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(32, 12, 32, 4)
+            addView(TextView(this@FiltersActivity).apply {
+                text = "Collez l'URL directe du fichier CSV publiée par $label. " +
+                    "Aucun téléchargement automatique sans votre accord. " +
+                    "Une liste vide ou invalide ne remplacera pas l'ancienne."
+                setPadding(0, 0, 0, 12)
+            })
+            addView(entry)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Actualiser $label")
+            .setView(wrap)
+            .setPositiveButton("Télécharger") { _, _ ->
+                val url = entry.text.toString().trim()
+                if (!url.startsWith("https://")) {
+                    Toast.makeText(this, "URL HTTPS requise", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Téléchargement en cours…", Toast.LENGTH_SHORT).show()
+                    Thread {
+                        val result = try {
+                            val count = CommunityLists.downloadCsv(this, id, url)
+                            "Liste $label mise à jour : $count numéros. " +
+                                "Mode actuel : ${CommunityLists.mode(this)}."
+                        } catch (e: Exception) {
+                            "Mise à jour impossible : ${e.message ?: "Erreur réseau / CSV"}. " +
+                                "Ancienne liste conservée."
+                        }
+                        runOnUiThread {
+                            refreshCommunityInfo()
+                            AlertDialog.Builder(this).setMessage(result)
+                                .setPositiveButton(android.R.string.ok, null).show()
+                        }
+                    }.start()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun importCommunity(requestCode: Int, data: Intent?) {
