@@ -59,12 +59,21 @@ class BlockedLogActivity : Activity() {
             if (normalized.length < 8) {
                 Toast.makeText(this, "Numéro indisponible pour la recherche", Toast.LENGTH_SHORT).show()
             } else {
+                val choices = arrayOf(
+                    "PagesJaunes / PagesBlanches (recherche manuelle)",
+                    "Moteur de recherche Web",
+                    "Données officielles ARCEP (opérateur attributaire)"
+                )
                 AlertDialog.Builder(this)
-                    .setTitle("Rechercher l'appelant ?")
-                    .setMessage("Cette action ouvrira le navigateur et transmettra le numéro à votre moteur de recherche. Les résultats ne constituent pas une preuve d'identité.")
-                    .setPositiveButton("Rechercher") { _, _ ->
-                        val query = Uri.encode("\"$normalized\" entreprise téléphone")
-                        val uri = Uri.parse("https://www.google.com/search?q=$query")
+                    .setTitle("Identifier un numéro")
+                    .setMessage("Une recherche externe transmettra ce numéro au site choisi. L'opérateur ARCEP n'est pas nécessairement l'entreprise appelante. Aucun résultat n'est une preuve d'identité.")
+                    .setItems(choices) { _, which ->
+                        val uri = when (which) {
+                            0 -> Uri.parse("https://www.pagesjaunes.fr/annuaireinverse")
+                            1 -> Uri.parse("https://www.google.com/search?q=" +
+                                Uri.encode("\"$normalized\" entreprise téléphone"))
+                            else -> Uri.parse("https://www.data.gouv.fr/datasets/ressources-en-numerotation-telephonique")
+                        }
                         try { startActivity(Intent(Intent.ACTION_VIEW, uri)) }
                         catch (_: Exception) {
                             Toast.makeText(this, "Aucun navigateur disponible", Toast.LENGTH_SHORT).show()
