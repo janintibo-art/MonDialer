@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.EditText
+import android.content.Intent
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +36,30 @@ class BlockedLogActivity : Activity() {
         }
 
         findViewById<EditText>(R.id.editSearch).visibility = android.view.View.GONE
+        findViewById<ListView>(R.id.list).setOnItemClickListener { parent, _, position, _ ->
+            @Suppress("UNCHECKED_CAST")
+            val item = parent.getItemAtPosition(position) as Map<String, String>
+            val number = item["number"] ?: return@setOnItemClickListener
+            val field = EditText(this).apply {
+                hint = "Entreprise ou nom supposé (local, non vérifié)"
+                setText(BlockRulesStore.callerAlias(number).orEmpty())
+                setSingleLine(true)
+            }
+            AlertDialog.Builder(this)
+                .setTitle("Étiquette personnelle — $number")
+                .setMessage("Cette étiquette est enregistrée uniquement sur votre téléphone. Elle ne prouve pas l’identité de l’appelant.")
+                .setView(field)
+                .setPositiveButton("Enregistrer") { _, _ ->
+                    BlockRulesStore.saveCallerAlias(number, field.text.toString())
+                    load()
+                }
+                .setNeutralButton("Effacer") { _, _ ->
+                    BlockRulesStore.saveCallerAlias(number, "")
+                    load()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
         load()
     }
 
@@ -42,8 +67,11 @@ class BlockedLogActivity : Activity() {
         val fmt = SimpleDateFormat("dd/MM HH:mm", Locale.FRANCE)
         val items = BlockRulesStore.blockedLog().map {
             mapOf(
-                "title" to it.number,
-                "sub" to "⛔ ${it.reason}  •  ${fmt.format(Date(it.time))}"
+                "title" to (BlockRulesStore.callerAlias(it.number)?.let { alias ->
+                    "$alias (étiquette personnelle) — ${it.number}"
+                } ?: it.number),
+                "sub" to "⛔ ${it.reason}  •  ${fmt.format(Date(it.time))}",
+                "number" to it.number
             )
         }
         val list = findViewById<ListView>(R.id.list)

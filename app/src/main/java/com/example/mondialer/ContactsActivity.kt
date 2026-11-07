@@ -219,10 +219,12 @@ class ContactsActivity : Activity() {
     }
 
     private fun filter(q: String) {
-        val query = q.trim().lowercase()
+        fun clean(value: String): String = Normalizer.normalize(value, Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}"), "").lowercase(java.util.Locale.ROOT)
+        val query = clean(q.trim())
         if (query.isEmpty()) { show(all); return }
         show(all.filter {
-            it.name.lowercase().contains(query) || it.number.contains(query)
+            clean(it.name).contains(query) || it.number.contains(q.trim())
         })
     }
 

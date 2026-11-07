@@ -44,6 +44,25 @@ object BlockRulesStore {
         return n
     }
 
+    // Alias d'identification définis localement par l'utilisateur :
+    // ce n'est pas une identification vérifiée d'entreprise.
+    fun callerAlias(number: String?): String? {
+        val key = normalize(number)
+        if (key.isBlank()) return null
+        return prefs(appCtx).getString("caller_alias_" + key, null)
+            ?.takeIf { it.isNotBlank() }
+    }
+
+    fun saveCallerAlias(number: String, alias: String) {
+        val key = normalize(number)
+        if (key.isBlank()) return
+        val edit = prefs(appCtx).edit()
+        val name = alias.trim()
+        if (name.isEmpty()) edit.remove("caller_alias_" + key)
+        else edit.putString("caller_alias_" + key, name)
+        edit.apply()
+    }
+
     // ---- Options ----
     var blockHidden: Boolean
         get() = prefs(appCtx).getBoolean("hidden", false)

@@ -67,7 +67,8 @@ class CallLogActivity : Activity() {
                 getString(R.string.action_dial_pad),
                 getString(R.string.action_block_number, num),
                 getString(R.string.action_block_prefix, prefix),
-                getString(R.string.report_call_menu)
+                getString(R.string.report_call_menu),
+                "Enregistrer dans les contacts"
             )
             AlertDialog.Builder(this)
                 .setTitle(num)
@@ -86,6 +87,8 @@ class CallLogActivity : Activity() {
                             Toast.makeText(this, R.string.prefix_blocked, Toast.LENGTH_SHORT).show()
                         }
                         3 -> Report33700.reportCall(this, num)
+                        4 -> startActivity(Intent(this, EditContactActivity::class.java)
+                            .putExtra("new_phone", num))
                     }
                 }
                 .show()

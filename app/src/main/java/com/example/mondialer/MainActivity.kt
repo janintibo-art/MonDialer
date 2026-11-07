@@ -455,6 +455,13 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         ThemeUtil.refreshIfNeeded(this)
+        if (checkSelfPermission(Manifest.permission.READ_CONTACTS)
+            == PackageManager.PERMISSION_GRANTED) {
+            contactsLoaded = false
+            loadContacts()
+            loadFavorites()
+            updateSuggestions(display.text.toString())
+        }
     }
 
     override fun onDestroy() {
