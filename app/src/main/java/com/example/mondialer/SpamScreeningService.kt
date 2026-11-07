@@ -34,7 +34,30 @@ class SpamScreeningService : CallScreeningService() {
                     .setSkipNotification(true)
             }
         }
+        // En mode avertissement, l'appel passe normalement : notification seulement.
+        if (reason == null && CommunityLists.mode(applicationContext) == "warn" &&
+            !BlockRulesStore.isInContacts(number)) {
+            CommunityLists.match(applicationContext, number)?.let { hit ->
+                warnCommunity(number, hit)
+            }
+        }
         respondToCall(details, response.build())
+    }
+
+    private fun warnCommunity(number: String?, hit: CommunityLists.Hit) {
+        try {
+            val manager = getSystemService(android.app.NotificationManager::class.java)
+            manager.createNotificationChannel(android.app.NotificationChannel(
+                "community_warn", "Avertissements communautaires",
+                android.app.NotificationManager.IMPORTANCE_DEFAULT))
+            val title = "Numéro signalé (non vérifié)"
+            val body = "${number ?: "Numéro inconnu"} · ${hit.source} · ${hit.reports} signalements"
+            val notification = android.app.Notification.Builder(this, "community_warn")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle(title).setContentText(body)
+                .setAutoCancel(true).build()
+            manager.notify((number ?: "").hashCode(), notification)
+        } catch (_: Exception) { }
     }
 
     /**

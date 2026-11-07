@@ -475,6 +475,13 @@ object BlockRulesStore {
             ) return "Numéro imitant le mien"
         }
 
+        // V9.18 : listes communautaires seulement en mode blocage.
+        // Les autorisations explicites et les contacts restent prioritaires.
+        if (CommunityLists.mode(appCtx) == "block" && !known) {
+            val hit = CommunityLists.match(appCtx, n)
+            if (hit != null) return "Liste communautaire ${hit.source} (${hit.reports} signalements)"
+        }
+
         return null
     }
 

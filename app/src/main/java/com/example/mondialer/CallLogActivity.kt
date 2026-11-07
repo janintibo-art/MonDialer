@@ -145,9 +145,12 @@ class CallLogActivity : Activity() {
                     !network.isNullOrBlank() -> "$network (nom reseau non verifie)"
                     else -> number.ifBlank { getString(R.string.hidden_number) }
                 }
+                val community = CommunityLists.match(this, number)
+                val communityNote = if (community == null) "" else
+                    "\n⚠ ${community.source} : ${community.reports} signalements (non vérifiés)"
                 out.add(mapOf(
                     "title" to shown,
-                    "sub" to "${typeSymbol(type)}  •  $date\n${number.ifBlank { getString(R.string.hidden_number) }}",
+                    "sub" to "${typeSymbol(type)}  •  $date\n${number.ifBlank { getString(R.string.hidden_number) }}$communityNote",
                     "num" to number,
                     "status" to statusOf(type)
                 ))

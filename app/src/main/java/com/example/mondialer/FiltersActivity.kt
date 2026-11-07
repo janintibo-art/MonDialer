@@ -13,6 +13,10 @@ import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import android.app.AlertDialog
+import android.view.View
+import java.text.DateFormat
+import java.util.Date
 
 class FiltersActivity : Activity() {
 
@@ -35,6 +39,9 @@ class FiltersActivity : Activity() {
             i.type = "*/*"
             startActivityForResult(i, 40)
         }
+
+        // V9.18 : listes communautaires facultatives, choix global warn/block.
+        setupCommunityLists()
 
         // Palettes complètes avec aperçu multicolore et thème actif mis en avant.
         val themeOptions = listOf(
@@ -197,6 +204,97 @@ class FiltersActivity : Activity() {
         }
     }
 
+    private lateinit var communityInfo: TextView
+
+    private fun setupCommunityLists() {
+        // Le layout du filtre est le premier ScrollView de la vue d'activité.
+        val scroll = findViewById<View>(R.id.btnBlockedLog).parent.parent as? android.widget.LinearLayout
+            ?: return
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(12, 18, 12, 18)
+            setBackgroundResource(R.drawable.card_row)
+        }
+        val heading = TextView(this).apply {
+            text = "LISTES COMMUNAUTAIRES · V9.18"
+            textSize = 17f
+            setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cNeon))
+        }
+        box.addView(heading)
+        communityInfo = TextView(this).apply {
+            textSize = 13f
+            setTextColor(ThemeRes.color(this@FiltersActivity, R.attr.cText))
+            setPadding(4, 9, 4, 9)
+        }
+        box.addView(communityInfo)
+        val modeBtn = Button(this).apply { text = "Mode : avertissement / blocage" }
+        modeBtn.setOnClickListener {
+            val items = arrayOf("Avertissement seulement (recommandé)",
+                "Bloquer tous les numéros des listes actives")
+            AlertDialog.Builder(this).setTitle("Politique des listes communautaires")
+                .setSingleChoiceItems(items, if (CommunityLists.mode(this) == "block") 1 else 0) { dialog, which ->
+                    CommunityLists.setMode(this, if (which == 1) "block" else "warn")
+                    refreshCommunityInfo()
+                    dialog.dismiss()
+                }.setNegativeButton(android.R.string.cancel, null).show()
+        }
+        box.addView(modeBtn)
+        for ((id, label, request) in listOf(
+            Triple("saracroche", "Saracroche", 91), Triple("nocall", "NoCall", 92))) {
+            val sw = Switch(this).apply {
+                text = "Activer $label (après import)"
+                isChecked = CommunityLists.enabled(this@FiltersActivity, id)
+                setOnCheckedChangeListener { _, value ->
+                    CommunityLists.setEnabled(this@FiltersActivity, id, value)
+                    refreshCommunityInfo()
+                }
+            }
+            box.addView(sw)
+            val btn = Button(this).apply { text = "Importer CSV $label" }
+            btn.setOnClickListener {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                }
+                startActivityForResult(intent, request)
+            }
+            box.addView(btn)
+        }
+        // Insérer après le bandeau et les actions hautes, avant les thèmes.
+        scroll.addView(box, 2)
+        refreshCommunityInfo()
+    }
+
+    private fun refreshCommunityInfo() {
+        if (!::communityInfo.isInitialized) return
+        val mode = if (CommunityLists.mode(this) == "block") "BLOCAGE" else "AVERTISSEMENT"
+        val lines = listOf("saracroche", "nocall").map { id ->
+            val count = CommunityLists.count(this, id)
+            val enabled = if (CommunityLists.enabled(this, id)) "active" else "inactive"
+            "$id : $count numéros · $enabled"
+        }
+        communityInfo.text = "Mode : $mode\n" + lines.joinToString("\n") +
+            "\nFichiers CSV choisis manuellement. Les signalements ne prouvent pas une fraude."
+    }
+
+    private fun importCommunity(requestCode: Int, data: Intent?) {
+        val id = if (requestCode == 91) "saracroche" else "nocall"
+        val uri = data?.data ?: return
+        Toast.makeText(this, "Import en cours...", Toast.LENGTH_SHORT).show()
+        Thread {
+            val result = try {
+                val stream = contentResolver.openInputStream(uri) ?: error("Fichier inaccessible")
+                val n = CommunityLists.importCsv(this, id, stream)
+                "Import $id : $n numéros enregistrés"
+            } catch (e: Exception) { "Import impossible : ${e.message ?: "CSV invalide"}" }
+            runOnUiThread {
+                refreshCommunityInfo()
+                AlertDialog.Builder(this).setMessage(result)
+                    .setPositiveButton(android.R.string.ok, null).show()
+            }
+        }.start()
+    }
+
     private fun exportRules() {
         try {
             val values = ContentValues().apply {
@@ -220,6 +318,10 @@ class FiltersActivity : Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode in 91..92 && resultCode == RESULT_OK) {
+            importCommunity(requestCode, data)
+            return
+        }
         if (requestCode == 40 && resultCode == RESULT_OK) {
             val uri = data?.data ?: return
             try {
@@ -259,6 +361,7 @@ class FiltersActivity : Activity() {
     override fun onResume() {
         super.onResume()
         ThemeUtil.refreshIfNeeded(this)
+        refreshCommunityInfo()
     }
 
     override fun onDestroy() {
